@@ -4,12 +4,9 @@ import { Redirect, Tabs, router } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { LoadingScreen } from '@/components/LoadingScreen';
 import { Colors, Spacing, FontSizes, BorderRadii, Shadows } from '@/constants/theme';
-import { Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LayoutDashboard, User, CalendarDays, CreditCard, MessageSquare, AlertTriangle } from 'lucide-react-native';
 import { supabase } from '@/lib/supabase';
-
-const IS_WEB = Platform.OS === 'web';
 
 type TrialState = 'loading' | 'ok' | 'warning' | 'expired';
 
@@ -89,8 +86,6 @@ export default function TrainerAppLayout() {
           tabBarStyle: {
             borderTopColor: Colors.neutral[200],
             backgroundColor: Colors.white,
-            height: 62,
-            paddingBottom: 10,
           },
           tabBarLabelStyle: { fontSize: 11, fontWeight: '600' },
         }}
@@ -104,7 +99,6 @@ export default function TrainerAppLayout() {
           options={{
             title: 'Assinatura',
             tabBarIcon: ({ color, size }) => <CreditCard size={size} color={color} />,
-            href: IS_WEB ? undefined : null,
           }}
         />
       </Tabs>

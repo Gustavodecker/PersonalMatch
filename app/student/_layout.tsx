@@ -19,8 +19,6 @@ export default function StudentLayout() {
         tabBarStyle: {
           borderTopColor: Colors.neutral[200],
           backgroundColor: Colors.white,
-          height: 62,
-          paddingBottom: 10,
         },
         tabBarLabelStyle: { fontSize: 11, fontWeight: '600' },
       }}

@@ -200,9 +200,11 @@ export default function AssinaturaScreen() {
         <ScrollView
           showsVerticalScrollIndicator={false}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); loadSubscription(); }} tintColor={Colors.primary[600]} />}
+          contentContainerStyle={{ paddingBottom: Spacing.xxl }}
         >
           <View style={s.header}>
             <Text style={s.headerTitle}>Assinatura</Text>
+            <Text style={s.headerSub}>Seu plano e faturamento</Text>
           </View>
 
           {/* Current plan */}
@@ -215,21 +217,17 @@ export default function AssinaturaScreen() {
                 <Text style={s.mobileCardLabel}>Plano atual</Text>
                 <Text style={[s.mobileCardPlan, { color: planColors.text }]}>{currentPlan.name}</Text>
               </View>
-            </View>
-
-            {subStatus && (
-              <View style={s.mobileRow}>
-                <Text style={s.mobileRowLabel}>Status</Text>
+              {subStatus && (
                 <View style={[s.statusPill, { backgroundColor: `${subStatus.color}18` }]}>
                   <View style={[s.statusDot, { backgroundColor: subStatus.color }]} />
                   <Text style={[s.statusText, { color: subStatus.color }]}>{subStatus.label}</Text>
                 </View>
-              </View>
-            )}
+              )}
+            </View>
 
             {isTrialing && subscription?.current_period_end && (
               <View style={s.mobileRow}>
-                <Text style={s.mobileRowLabel}>Teste grátis até</Text>
+                <Text style={s.mobileRowLabel}>Teste grátis ate</Text>
                 <Text style={[s.mobileRowValue, { color: Colors.primary[700] }]}>
                   {formatDate(subscription.current_period_end)}
                 </Text>
@@ -247,6 +245,28 @@ export default function AssinaturaScreen() {
               </View>
             )}
           </View>
+
+          {/* CTA para assinar/gerenciar no site */}
+          <TouchableOpacity
+            style={s.mobileCta}
+            onPress={() => Linking.openURL(`${WEB_APP_URL}/trainer/assinatura`)}
+            activeOpacity={0.85}
+          >
+            <View style={s.mobileCtaLeft}>
+              <Globe size={22} color={Colors.primary[600]} />
+              <View style={{ flex: 1 }}>
+                <Text style={s.mobileCtaTitle}>
+                  {currentPlanId === 'free' ? 'Fazer upgrade do plano' : 'Gerenciar assinatura'}
+                </Text>
+                <Text style={s.mobileCtaSub}>
+                  {currentPlanId === 'free'
+                    ? 'Assine um plano Pro ou Premium no site'
+                    : 'Cancele, altere ou atualize no site'}
+                </Text>
+              </View>
+            </View>
+            <ExternalLink size={18} color={Colors.primary[600]} />
+          </TouchableOpacity>
 
           {/* Plans overview (read-only) */}
           <Text style={s.plansTitle}>Planos disponíveis</Text>
@@ -285,30 +305,20 @@ export default function AssinaturaScreen() {
                       </View>
                     ))}
                   </View>
+                  {!isCurrent && plan.id !== 'free' && (
+                    <TouchableOpacity
+                      style={[s.mobilePlanBtn, plan.highlight && { backgroundColor: Colors.primary[600] }]}
+                      onPress={() => Linking.openURL(`${WEB_APP_URL}/trainer/assinatura`)}
+                      activeOpacity={0.85}
+                    >
+                      <ExternalLink size={14} color={Colors.white} />
+                      <Text style={s.mobilePlanBtnText}>Assinar no site</Text>
+                    </TouchableOpacity>
+                  )}
                 </View>
               );
             })}
           </View>
-
-          {/* Web-only notice with button */}
-          <View style={s.mobileNotice}>
-            <Globe size={18} color={Colors.primary[600]} />
-            <View style={{ flex: 1, gap: 10 }}>
-              <Text style={s.mobileNoticeText}>
-                Para assinar ou gerenciar sua assinatura, acesse a versão web da plataforma.
-              </Text>
-              <TouchableOpacity
-                style={s.webLinkBtn}
-                onPress={() => Linking.openURL(`${WEB_APP_URL}/trainer/assinatura`)}
-                activeOpacity={0.85}
-              >
-                <ExternalLink size={14} color={Colors.white} />
-                <Text style={s.webLinkBtnText}>Acessar versão web</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          <View style={{ height: Spacing.xxl }} />
         </ScrollView>
       </SafeAreaView>
     );
@@ -525,19 +535,21 @@ const s = StyleSheet.create({
   mobileRowLabel: { fontSize: FontSizes.sm, color: Colors.neutral[500], fontWeight: '500' },
   mobileRowValue: { fontSize: FontSizes.sm, fontWeight: '700' },
 
-  mobileNotice: {
-    flexDirection: 'row', alignItems: 'flex-start', gap: 12,
-    marginHorizontal: Spacing.lg,
-    backgroundColor: Colors.primary[50], borderRadius: 14,
-    padding: 16, borderWidth: 1, borderColor: Colors.primary[100],
+  mobileCta: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    marginHorizontal: Spacing.lg, marginBottom: Spacing.md,
+    backgroundColor: Colors.primary[600], borderRadius: 16,
+    padding: Spacing.md,
   },
-  mobileNoticeText: { fontSize: FontSizes.sm, color: Colors.primary[800], lineHeight: 20, fontWeight: '500' },
-  webLinkBtn: {
-    flexDirection: 'row', alignItems: 'center', gap: 6,
-    backgroundColor: Colors.primary[600], borderRadius: 10,
-    paddingHorizontal: 14, paddingVertical: 10, alignSelf: 'flex-start',
+  mobileCtaLeft: { flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 },
+  mobileCtaTitle: { fontSize: FontSizes.md, fontWeight: '800', color: Colors.white },
+  mobileCtaSub: { fontSize: FontSizes.xs, color: 'rgba(255,255,255,0.75)', marginTop: 2 },
+  mobilePlanBtn: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
+    backgroundColor: Colors.neutral[800], borderRadius: 10,
+    paddingVertical: 10,
   },
-  webLinkBtnText: { fontSize: FontSizes.sm, fontWeight: '700', color: Colors.white },
+  mobilePlanBtnText: { fontSize: FontSizes.sm, fontWeight: '700', color: Colors.white },
 
   mobilePlansWrap: { paddingHorizontal: Spacing.lg, gap: 10, marginBottom: Spacing.md },
   mobilePlanCard: {
