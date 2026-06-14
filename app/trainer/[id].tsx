@@ -18,7 +18,7 @@ import {
   MessageSquare, Monitor, Users, Heart,
   DollarSign, Target, CheckCircle, Phone, Calendar, LogIn,
   Home, Building2, ShieldCheck, Eye, Lock, Award,
-  ChevronRight, Image as ImageIcon, ChevronLeft,
+  ChevronRight, Image as ImageIcon, ChevronLeft, Instagram,
 } from 'lucide-react-native';
 
 const COVER_PLACEHOLDER = 'https://images.pexels.com/photos/1552242/pexels-photo-1552242.jpeg?auto=compress&cs=tinysrgb&w=1200&h=500&fit=crop';
@@ -583,6 +583,22 @@ export default function TrainerDetailScreen() {
               <BadgeCheck size={13} color={Colors.primary[500]} />
               <Text style={s.infoText}>CREF {trainer.cref}</Text>
             </View>
+          ) : null}
+
+          {trainer.instagram ? (
+            <TouchableOpacity
+              style={s.instagramRow}
+              onPress={() => {
+                const handle = trainer.instagram!.replace(/^@/, '').replace(/^https?:\/\/(www\.)?instagram\.com\/?/, '').replace(/\/$/, '');
+                Linking.openURL(`https://instagram.com/${handle}`);
+              }}
+              activeOpacity={0.75}
+            >
+              <Instagram size={14} color='#E1306C' />
+              <Text style={s.instagramText}>
+                @{trainer.instagram.replace(/^@/, '').replace(/^https?:\/\/(www\.)?instagram\.com\/?/, '').replace(/\/$/, '')}
+              </Text>
+            </TouchableOpacity>
           ) : null}
 
           <View style={s.statsStrip}>
@@ -1153,6 +1169,13 @@ const s = StyleSheet.create({
   trainerName: { fontSize: 24, fontWeight: '800', color: Colors.neutral[900], letterSpacing: -0.4 },
   infoRow: { flexDirection: 'row', alignItems: 'center', gap: 5 },
   infoText: { fontSize: FontSizes.sm, color: Colors.neutral[600], fontWeight: '500' },
+  instagramRow: {
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    alignSelf: 'flex-start',
+    backgroundColor: '#FFF0F5', paddingHorizontal: 10, paddingVertical: 5,
+    borderRadius: 999, borderWidth: 1, borderColor: '#FBCFE8',
+  },
+  instagramText: { fontSize: FontSizes.sm, fontWeight: '700', color: '#BE185D' },
 
   statsStrip: {
     flexDirection: 'row', alignItems: 'center',
