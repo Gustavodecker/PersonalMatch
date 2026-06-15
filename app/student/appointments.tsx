@@ -73,10 +73,13 @@ export default function StudentAppointments() {
   const [reviewError, setReviewError] = useState<string | null>(null);
   const [reviewSuccess, setReviewSuccess] = useState(false);
 
-  useEffect(() => { loadAppointments(); }, []);
+  useEffect(() => { if (profile?.id) loadAppointments(); }, [profile?.id]);
 
   const loadAppointments = async () => {
-    if (!profile) return;
+    if (!profile) {
+      setLoading(false);
+      return;
+    }
     const { data, error } = await supabase
       .from('appointments')
       .select(`
@@ -147,7 +150,7 @@ export default function StudentAppointments() {
     });
     setReviewSaving(false);
     if (error) {
-      setReviewError('Erro ao enviar avaliacao. Tente novamente.');
+      setReviewError(error.message ?? 'Erro ao enviar avaliacao. Tente novamente.');
       return;
     }
     setReviewedIds((prev) => new Set([...prev, reviewModal.trainer_id]));
@@ -261,8 +264,9 @@ export default function StudentAppointments() {
             const trainerName = tp?.profile?.full_name ?? 'Personal';
             const avatarUrl = tp?.profile?.avatar_url ?? AVATAR_PLACEHOLDER;
             const canCancel = apt.status === 'requested' || apt.status === 'confirmed';
-            const canReview = (apt.status === 'completed' || apt.appointment_date < today) && !reviewedIds.has(apt.trainer_id);
-            const alreadyReviewed = reviewedIds.has(apt.trainer_id);
+            const isPast = apt.appointment_date < today;
+            const canReview = (apt.status === 'completed' || (isPast && apt.status !== 'cancelled' && apt.status !== 'rejected')) && !reviewedIds.has(apt.trainer_id);
+            const alreadyReviewed = reviewedIds.has(apt.trainer_id) && (apt.status === 'completed' || isPast);
             const dateStr = formatDateShort(apt.appointment_date);
 
             return (
