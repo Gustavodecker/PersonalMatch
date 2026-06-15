@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   Image, Platform, Dimensions, TextInput, Alert, FlatList,
-  NativeScrollEvent, NativeSyntheticEvent,
+  NativeScrollEvent, NativeSyntheticEvent, Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -17,7 +17,7 @@ import {
   Dumbbell, ChevronRight, CheckCircle, Star, BadgeCheck,
   ArrowRight, Search, MapPin, Monitor, Heart,
   MessageSquare, Phone, TrendingUp, Zap, Shield,
-  Settings, Award, Lock, Target, Users, Sparkles,
+  Settings as _Settings, Award, Lock, Target, Users, Sparkles,
 } from 'lucide-react-native';
 
 const IS_WEB = Platform.OS === 'web';
@@ -84,7 +84,13 @@ const PLANS = [
     price: 'R$ 29,90',
     period: '/mês',
     desc: 'Para personais em crescimento',
-    features: ['Leads ilimitados', '8 fotos no perfil', 'Selo verificado', 'Melhor posicionamento', 'Suporte prioritário'],
+    features: [
+      'Leads ilimitados',
+      '8 fotos no perfil',
+      'Selo verificado no perfil',
+      'Melhor posicionamento na busca',
+      'Suporte prioritário via WhatsApp',
+    ],
     cta: 'Assinar Pro',
     ctaRoute: '/(auth)/register?role=trainer',
     accent: Colors.primary[600],
@@ -98,7 +104,13 @@ const PLANS = [
     price: 'R$ 59,90',
     period: '/mês',
     desc: 'Para quem quer se destacar',
-    features: ['Leads ilimitados', '20 fotos no perfil', 'Destaque na busca', 'Destaque na home', 'Métricas avançadas'],
+    features: [
+      'Leads ilimitados',
+      '20 fotos no perfil',
+      'Destaque na busca',
+      'Destaque na home da plataforma',
+      'Métricas avançadas de perfil',
+    ],
     cta: 'Assinar Premium',
     ctaRoute: '/(auth)/register?role=trainer',
     accent: Colors.warning[600],
@@ -406,6 +418,12 @@ const PublicHome: React.FC = () => {
   const [loadingTrainers, setLoadingTrainers] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const scrollRef = useRef<ScrollView>(null);
+  const sectionOffsets = useRef<Record<string, number>>({});
+
+  const scrollToSection = (key: string) => {
+    const y = sectionOffsets.current[key];
+    if (y !== undefined) scrollRef.current?.scrollTo({ y, animated: true });
+  };
 
   useEffect(() => { fetchFeaturedTrainers(); }, []);
 
@@ -452,16 +470,13 @@ const PublicHome: React.FC = () => {
           {IS_DESKTOP && (
             <View style={s.headerNav}>
               {[
-                { label: 'Buscar personal', href: '/search' as const },
-                { label: 'Como funciona', href: null },
-                { label: 'Para alunos', href: null },
-                { label: 'Para personais', href: '/(auth)/register?role=trainer' as const },
-                { label: 'Planos', href: '/(auth)/register?role=trainer' as const },
+                { label: 'Buscar personal', action: () => router.push('/search' as any) },
+                { label: 'Como funciona',   action: () => scrollToSection('como-funciona') },
+                { label: 'Para alunos',     action: () => scrollToSection('para-alunos') },
+                { label: 'Para personais',  action: () => scrollToSection('para-personais') },
+                { label: 'Planos',          action: () => scrollToSection('planos') },
               ].map((item) => (
-                <TouchableOpacity
-                  key={item.label}
-                  onPress={() => item.href && router.push(item.href as any)}
-                >
+                <TouchableOpacity key={item.label} onPress={item.action}>
                   <Text style={s.navLink}>{item.label}</Text>
                 </TouchableOpacity>
               ))}
@@ -656,7 +671,7 @@ const PublicHome: React.FC = () => {
       </View>
 
       {/* ── 4. COMO FUNCIONA ─────────────────────────────────────────────── */}
-      <View style={s.howSection}>
+      <View style={s.howSection} onLayout={(e) => { sectionOffsets.current['como-funciona'] = e.nativeEvent.layout.y; }}>
         <View style={s.pageInner}>
           <View style={s.sectionLabel}>
             <Text style={s.sectionLabelText}>PROCESSO SIMPLES</Text>
@@ -690,7 +705,7 @@ const PublicHome: React.FC = () => {
       </View>
 
       {/* ── 5. OBJETIVOS / CATEGORIAS ────────────────────────────────────── */}
-      <View style={s.catSection}>
+      <View style={s.catSection} onLayout={(e) => { sectionOffsets.current['para-alunos'] = e.nativeEvent.layout.y; }}>
         <View style={s.pageInner}>
           <View style={s.sectionHeader}>
             <View>
@@ -797,7 +812,7 @@ const PublicHome: React.FC = () => {
       </View>
 
       {/* ── 7. PARA PERSONAL TRAINERS ────────────────────────────────────── */}
-      <View style={s.forTrainersSection}>
+      <View style={s.forTrainersSection} onLayout={(e) => { sectionOffsets.current['para-personais'] = e.nativeEvent.layout.y; }}>
         <View style={s.pageInner}>
           {IS_DESKTOP ? (
             <View style={s.forTrainersDesktop}>
@@ -890,7 +905,7 @@ const PublicHome: React.FC = () => {
 
       {/* ── 8. PLANOS (web only — no payment on mobile) ──────────────────── */}
       {IS_WEB && (
-        <View style={s.plansSection}>
+        <View style={s.plansSection} onLayout={(e) => { sectionOffsets.current['planos'] = e.nativeEvent.layout.y; }}>
           <View style={s.pageInner}>
             <View style={s.plansSectionHead}>
               <View style={s.sectionPill}>
@@ -1081,10 +1096,13 @@ const PublicHome: React.FC = () => {
                 <TouchableOpacity onPress={() => router.push('/search')}>
                   <Text style={s.footerLink}>Buscar personal</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => router.push('/(auth)/register?role=trainer')}>
+                <TouchableOpacity onPress={() => scrollToSection('como-funciona')}>
+                  <Text style={s.footerLink}>Como funciona</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => scrollToSection('para-personais')}>
                   <Text style={s.footerLink}>Para personais</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => router.push('/(auth)/register?role=trainer')}>
+                <TouchableOpacity onPress={() => scrollToSection('planos')}>
                   <Text style={s.footerLink}>Planos</Text>
                 </TouchableOpacity>
               </View>
@@ -1094,26 +1112,28 @@ const PublicHome: React.FC = () => {
                   <Text style={s.footerLink}>Entrar</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => router.push('/(auth)/register?role=student')}>
-                  <Text style={s.footerLink}>Sou aluno</Text>
+                  <Text style={s.footerLink}>Cadastrar como aluno</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => router.push('/(auth)/register?role=trainer')}>
-                  <Text style={s.footerLink}>Sou personal</Text>
+                  <Text style={s.footerLink}>Cadastrar como personal</Text>
                 </TouchableOpacity>
               </View>
               <View style={s.footerCol}>
-                <Text style={s.footerColHead}>Legal</Text>
+                <Text style={s.footerColHead}>Suporte</Text>
+                <TouchableOpacity onPress={() => Linking.openURL('https://wa.me/5547992222949?text=Oi%2C%20preciso%20de%20suporte%20no%20PersonalMatch')}>
+                  <Text style={s.footerLink}>Falar com suporte</Text>
+                </TouchableOpacity>
                 <TouchableOpacity><Text style={s.footerLink}>Termos de uso</Text></TouchableOpacity>
                 <TouchableOpacity><Text style={s.footerLink}>Privacidade</Text></TouchableOpacity>
-                <TouchableOpacity><Text style={s.footerLink}>Suporte</Text></TouchableOpacity>
-                {IS_WEB && (
-                  <TouchableOpacity
-                    style={{ marginTop: 12, flexDirection: 'row', alignItems: 'center', gap: 5 }}
-                    onPress={() => router.push('/painel-restrito/dashboard' as any)}
-                  >
-                    <Settings size={11} color={Colors.neutral[700]} />
-                    <Text style={[s.footerLink, { color: Colors.neutral[700] }]}>Admin</Text>
-                  </TouchableOpacity>
-                )}
+              </View>
+              <View style={s.footerCol}>
+                <Text style={s.footerColHead}>Aplicativo</Text>
+                <TouchableOpacity onPress={() => Linking.openURL('https://apps.apple.com/app/personalmatch')}>
+                  <Text style={s.footerLink}>Download iOS</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => Linking.openURL('https://play.google.com/store/apps/details?id=com.personalmatch')}>
+                  <Text style={s.footerLink}>Download Android</Text>
+                </TouchableOpacity>
               </View>
             </View>
           </View>
@@ -1769,9 +1789,9 @@ const s = StyleSheet.create({
   footerTagline: { fontSize: 13, color: Colors.neutral[600], marginBottom: 36, lineHeight: 20 },
   footerLinks: { gap: 28, marginBottom: 40 },
   footerLinksDesktop: {
-    flexDirection: 'row', gap: 56,
+    flexDirection: 'row', gap: 40,
   },
-  footerCol: { gap: 11 },
+  footerCol: { gap: 11, flex: IS_DESKTOP ? 1 : undefined },
   footerColHead: {
     fontSize: 11, fontWeight: '700', color: Colors.neutral[500],
     textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 2,
