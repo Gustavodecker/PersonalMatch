@@ -123,12 +123,15 @@ export default function TrainerOnboarding() {
   const [bio, setBio] = useState('');
   const [experience, setExperience] = useState('');
   const [neighborhood, setNeighborhood] = useState('');
+  const [city, setCity] = useState('');
+  const [state, setState] = useState('');
   const [monthlyRate, setMonthlyRate] = useState('');
 
   // Step 1 — Modality + per-modality pricing
   const [acceptsOnline, setAcceptsOnline] = useState(false);
   const [acceptsInPerson, setAcceptsInPerson] = useState(true);
   const [acceptsHome, setAcceptsHome] = useState(false);
+  const [acceptsGym, setAcceptsGym] = useState(false);
   const [inPersonRate, setInPersonRate] = useState('');
   const [onlineRate, setOnlineRate] = useState('');
   const [homeRate, setHomeRate] = useState('');
@@ -170,15 +173,18 @@ export default function TrainerOnboarding() {
         setAcceptsOnline(data.accepts_online ?? false);
         setAcceptsInPerson(data.accepts_in_person ?? true);
         setAcceptsHome(data.accepts_home ?? false);
+        setAcceptsGym(data.accepts_gym ?? false);
         if (data.target_audience)    setTargetAudience(data.target_audience);
         if (data.objectives)         setObjectives(data.objectives);
         if (data.whatsapp)           setWhatsapp(data.whatsapp);
         if (data.instagram)          setInstagram(data.instagram);
         if (data.cover_photo_url)    setCoverUri(data.cover_photo_url);
       });
-      supabase.from('profiles').select('avatar_url, bio').eq('id', profile.id).maybeSingle().then(({ data }) => {
+      supabase.from('profiles').select('avatar_url, bio, city, state').eq('id', profile.id).maybeSingle().then(({ data }) => {
         if (data?.avatar_url) setAvatarUri(data.avatar_url);
         if (data?.bio)        setBio(data.bio);
+        if (data?.city)       setCity(data.city);
+        if (data?.state)      setState(data.state);
       });
       supabase.from('trainer_specialties').select('specialty_id').eq('trainer_id', profile.id).then(({ data }) => {
         if (data) setSelectedSpecialties(data.map((ts: any) => ts.specialty_id));
@@ -275,7 +281,7 @@ export default function TrainerOnboarding() {
   };
 
   const canProceed = () => {
-    if (step === 1) return acceptsOnline || acceptsInPerson || acceptsHome;
+    if (step === 1) return acceptsOnline || acceptsInPerson || acceptsHome || acceptsGym;
     return true;
   };
 
@@ -298,6 +304,7 @@ export default function TrainerOnboarding() {
       accepts_online: acceptsOnline,
       accepts_in_person: acceptsInPerson,
       accepts_home: acceptsHome,
+      accepts_gym: acceptsGym,
       target_audience: targetAudience,
       objectives: objectives,
       whatsapp: whatsapp.trim() || null,
@@ -306,7 +313,11 @@ export default function TrainerOnboarding() {
 
     if (err) { setError(err.message); setSaving(false); return; }
 
-    await supabase.from('profiles').update({ bio: bio.trim() || null }).eq('id', profile.id);
+    await supabase.from('profiles').update({
+      bio: bio.trim() || null,
+      city: city.trim() || null,
+      state: state.trim() || null,
+    }).eq('id', profile.id);
 
     await supabase.from('trainer_specialties').delete().eq('trainer_id', profile.id);
     if (selectedSpecialties.length > 0) {
@@ -417,7 +428,9 @@ export default function TrainerOnboarding() {
             <Text style={styles.groupLabel}>Informações profissionais</Text>
             <LabeledInput label="CREF (opcional)" value={cref} onChangeText={setCref} placeholder="000000-G/SP" autoCapitalize="characters" />
             <LabeledInput label="Anos de experiência" value={experience} onChangeText={setExperience} keyboardType="numeric" placeholder="Ex: 5" />
-            <LabeledInput label="Bairro / Cidade" value={neighborhood} onChangeText={setNeighborhood} placeholder="Ex: Pinheiros, São Paulo" />
+            <LabeledInput label="Estado" value={state} onChangeText={setState} placeholder="Ex: SP" autoCapitalize="characters" maxLength={2} />
+            <LabeledInput label="Cidade" value={city} onChangeText={setCity} placeholder="Ex: São Paulo" autoCapitalize="words" />
+            <LabeledInput label="Bairro" value={neighborhood} onChangeText={setNeighborhood} placeholder="Ex: Pinheiros" autoCapitalize="words" />
           </View>
         )}
 
@@ -431,9 +444,10 @@ export default function TrainerOnboarding() {
             <Text style={styles.groupLabel}>Modalidade de atendimento</Text>
             <View style={styles.modalityWrap}>
               {[
-                { label: 'Presencial', icon: <Users  size={20} color={acceptsInPerson ? Colors.primary[600] : Colors.neutral[500]} />, val: acceptsInPerson, set: setAcceptsInPerson },
-                { label: 'Online',     icon: <Monitor size={20} color={acceptsOnline ? Colors.primary[600] : Colors.neutral[500]} />,   val: acceptsOnline,    set: setAcceptsOnline },
-                { label: 'Domicílio',  icon: <Home    size={20} color={acceptsHome ? Colors.primary[600] : Colors.neutral[500]} />,     val: acceptsHome,      set: setAcceptsHome },
+                { label: 'Presencial', icon: <Users    size={20} color={acceptsInPerson ? Colors.primary[600] : Colors.neutral[500]} />, val: acceptsInPerson, set: setAcceptsInPerson },
+                { label: 'Online',     icon: <Monitor  size={20} color={acceptsOnline   ? Colors.primary[600] : Colors.neutral[500]} />, val: acceptsOnline,   set: setAcceptsOnline },
+                { label: 'Domicílio',  icon: <Home     size={20} color={acceptsHome     ? Colors.primary[600] : Colors.neutral[500]} />, val: acceptsHome,     set: setAcceptsHome },
+                { label: 'Academia',   icon: <Building2 size={20} color={acceptsGym     ? Colors.primary[600] : Colors.neutral[500]} />, val: acceptsGym,      set: setAcceptsGym },
               ].map((opt) => (
                 <TouchableOpacity
                   key={opt.label}
@@ -491,7 +505,7 @@ export default function TrainerOnboarding() {
                 </View>
               </View>
             )}
-            {(acceptsInPerson || acceptsHome || acceptsOnline) && (
+            {(acceptsInPerson || acceptsHome || acceptsOnline || acceptsGym) && (
               <View style={styles.priceRow}>
                 <View style={[styles.priceIcon, { backgroundColor: '#F5F3FF' }]}><Building2 size={16} color="#7C3AED" /></View>
                 <View style={styles.priceFlex}>
@@ -505,7 +519,7 @@ export default function TrainerOnboarding() {
                 </View>
               </View>
             )}
-            {(acceptsInPerson || acceptsHome || acceptsOnline) && (
+            {(acceptsInPerson || acceptsHome || acceptsOnline || acceptsGym) && (
               <View style={styles.priceRow}>
                 <View style={[styles.priceIcon, { backgroundColor: '#F0F9FF' }]}><DollarSign size={16} color="#0369A1" /></View>
                 <View style={styles.priceFlex}>
@@ -519,7 +533,7 @@ export default function TrainerOnboarding() {
                 </View>
               </View>
             )}
-            {!acceptsInPerson && !acceptsOnline && !acceptsHome && (
+            {!acceptsInPerson && !acceptsOnline && !acceptsHome && !acceptsGym && (
               <Text style={styles.emptyNote}>Selecione ao menos uma modalidade acima para definir preços.</Text>
             )}
 
@@ -601,7 +615,7 @@ export default function TrainerOnboarding() {
               <View style={{ flex: 1 }}>
                 <Text style={styles.previewName}>{profile?.full_name ?? 'Seu nome'}</Text>
                 {cref ? <Text style={styles.previewCref}>CREF {cref}</Text> : null}
-                {neighborhood ? <Text style={styles.previewNeighborhood}>{neighborhood}</Text> : null}
+                {neighborhood ? <Text style={styles.previewNeighborhood}>{[neighborhood, city, state].filter(Boolean).join(', ')}</Text> : null}
               </View>
             </View>
 

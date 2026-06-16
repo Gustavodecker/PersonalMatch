@@ -18,6 +18,8 @@ export default function TrainerProfile() {
   const [fullName, setFullName] = useState(profile?.full_name ?? '');
   const [bio, setBio] = useState(profile?.bio ?? '');
   const [city, setCity] = useState(profile?.city ?? '');
+  const [state, setState] = useState(profile?.state ?? '');
+  const [neighborhood, setNeighborhood] = useState('');
   const [saving, setSaving] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -27,10 +29,15 @@ export default function TrainerProfile() {
     if (!profile) return;
     supabase
       .from('trainers')
-      .select('is_verified')
+      .select('is_verified, neighborhood')
       .eq('id', profile.id)
       .maybeSingle()
-      .then(({ data }) => { if (data) setIsVerified(data.is_verified ?? false); });
+      .then(({ data }) => {
+        if (data) {
+          setIsVerified(data.is_verified ?? false);
+          if (data.neighborhood) setNeighborhood(data.neighborhood);
+        }
+      });
   }, [profile?.id]);
 
   const handleSignOut = async () => {
@@ -42,6 +49,7 @@ export default function TrainerProfile() {
     setFullName(profile?.full_name ?? '');
     setBio(profile?.bio ?? '');
     setCity(profile?.city ?? '');
+    setState(profile?.state ?? '');
     setSaveError(null);
     setEditModal(true);
   };
@@ -56,10 +64,16 @@ export default function TrainerProfile() {
         full_name: fullName.trim(),
         bio: bio.trim() || null,
         city: city.trim() || null,
+        state: state.trim() || null,
       })
       .eq('id', profile.id);
 
     if (error) { setSaveError(error.message); setSaving(false); return; }
+
+    if (neighborhood.trim()) {
+      await supabase.from('trainers').update({ neighborhood: neighborhood.trim() }).eq('id', profile.id);
+    }
+
     await refreshProfile();
     setSaving(false);
     setEditModal(false);
@@ -267,6 +281,29 @@ export default function TrainerProfile() {
                 onChangeText={setCity}
                 placeholder="Ex: São Paulo"
                 placeholderTextColor={Colors.neutral[400]}
+              />
+            </View>
+            <View style={styles.field}>
+              <Text style={styles.fieldLabel}>Estado</Text>
+              <TextInput
+                style={styles.fieldInput}
+                value={state}
+                onChangeText={setState}
+                placeholder="Ex: SP"
+                placeholderTextColor={Colors.neutral[400]}
+                autoCapitalize="characters"
+                maxLength={2}
+              />
+            </View>
+            <View style={styles.field}>
+              <Text style={styles.fieldLabel}>Bairro</Text>
+              <TextInput
+                style={styles.fieldInput}
+                value={neighborhood}
+                onChangeText={setNeighborhood}
+                placeholder="Ex: Pinheiros"
+                placeholderTextColor={Colors.neutral[400]}
+                autoCapitalize="words"
               />
             </View>
 

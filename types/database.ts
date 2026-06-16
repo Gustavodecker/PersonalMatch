@@ -28,6 +28,10 @@ export type Trainer = {
   latitude: number | null;
   longitude: number | null;
   neighborhood: string | null;
+  normalized_city: string | null;
+  normalized_neighborhood: string | null;
+  service_region: string | null;
+  service_radius_km: number | null;
   location_type: 'gym' | 'home' | 'both' | 'online' | null;
   accepts_online: boolean;
   accepts_in_person: boolean;
