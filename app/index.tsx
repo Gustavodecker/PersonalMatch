@@ -1123,8 +1123,8 @@ const PublicHome: React.FC = () => {
                 <TouchableOpacity onPress={() => Linking.openURL('https://wa.me/5547992222949?text=Oi%2C%20preciso%20de%20suporte%20no%20SuperShape')}>
                   <Text style={s.footerLink}>Falar com suporte</Text>
                 </TouchableOpacity>
-                <TouchableOpacity><Text style={s.footerLink}>Termos de uso</Text></TouchableOpacity>
-                <TouchableOpacity><Text style={s.footerLink}>Privacidade</Text></TouchableOpacity>
+                <TouchableOpacity onPress={() => router.push('/termos')}><Text style={s.footerLink}>Termos de uso</Text></TouchableOpacity>
+                <TouchableOpacity onPress={() => router.push('/privacidade')}><Text style={s.footerLink}>Privacidade</Text></TouchableOpacity>
               </View>
               <View style={s.footerCol}>
                 <Text style={s.footerColHead}>Aplicativo</Text>
