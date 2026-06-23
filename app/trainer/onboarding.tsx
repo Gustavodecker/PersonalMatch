@@ -327,7 +327,7 @@ export default function TrainerOnboarding() {
     }
 
     await refreshProfile();
-    router.replace('/trainer/dashboard');
+    router.replace('/trainer/(app)/dashboard');
   };
 
   const next = () => { if (step < STEPS.length - 1) setStep(step + 1); else saveAndFinish(); };

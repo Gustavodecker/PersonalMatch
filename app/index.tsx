@@ -1161,9 +1161,9 @@ const TrainerRedirect: React.FC<{ userId: string }> = ({ userId }) => {
         if (!data.cref && !data.whatsapp && data.experience_years === 0) {
           router.replace('/trainer/onboarding');
         } else {
-          router.replace('/trainer/dashboard');
+          router.replace('/trainer/(app)/dashboard');
         }
-      } catch { router.replace('/trainer/dashboard'); }
+      } catch { router.replace('/trainer/(app)/dashboard'); }
       finally { setChecked(true); }
     })();
   }, [userId]);
