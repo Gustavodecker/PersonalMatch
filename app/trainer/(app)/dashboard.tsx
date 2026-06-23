@@ -12,7 +12,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Colors, Spacing, FontSizes, Shadows } from '@/constants/theme';
 import { Lead, Appointment } from '@/types/database';
-type PlanId = 'free' | 'free_trial' | 'pro' | 'premium';
+import { getPlanById, type PlanId } from '@/src/stripe-config';
 import {
   Star, Users, Eye, MessageSquare,
   CheckCircle, XCircle, Clock, ChevronRight,
@@ -131,7 +131,7 @@ export default function TrainerDashboard() {
   const StatusIcon = statusInfo.icon;
   const firstName = profile?.full_name?.split(' ')[0] ?? '';
   const initial = profile?.full_name?.[0]?.toUpperCase() ?? '?';
-  const planName = subscriptionPlan === 'premium' ? 'Premium' : subscriptionPlan === 'pro' ? 'Pro' : subscriptionPlan === 'free_trial' ? 'Teste Gratuito' : 'Gratuito';
+  const plan = getPlanById(subscriptionPlan);
   const isPremium = subscriptionPlan === 'premium';
   const isPro = subscriptionPlan === 'pro';
   const trialDaysLeft = daysUntil(trialEnd);
@@ -216,7 +216,7 @@ export default function TrainerDashboard() {
                 : <Zap size={15} color={planBannerStyle.iconColor} />}
             </View>
             <View style={s.planBannerText}>
-              <Text style={[s.planBannerName, { color: planBannerStyle.textColor }]}>Plano {planName}</Text>
+              <Text style={[s.planBannerName, { color: planBannerStyle.textColor }]}>Plano {plan.name}</Text>
               {subscriptionPlan === 'free' && (
                 <Text style={s.planBannerSub}>Faça upgrade para mais recursos</Text>
               )}
@@ -231,7 +231,7 @@ export default function TrainerDashboard() {
                 : <Zap size={15} color={planBannerStyle.iconColor} />}
             </View>
             <View style={s.planBannerText}>
-              <Text style={[s.planBannerName, { color: planBannerStyle.textColor }]}>Plano {planName}</Text>
+              <Text style={[s.planBannerName, { color: planBannerStyle.textColor }]}>Plano {plan.name}</Text>
             </View>
           </View>
         )}

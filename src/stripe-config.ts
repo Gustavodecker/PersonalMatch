@@ -1,3 +1,62 @@
+export type PlanId = 'free' | 'free_trial' | 'pro' | 'premium';
+
+export interface Plan {
+  id: PlanId;
+  name: string;
+  priceLabel: string;
+  description: string;
+  features: string[];
+  badge?: string;
+  highlight?: boolean;
+}
+
+export const PLANS: Plan[] = [
+  {
+    id: 'free',
+    name: 'Gratuito',
+    priceLabel: 'R$ 0 / mês',
+    description: 'Para começar no marketplace',
+    features: [
+      'Perfil básico no marketplace',
+      'Até 3 fotos na galeria',
+      'Receba leads de alunos',
+    ],
+  },
+  {
+    id: 'pro',
+    name: 'Pro',
+    priceLabel: 'R$ 29,90 / mês',
+    description: 'Ideal para personal trainers em crescimento',
+    features: [
+      'Perfil destacado na busca',
+      'Até 10 fotos na galeria',
+      'Agenda de disponibilidade online',
+      'Leads ilimitados',
+      'Suporte por e-mail',
+    ],
+    badge: 'Popular',
+    highlight: true,
+  },
+  {
+    id: 'premium',
+    name: 'Premium',
+    priceLabel: 'R$ 59,90 / mês',
+    description: 'A solução completa para o máximo desempenho',
+    features: [
+      'Tudo do plano Pro',
+      'Fotos ilimitadas na galeria',
+      'Destaque no topo da busca',
+      'Badge verificado no perfil',
+      'Relatórios e estatísticas avançados',
+      'Suporte prioritário',
+    ],
+    badge: 'Melhor custo-benefício',
+  },
+];
+
+export const getPlanById = (id: PlanId): Plan =>
+  PLANS.find((p) => p.id === id) ?? PLANS[0];
+
 export interface StripeProduct {
   id: string;
   priceId: string;
