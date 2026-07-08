@@ -3,7 +3,7 @@ import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   Modal, RefreshControl, Linking,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
@@ -22,6 +22,7 @@ const TAB_OPTIONS: { key: 'pending' | 'upcoming' | 'past'; label: string }[] = [
 
 export default function AvailabilityScreen() {
   const { profile } = useAuth();
+  const insets = useSafeAreaInsets();
   const [tab, setTab] = useState<'pending' | 'upcoming' | 'past'>('pending');
   const [pendingApts, setPendingApts] = useState<Appointment[]>([]);
   const [upcomingApts, setUpcomingApts] = useState<Appointment[]>([]);
@@ -248,7 +249,7 @@ export default function AvailabilityScreen() {
       {/* Detail modal */}
       <Modal visible={!!detailApt} transparent animationType="slide" onRequestClose={() => setDetailApt(null)}>
         <View style={s.modalBg}>
-          <View style={s.modalCard}>
+          <View style={[s.modalCard, { paddingBottom: Math.max(insets.bottom, Spacing.xl) }]}>
             <View style={s.modalHeader}>
               <Text style={s.modalTitle}>Detalhes da sessão</Text>
               <TouchableOpacity onPress={() => setDetailApt(null)}>

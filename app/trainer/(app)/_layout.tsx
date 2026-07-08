@@ -66,7 +66,10 @@ export default function TrainerAppLayout() {
   }
 
   return (
-    <View style={{ flex: 1 }}>
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: trialState === 'warning' ? Colors.warning[50] : Colors.white }}
+      edges={['top']}
+    >
       {trialState === 'warning' && (
         <View style={warn.banner}>
           <AlertTriangle size={14} color={Colors.warning[700]} />
@@ -102,7 +105,7 @@ export default function TrainerAppLayout() {
           }}
         />
       </Tabs>
-    </View>
+    </SafeAreaView>
   );
 }
 

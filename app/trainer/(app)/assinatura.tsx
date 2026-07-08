@@ -28,14 +28,16 @@ const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL ?? '';
 
 const PLAN_ICONS: Record<PlanId, React.ElementType> = {
   free: Zap,
+  free_trial: Zap,
   pro: Star,
   premium: Crown,
 };
 
 const PLAN_COLORS: Record<PlanId, { bg: string; border: string; icon: string; text: string }> = {
-  free:    { bg: Colors.neutral[50],  border: Colors.neutral[200],  icon: Colors.neutral[500],  text: Colors.neutral[700] },
-  pro:     { bg: Colors.primary[50],  border: Colors.primary[200],  icon: Colors.primary[600],  text: Colors.primary[800] },
-  premium: { bg: '#FFFBEB',           border: '#FCD34D',            icon: '#D97706',            text: '#92400E' },
+  free:       { bg: Colors.neutral[50],  border: Colors.neutral[200],  icon: Colors.neutral[500],  text: Colors.neutral[700] },
+  free_trial: { bg: Colors.primary[50],  border: Colors.primary[200],  icon: Colors.primary[600],  text: Colors.primary[800] },
+  pro:        { bg: Colors.primary[50],  border: Colors.primary[200],  icon: Colors.primary[600],  text: Colors.primary[800] },
+  premium:    { bg: '#FFFBEB',           border: '#FCD34D',            icon: '#D97706',            text: '#92400E' },
 };
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
@@ -256,12 +258,14 @@ export default function AssinaturaScreen() {
               <Globe size={22} color={Colors.primary[600]} />
               <View style={{ flex: 1 }}>
                 <Text style={s.mobileCtaTitle}>
-                  {currentPlanId === 'free' ? 'Fazer upgrade do plano' : 'Gerenciar assinatura'}
+                  {currentPlanId === 'free' || currentPlanId === 'free_trial'
+                    ? 'Fazer upgrade do plano'
+                    : 'Gerenciar assinatura'}
                 </Text>
                 <Text style={s.mobileCtaSub}>
-                  {currentPlanId === 'free'
+                  {currentPlanId === 'free' || currentPlanId === 'free_trial'
                     ? 'Assine um plano Pro ou Premium no site'
-                    : 'Cancele, altere ou atualize no site'}
+                    : 'Para alterar ou cancelar, acesse o site'}
                 </Text>
               </View>
             </View>

@@ -3,7 +3,7 @@ import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   RefreshControl, Linking, TextInput, Modal,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { Colors, Spacing, FontSizes, BorderRadii, Shadows } from '@/constants/theme';
@@ -53,6 +53,7 @@ function cleanMessage(msg: string | null): string | null {
 
 export default function ContactsScreen() {
   const { profile } = useAuth();
+  const insets = useSafeAreaInsets();
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -206,7 +207,7 @@ export default function ContactsScreen() {
       {/* Detail modal */}
       <Modal visible={!!detailLead} transparent animationType="slide" onRequestClose={() => setDetailLead(null)}>
         <View style={s.modalBg}>
-          <View style={s.modalCard}>
+          <View style={[s.modalCard, { paddingBottom: Math.max(insets.bottom, Spacing.xl) }]}>
             <View style={s.modalHeader}>
               <Text style={s.modalTitle}>Contato</Text>
               <TouchableOpacity onPress={() => setDetailLead(null)}>

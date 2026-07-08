@@ -4,7 +4,7 @@ import {
   TextInput, Modal,
 } from 'react-native';
 import { router } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/Button';
@@ -14,6 +14,7 @@ import { Mail, MapPin, ExternalLink, Edit2, Check, X, Camera, BadgeCheck, Shield
 
 export default function TrainerProfile() {
   const { profile, refreshProfile, signOut } = useAuth();
+  const insets = useSafeAreaInsets();
   const [editModal, setEditModal] = useState(false);
   const [fullName, setFullName] = useState(profile?.full_name ?? '');
   const [bio, setBio] = useState(profile?.bio ?? '');
@@ -242,7 +243,7 @@ export default function TrainerProfile() {
       {/* Edit modal */}
       <Modal visible={editModal} transparent animationType="slide">
         <View style={styles.modalBg}>
-          <View style={styles.modalCard}>
+          <View style={[styles.modalCard, { paddingBottom: Math.max(insets.bottom, Spacing.xl) }]}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Editar perfil</Text>
               <TouchableOpacity onPress={() => setEditModal(false)}>
