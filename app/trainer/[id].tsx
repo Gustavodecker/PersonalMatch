@@ -1162,15 +1162,16 @@ const s = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: Spacing.lg },
   notFound: { fontSize: FontSizes.xl, color: Colors.neutral[600] },
 
-  coverWrap: { height: 320, position: 'relative' },
+  coverWrap: { height: 340, position: 'relative' },
   cover: { width: '100%', height: '100%' },
   coverNav: {
     position: 'absolute', top: 0, left: 0, right: 0,
     flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: Spacing.md,
   },
   navBtn: {
-    width: 42, height: 42, borderRadius: 21,
-    backgroundColor: 'rgba(0,0,0,0.36)', alignItems: 'center', justifyContent: 'center',
+    width: 44, height: 44, borderRadius: 22,
+    backgroundColor: 'rgba(0,0,0,0.4)', alignItems: 'center', justifyContent: 'center',
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)',
   },
   coverBadges: { position: 'absolute', bottom: 80, left: 16, flexDirection: 'row', gap: 6 },
   featuredBadge: {
@@ -1194,8 +1195,8 @@ const s = StyleSheet.create({
   profileCard: {
     backgroundColor: Colors.white,
     marginHorizontal: Spacing.md,
-    marginTop: -52,
-    borderRadius: 24,
+    marginTop: -56,
+    borderRadius: 28,
     padding: Spacing.lg,
     paddingTop: Spacing.md,
     ...Shadows.lg,
@@ -1204,10 +1205,10 @@ const s = StyleSheet.create({
   },
   profileTop: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between' },
   avatar: {
-    width: 88, height: 88, borderRadius: 44,
+    width: 96, height: 96, borderRadius: 48,
     borderWidth: 4, borderColor: Colors.white,
     backgroundColor: Colors.neutral[200],
-    marginTop: -64,
+    marginTop: -72,
   },
   profileRight: { alignItems: 'flex-end', gap: 4, paddingBottom: 4 },
   pricePill: {
@@ -1224,7 +1225,7 @@ const s = StyleSheet.create({
   priceConsulte: { fontSize: FontSizes.sm, fontWeight: '600', color: Colors.neutral[500] },
   monthlyRate: { fontSize: FontSizes.xs, color: Colors.neutral[500], fontWeight: '500' },
 
-  trainerName: { fontSize: 24, fontWeight: '800', color: Colors.neutral[900], letterSpacing: -0.4 },
+  trainerName: { fontSize: 26, fontWeight: '800', color: Colors.neutral[900], letterSpacing: -0.5, marginTop: 2 },
   infoRow: { flexDirection: 'row', alignItems: 'center', gap: 5 },
   infoText: { fontSize: FontSizes.sm, color: Colors.neutral[600], fontWeight: '500' },
   instagramRow: {
@@ -1237,12 +1238,13 @@ const s = StyleSheet.create({
 
   statsStrip: {
     flexDirection: 'row', alignItems: 'center',
-    backgroundColor: Colors.primary[50], borderRadius: 16, padding: 14, marginTop: 6,
+    backgroundColor: Colors.primary[50], borderRadius: 18, padding: 16, marginTop: 8,
+    borderWidth: 1, borderColor: Colors.primary[100],
   },
-  stripItem: { flex: 1, alignItems: 'center', gap: 3 },
-  stripVal: { fontSize: FontSizes.sm, fontWeight: '700', color: Colors.primary[900], textAlign: 'center' },
-  stripLbl: { fontSize: 10, color: Colors.primary[500], textAlign: 'center' },
-  stripDivider: { width: 1, height: 36, backgroundColor: Colors.primary[100] },
+  stripItem: { flex: 1, alignItems: 'center', gap: 4 },
+  stripVal: { fontSize: FontSizes.md, fontWeight: '800', color: Colors.primary[900], textAlign: 'center' },
+  stripLbl: { fontSize: 10, color: Colors.primary[500], textAlign: 'center', letterSpacing: 0.2 },
+  stripDivider: { width: 1, height: 38, backgroundColor: Colors.primary[100] },
 
   // Layout
   body: { paddingHorizontal: Spacing.md, paddingTop: Spacing.lg },
@@ -1262,8 +1264,8 @@ const s = StyleSheet.create({
 
   section: { marginBottom: Spacing.xl },
   sectionTitle: {
-    fontSize: FontSizes.xs, fontWeight: '700', color: Colors.neutral[400],
-    textTransform: 'uppercase', letterSpacing: 1.0, marginBottom: 14,
+    fontSize: FontSizes.sm, fontWeight: '800', color: Colors.neutral[500],
+    textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 14,
   },
   sectionHeaderRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 },
   seeAllText: { fontSize: FontSizes.sm, fontWeight: '600', color: Colors.primary[600] },
@@ -1432,22 +1434,22 @@ const s = StyleSheet.create({
   stickyBar: {
     position: 'absolute', bottom: 0, left: 0, right: 0,
     backgroundColor: Colors.white, flexDirection: 'row', alignItems: 'center', gap: 8,
-    paddingHorizontal: Spacing.md, paddingVertical: 12, paddingBottom: 24,
+    paddingHorizontal: Spacing.md, paddingVertical: 14, paddingBottom: 28,
     borderTopWidth: 1, borderTopColor: Colors.neutral[100], ...Shadows.lg,
   },
   waBtn: {
     flexDirection: 'row', alignItems: 'center', gap: 6,
-    backgroundColor: '#22C55E', paddingHorizontal: 14, paddingVertical: 13, borderRadius: 14,
+    backgroundColor: '#16A34A', paddingHorizontal: 16, paddingVertical: 14, borderRadius: 16,
   },
   waBtnText: { fontSize: FontSizes.sm, fontWeight: '700', color: Colors.white },
   contactBtn: {
     flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
-    backgroundColor: Colors.primary[600], paddingVertical: 13, borderRadius: 14,
+    backgroundColor: Colors.primary[600], paddingVertical: 14, borderRadius: 16,
   },
   contactBtnText: { fontSize: FontSizes.sm, fontWeight: '700', color: Colors.white },
   bookBtn: {
     flexDirection: 'row', alignItems: 'center', gap: 6,
-    backgroundColor: Colors.primary[50], paddingHorizontal: 14, paddingVertical: 13, borderRadius: 14,
+    backgroundColor: Colors.primary[50], paddingHorizontal: 16, paddingVertical: 14, borderRadius: 16,
     borderWidth: 1.5, borderColor: Colors.primary[200],
   },
   bookBtnText: { fontSize: FontSizes.sm, fontWeight: '700', color: Colors.primary[700] },

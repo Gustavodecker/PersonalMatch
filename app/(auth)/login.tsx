@@ -3,6 +3,7 @@ import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   KeyboardAvoidingView, Platform, Image,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '@/contexts/AuthContext';
@@ -24,7 +25,7 @@ export default function LoginScreen() {
     const { error: err } = await signIn(email.trim().toLowerCase(), password);
     setLoading(false);
     if (err) {
-      setError('E-mail ou senha incorretos.');
+      setError('E-mail ou senha incorretos. Verifique e tente novamente.');
     } else {
       router.replace('/');
     }
@@ -32,10 +33,16 @@ export default function LoginScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
+      <LinearGradient
+        colors={[Colors.primary[800], Colors.primary[600]]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={StyleSheet.absoluteFill}
+      />
       <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
 
-          {/* Hero with floating logo card */}
+          {/* Hero */}
           <View style={styles.hero}>
             <View style={styles.logoCard}>
               <Image
@@ -47,10 +54,16 @@ export default function LoginScreen() {
             <Text style={styles.tagline}>Conecte-se ao personal certo</Text>
           </View>
 
+          {/* Form card */}
           <View style={styles.card}>
-            <Text style={styles.title}>Entrar na sua conta</Text>
+            <Text style={styles.title}>Boas-vindas de volta</Text>
+            <Text style={styles.subtitle}>Entre com sua conta para continuar</Text>
 
-            {error ? <Text style={styles.errorMsg}>{error}</Text> : null}
+            {error ? (
+              <View style={styles.errorBox}>
+                <Text style={styles.errorMsg}>{error}</Text>
+              </View>
+            ) : null}
 
             <Input
               label="E-mail"
@@ -68,19 +81,31 @@ export default function LoginScreen() {
               placeholder="••••••••"
             />
 
-            <Button onPress={handleLogin} loading={loading} size="lg">Entrar</Button>
+            <View style={styles.btnWrap}>
+              <Button onPress={handleLogin} loading={loading} size="lg" style={styles.btn}>
+                Entrar
+              </Button>
+            </View>
 
-            <TouchableOpacity style={styles.link} onPress={() => router.push('/(auth)/register')}>
-              <Text style={styles.linkText}>
-                Não tem conta? <Text style={styles.linkBold}>Cadastre-se grátis</Text>
+            <View style={styles.divider}>
+              <View style={styles.divLine} />
+              <Text style={styles.divText}>ou</Text>
+              <View style={styles.divLine} />
+            </View>
+
+            <TouchableOpacity
+              style={styles.registerBtn}
+              onPress={() => router.push('/(auth)/register')}
+            >
+              <Text style={styles.registerText}>
+                Não tem conta? <Text style={styles.registerBold}>Criar conta grátis</Text>
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.homeLink} onPress={() => router.replace('/')}>
-              <Text style={styles.homeLinkText}>Voltar ao início</Text>
+              <Text style={styles.homeLinkText}>← Voltar à página inicial</Text>
             </TouchableOpacity>
           </View>
-
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -88,66 +113,88 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: Colors.primary[700] },
+  safe: { flex: 1, backgroundColor: Colors.primary[800] },
   flex: { flex: 1 },
   scroll: { flexGrow: 1 },
 
   hero: {
     alignItems: 'center',
     paddingTop: Spacing.xxxl + 8,
-    paddingBottom: Spacing.xxl + 4,
+    paddingBottom: Spacing.xl + 4,
     paddingHorizontal: Spacing.xl,
     gap: Spacing.lg,
   },
   logoCard: {
     backgroundColor: Colors.white,
-    borderRadius: 20,
-    paddingHorizontal: 28,
-    paddingVertical: 18,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.18,
-    shadowRadius: 16,
-    elevation: 8,
+    borderRadius: 22,
+    paddingHorizontal: 32,
+    paddingVertical: 20,
+    shadowColor: Colors.primary[900],
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.25,
+    shadowRadius: 20,
+    elevation: 10,
   },
-  logoImage: {
-    width: 220,
-    height: 68,
-  },
+  logoImage: { width: 220, height: 68 },
   tagline: {
     fontSize: FontSizes.md,
-    color: 'rgba(255,255,255,0.7)',
+    color: 'rgba(255,255,255,0.65)',
     textAlign: 'center',
-    letterSpacing: 0.2,
+    letterSpacing: 0.3,
   },
 
   card: {
     flex: 1,
     backgroundColor: Colors.white,
-    borderTopLeftRadius: 28,
-    borderTopRightRadius: 28,
-    padding: Spacing.xl,
-    paddingTop: Spacing.xxl + 4,
-    gap: Spacing.xs,
+    borderTopLeftRadius: 32,
+    borderTopRightRadius: 32,
+    paddingHorizontal: Spacing.xl,
+    paddingTop: 36,
+    paddingBottom: 32,
   },
   title: {
-    fontSize: FontSizes.xxl,
-    fontWeight: '700',
+    fontSize: FontSizes.xxxl,
+    fontWeight: '800',
     color: Colors.neutral[900],
-    marginBottom: Spacing.md,
-    letterSpacing: -0.3,
+    letterSpacing: -0.6,
+    marginBottom: 4,
   },
-  errorMsg: {
+  subtitle: {
+    fontSize: FontSizes.md,
+    color: Colors.neutral[500],
+    marginBottom: Spacing.xl,
+  },
+
+  errorBox: {
     backgroundColor: Colors.error[50],
-    color: Colors.error[700],
+    borderWidth: 1,
+    borderColor: Colors.error[100],
     borderRadius: BorderRadii.md,
     padding: Spacing.md,
-    fontSize: FontSizes.sm,
-    marginBottom: Spacing.sm,
+    marginBottom: Spacing.md,
   },
-  link: { alignItems: 'center', paddingVertical: Spacing.md, marginTop: Spacing.sm },
-  linkText: { fontSize: FontSizes.md, color: Colors.neutral[600] },
-  linkBold: { color: Colors.primary[600], fontWeight: '700' },
-  homeLink: { alignItems: 'center', paddingVertical: Spacing.sm },
+  errorMsg: {
+    fontSize: FontSizes.sm,
+    color: Colors.error[700],
+    fontWeight: '500',
+  },
+
+  btnWrap: { marginTop: Spacing.sm },
+  btn: { width: '100%' },
+
+  divider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
+    marginVertical: Spacing.lg,
+  },
+  divLine: { flex: 1, height: 1, backgroundColor: Colors.neutral[200] },
+  divText: { fontSize: FontSizes.sm, color: Colors.neutral[400], fontWeight: '500' },
+
+  registerBtn: { alignItems: 'center', paddingVertical: Spacing.sm },
+  registerText: { fontSize: FontSizes.md, color: Colors.neutral[600] },
+  registerBold: { color: Colors.primary[600], fontWeight: '700' },
+
+  homeLink: { alignItems: 'center', paddingTop: Spacing.lg },
   homeLinkText: { fontSize: FontSizes.sm, color: Colors.neutral[400] },
 });
