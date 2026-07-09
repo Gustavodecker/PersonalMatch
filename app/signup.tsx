@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  KeyboardAvoidingView, Platform,
+  KeyboardAvoidingView, Platform, Image,
 } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -62,7 +62,11 @@ export default function SignupScreen() {
               <ArrowLeft size={22} color={Colors.white} />
             </TouchableOpacity>
             <View style={styles.logoRow}>
-              <Dumbbell size={20} color={Colors.white} />
+              <Image
+                source={require('@/assets/images/tbuxfSzx0HD3j4sIzoHhw_TFPbJRs3_00001_(1).png')}
+                style={styles.logoIcon}
+                resizeMode="contain"
+              />
               <Text style={styles.brand}>99 Personal</Text>
             </View>
             <View style={{ width: 38 }} />
@@ -139,7 +143,8 @@ const styles = StyleSheet.create({
     padding: Spacing.lg,
   },
   back: { padding: Spacing.xs },
-  logoRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  logoRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  logoIcon: { width: 32, height: 32, borderRadius: 10 },
   brand: { fontSize: FontSizes.lg, fontWeight: '700', color: Colors.white },
   card: {
     flex: 1, backgroundColor: Colors.white,

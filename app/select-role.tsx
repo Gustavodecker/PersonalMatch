@@ -36,9 +36,11 @@ export default function SelectRoleScreen() {
       <View style={styles.container}>
         {/* Header */}
         <View style={styles.header}>
-          <View style={styles.logoWrap}>
-            <Dumbbell size={22} color={Colors.white} strokeWidth={2.5} />
-          </View>
+          <Image
+            source={require('@/assets/images/tbuxfSzx0HD3j4sIzoHhw_TFPbJRs3_00001_(1).png')}
+            style={styles.logoWrap}
+            resizeMode="contain"
+          />
           <Text style={styles.appName}>99 Personal</Text>
         </View>
 
@@ -148,9 +150,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: Spacing.xxl,
   },
   logoWrap: {
-    width: 40, height: 40, borderRadius: 12,
-    backgroundColor: Colors.primary[500],
-    alignItems: 'center', justifyContent: 'center',
+    width: 44, height: 44, borderRadius: 14,
   },
   appName: { fontSize: FontSizes.xl, fontWeight: '800', color: Colors.white },
 

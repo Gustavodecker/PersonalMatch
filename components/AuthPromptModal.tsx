@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import {
   View, Text, StyleSheet, Modal, TouchableOpacity,
-  TextInput, KeyboardAvoidingView, Platform, ScrollView,
+  TextInput, KeyboardAvoidingView, Platform, ScrollView, Image,
 } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { Colors, FontSizes, Spacing, Shadows } from '@/constants/theme';
-import { X, Dumbbell, LogIn, UserPlus } from 'lucide-react-native';
+import { X, LogIn, UserPlus } from 'lucide-react-native';
 
 type Tab = 'login' | 'register';
 
@@ -67,12 +67,11 @@ export function AuthPromptModal({ visible, onClose, message }: Props) {
 
           {/* Header */}
           <View style={s.header}>
-            <View style={s.logoRow}>
-              <View style={s.logoBubble}>
-                <Dumbbell size={18} color={Colors.white} />
-              </View>
-              <Text style={s.logoText}>99 Personal</Text>
-            </View>
+            <Image
+              source={require('@/assets/images/k-1aa6IzU5CK8N6qYmpX7_BKvZ5utI_00001.png')}
+              style={s.logoImage}
+              resizeMode="contain"
+            />
             <TouchableOpacity style={s.closeBtn} onPress={onClose}>
               <X size={18} color={Colors.neutral[500]} />
             </TouchableOpacity>
@@ -190,6 +189,7 @@ const s = StyleSheet.create({
     marginTop: 10, marginBottom: 16,
   },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 },
+  logoImage: { width: 140, height: 36 },
   logoRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   logoBubble: {
     width: 32, height: 32, borderRadius: 10,

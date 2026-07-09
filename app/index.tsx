@@ -187,11 +187,14 @@ const MobileWelcome: React.FC = () => {
       <SafeAreaView style={ww.overlay} edges={['top', 'bottom']} pointerEvents="box-none">
         {/* Top: logo */}
         <View style={ww.topBar}>
-          <Image
-            source={require('@/assets/images/k-1aa6IzU5CK8N6qYmpX7_BKvZ5utI_00001.png')}
-            style={ww.logoImg}
-            resizeMode="contain"
-          />
+          <View style={ww.logoWrap}>
+            <Image
+              source={require('@/assets/images/tbuxfSzx0HD3j4sIzoHhw_TFPbJRs3_00001_(1).png')}
+              style={ww.logoIconImg}
+              resizeMode="contain"
+            />
+            <Text style={ww.logoText}>99 Personal</Text>
+          </View>
           <TouchableOpacity
             onPress={() => router.push('/(auth)/login')}
             style={ww.skipBtn}
@@ -322,6 +325,7 @@ const ww = StyleSheet.create({
   },
   logoWrap: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   logoImg: { width: 140, height: 40 },
+  logoIconImg: { width: 36, height: 36, borderRadius: 10 },
   logoIcon: {
     width: 34, height: 34, borderRadius: 10,
     backgroundColor: Colors.primary[600],

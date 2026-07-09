@@ -104,7 +104,11 @@ export default function StudentDashboard() {
           <View style={s.heroTop}>
             <View style={{ flex: 1 }}>
               <View style={s.logoRow}>
-                <Dumbbell size={14} color="rgba(255,255,255,0.6)" />
+                <Image
+                  source={require('@/assets/images/tbuxfSzx0HD3j4sIzoHhw_TFPbJRs3_00001_(1).png')}
+                  style={s.logoIcon}
+                  resizeMode="contain"
+                />
                 <Text style={s.logoText}>99 Personal</Text>
               </View>
               <Text style={s.greeting}>{greeting}, {firstName}!</Text>
@@ -366,8 +370,9 @@ const s = StyleSheet.create({
     flexDirection: 'row', alignItems: 'flex-start',
     marginBottom: Spacing.md,
   },
-  logoRow: { flexDirection: 'row', alignItems: 'center', gap: 5, marginBottom: 4 },
-  logoText: { fontSize: FontSizes.xs, fontWeight: '700', color: 'rgba(255,255,255,0.5)', letterSpacing: 1, textTransform: 'uppercase' },
+  logoRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 },
+  logoIcon: { width: 20, height: 20, borderRadius: 6 },
+  logoText: { fontSize: FontSizes.xs, fontWeight: '700', color: 'rgba(255,255,255,0.55)', letterSpacing: 1, textTransform: 'uppercase' },
   greeting: { fontSize: 26, fontWeight: '800', color: Colors.white, letterSpacing: -0.4 },
   heroSub: { fontSize: FontSizes.md, color: 'rgba(255,255,255,0.6)', marginTop: 2 },
   avatarBtn: {},
