@@ -19,13 +19,33 @@ function GoogleIcon() {
   );
 }
 
+function MicrosoftIcon() {
+  return (
+    <View style={g.msWrap}>
+      <View style={g.msGrid}>
+        <View style={[g.msCell, { backgroundColor: '#F25022' }]} />
+        <View style={[g.msCell, { backgroundColor: '#7FBA00' }]} />
+        <View style={[g.msCell, { backgroundColor: '#00A4EF' }]} />
+        <View style={[g.msCell, { backgroundColor: '#FFB900' }]} />
+      </View>
+    </View>
+  );
+}
+
+function AppleIcon() {
+  return (
+    <View style={g.iconWrap}>
+      <Text style={g.appleText}></Text>
+    </View>
+  );
+}
+
 const g = StyleSheet.create({
   iconWrap: {
     width: 22, height: 22, borderRadius: 11,
     backgroundColor: '#fff',
     alignItems: 'center', justifyContent: 'center',
-    borderWidth: 1.5,
-    borderColor: '#dadce0',
+    borderWidth: 1.5, borderColor: '#dadce0',
   },
   iconText: {
     fontSize: 13, fontWeight: '800',
@@ -33,15 +53,28 @@ const g = StyleSheet.create({
     letterSpacing: -0.2,
     lineHeight: 17,
   },
+  appleText: {
+    fontSize: 15, fontWeight: '600', color: '#000', lineHeight: 18,
+  },
+  msWrap: {
+    width: 22, height: 22, borderRadius: 3,
+    alignItems: 'center', justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  msGrid: {
+    width: 18, height: 18,
+    flexDirection: 'row', flexWrap: 'wrap', gap: 1,
+  },
+  msCell: { width: 8, height: 8 },
 });
 
 export default function LoginScreen() {
-  const { signIn, signInWithGoogle } = useAuth();
-  const [email, setEmail]         = useState('');
-  const [password, setPassword]   = useState('');
-  const [loading, setLoading]     = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
-  const [error, setError]         = useState<string | null>(null);
+  const { signIn, signInWithProvider } = useAuth();
+  const [email, setEmail]       = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading]   = useState(false);
+  const [providerLoading, setProviderLoading] = useState<string | null>(null);
+  const [error, setError]       = useState<string | null>(null);
 
   const handleLogin = async () => {
     if (!email || !password) { setError('Preencha e-mail e senha.'); return; }
@@ -56,16 +89,19 @@ export default function LoginScreen() {
     }
   };
 
-  const handleGoogle = async () => {
+  const handleProvider = async (provider: 'google' | 'azure' | 'apple') => {
+    if (providerLoading) return;
     setError(null);
-    setGoogleLoading(true);
-    const { error: err } = await signInWithGoogle();
+    setProviderLoading(provider);
+    const { error: err } = await signInWithProvider(provider);
     if (err) {
       setError(err);
-      setGoogleLoading(false);
+      setProviderLoading(null);
     }
-    // On success the page redirects — no need to reset loading
+    // On web the page navigates away; on native the browser closes and session is handled
   };
+
+  const isAnyLoading = loading || !!providerLoading;
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -84,18 +120,44 @@ export default function LoginScreen() {
 
             {error ? <Text style={styles.errorMsg}>{error}</Text> : null}
 
-            {/* Google OAuth */}
+            {/* Social OAuth buttons */}
             <TouchableOpacity
-              style={styles.googleBtn}
-              onPress={handleGoogle}
-              disabled={googleLoading}
+              style={styles.socialBtn}
+              onPress={() => handleProvider('google')}
+              disabled={isAnyLoading}
               activeOpacity={0.85}
             >
               <GoogleIcon />
-              <Text style={styles.googleBtnText}>
-                {googleLoading ? 'Redirecionando…' : 'Continuar com Google'}
+              <Text style={styles.socialBtnText}>
+                {providerLoading === 'google' ? 'Redirecionando…' : 'Continuar com Google'}
               </Text>
             </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.socialBtn}
+              onPress={() => handleProvider('azure')}
+              disabled={isAnyLoading}
+              activeOpacity={0.85}
+            >
+              <MicrosoftIcon />
+              <Text style={styles.socialBtnText}>
+                {providerLoading === 'azure' ? 'Redirecionando…' : 'Continuar com Microsoft'}
+              </Text>
+            </TouchableOpacity>
+
+            {Platform.OS !== 'android' && (
+              <TouchableOpacity
+                style={[styles.socialBtn, styles.appleBtn]}
+                onPress={() => handleProvider('apple')}
+                disabled={isAnyLoading}
+                activeOpacity={0.85}
+              >
+                <AppleIcon />
+                <Text style={styles.appleBtnText}>
+                  {providerLoading === 'apple' ? 'Redirecionando…' : 'Continuar com Apple'}
+                </Text>
+              </TouchableOpacity>
+            )}
 
             {/* Divider */}
             <View style={styles.dividerRow}>
@@ -161,19 +223,21 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadii.md, padding: Spacing.md, fontSize: FontSizes.sm, marginBottom: Spacing.sm,
   },
 
-  // Google button
-  googleBtn: {
+  socialBtn: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10,
     backgroundColor: Colors.white,
     borderWidth: 1.5, borderColor: '#dadce0',
     borderRadius: BorderRadii.lg, paddingVertical: 13,
-    marginBottom: Spacing.sm,
+    marginBottom: Spacing.xs,
     shadowColor: Colors.neutral[900],
     shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.06, shadowRadius: 4, elevation: 1,
   },
-  googleBtnText: { fontSize: FontSizes.md, fontWeight: '600', color: Colors.neutral[800] },
+  socialBtnText: { fontSize: FontSizes.md, fontWeight: '600', color: Colors.neutral[800] },
+  appleBtn: {
+    backgroundColor: '#000', borderColor: '#000',
+  },
+  appleBtnText: { fontSize: FontSizes.md, fontWeight: '600', color: Colors.white },
 
-  // Divider
   dividerRow: {
     flexDirection: 'row', alignItems: 'center', gap: 10,
     marginVertical: Spacing.sm,

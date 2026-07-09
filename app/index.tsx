@@ -1174,10 +1174,11 @@ const TrainerRedirect: React.FC<{ userId: string }> = ({ userId }) => {
 // ─── Root export ───────────────────────────────────────────────────────────────
 
 const Index: React.FC = () => {
-  const { user, profile, loading } = useAuth();
+  const { user, profile, loading, needsRoleSelection } = useAuth();
   const [loadingRedirect, setLoadingRedirect] = useState(true);
   useEffect(() => { if (!loading) setLoadingRedirect(false); }, [loading]);
   if (loading || loadingRedirect) return <LoadingScreen />;
+  if (user && !profile && needsRoleSelection) return <Redirect href="/select-role" />;
   if (user && profile) {
     if (profile.role === 'student') return <Redirect href="/student/dashboard" />;
     if (profile.role === 'trainer') return <TrainerRedirect userId={user.id} />;
