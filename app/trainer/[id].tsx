@@ -18,7 +18,7 @@ import {
   MessageSquare, Monitor, Users, Heart,
   DollarSign, Target, CheckCircle, Phone, Calendar, LogIn,
   Home, Building2, ShieldCheck, Eye, Lock, Award,
-  ChevronRight, Image as ImageIcon, ChevronLeft, Instagram,
+  ChevronRight, Image as ImageIcon, ChevronLeft, Instagram, X,
 } from 'lucide-react-native';
 
 const COVER_PLACEHOLDER = 'https://images.pexels.com/photos/1552242/pexels-photo-1552242.jpeg?auto=compress&cs=tinysrgb&w=1200&h=500&fit=crop';
@@ -97,6 +97,7 @@ export default function TrainerDetailScreen() {
   const [selectedClassTypeId, setSelectedClassTypeId] = useState<string | null>(null);
 
   const [galleryExpanded, setGalleryExpanded] = useState(false);
+  const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
 
   useEffect(() => { if (id) loadTrainer(); }, [id]);
 
@@ -724,7 +725,12 @@ export default function TrainerDetailScreen() {
               </View>
               <View style={s.galleryGrid}>
                 {displayedGallery.map((url, idx) => (
-                  <View key={idx} style={[s.galleryCell, idx === 0 && s.galleryCellLarge]}>
+                  <TouchableOpacity
+                    key={idx}
+                    style={[s.galleryCell, idx === 0 && s.galleryCellLarge]}
+                    onPress={() => setLightboxIdx(idx)}
+                    activeOpacity={0.85}
+                  >
                     <Image source={{ uri: url }} style={s.galleryImg} resizeMode="cover" />
                     {idx === 5 && !galleryExpanded && galleryImages.length > 6 && (
                       <View style={s.galleryMoreOverlay}>
@@ -732,7 +738,7 @@ export default function TrainerDetailScreen() {
                         <Text style={s.galleryMoreText}>+{galleryImages.length - 6}</Text>
                       </View>
                     )}
-                  </View>
+                  </TouchableOpacity>
                 ))}
               </View>
             </View>
@@ -943,6 +949,58 @@ export default function TrainerDetailScreen() {
         onClose={() => setAuthModal(false)}
         message={authMessage}
       />
+
+      {/* Photo lightbox */}
+      <Modal
+        visible={lightboxIdx !== null}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setLightboxIdx(null)}
+        statusBarTranslucent
+      >
+        <View style={s.lightboxBg}>
+          <SafeAreaView style={s.lightboxSafe} edges={['top', 'bottom']}>
+            {/* Close */}
+            <TouchableOpacity style={s.lightboxClose} onPress={() => setLightboxIdx(null)} activeOpacity={0.8}>
+              <X size={22} color={Colors.white} />
+            </TouchableOpacity>
+
+            {/* Counter */}
+            {lightboxIdx !== null && (
+              <Text style={s.lightboxCounter}>{lightboxIdx + 1} / {galleryImages.length}</Text>
+            )}
+
+            {/* Image */}
+            {lightboxIdx !== null && (
+              <Image
+                source={{ uri: galleryImages[lightboxIdx] }}
+                style={s.lightboxImg}
+                resizeMode="contain"
+              />
+            )}
+
+            {/* Prev / Next */}
+            <View style={s.lightboxNav}>
+              <TouchableOpacity
+                style={[s.lightboxNavBtn, lightboxIdx === 0 && s.lightboxNavBtnDisabled]}
+                onPress={() => setLightboxIdx((i) => (i !== null && i > 0 ? i - 1 : i))}
+                disabled={lightboxIdx === 0}
+                activeOpacity={0.75}
+              >
+                <ChevronLeft size={26} color={Colors.white} />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[s.lightboxNavBtn, lightboxIdx === galleryImages.length - 1 && s.lightboxNavBtnDisabled]}
+                onPress={() => setLightboxIdx((i) => (i !== null && i < galleryImages.length - 1 ? i + 1 : i))}
+                disabled={lightboxIdx === galleryImages.length - 1}
+                activeOpacity={0.75}
+              >
+                <ChevronRight size={26} color={Colors.white} />
+              </TouchableOpacity>
+            </View>
+          </SafeAreaView>
+        </View>
+      </Modal>
 
       {/* Booking modal */}
       <Modal visible={bookModal} transparent animationType="slide">
@@ -1481,4 +1539,36 @@ const s = StyleSheet.create({
   classChipTextActive: { color: Colors.secondary[700] },
   classChipDur: { fontSize: FontSizes.xs, color: Colors.neutral[400] },
   classChipDurActive: { color: Colors.secondary[500] },
+
+  // Lightbox
+  lightboxBg: {
+    flex: 1, backgroundColor: 'rgba(0,0,0,0.97)',
+  },
+  lightboxSafe: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  lightboxClose: {
+    position: 'absolute', top: 0, right: 16,
+    width: 44, height: 44, borderRadius: 22,
+    backgroundColor: 'rgba(255,255,255,0.12)',
+    alignItems: 'center', justifyContent: 'center', zIndex: 10,
+  },
+  lightboxCounter: {
+    position: 'absolute', top: 0, left: 0, right: 0,
+    textAlign: 'center', lineHeight: 44,
+    fontSize: FontSizes.sm, fontWeight: '700', color: 'rgba(255,255,255,0.7)',
+  },
+  lightboxImg: {
+    width: '100%',
+    height: '80%',
+  },
+  lightboxNav: {
+    position: 'absolute', bottom: 0, left: 0, right: 0,
+    flexDirection: 'row', justifyContent: 'space-between',
+    paddingHorizontal: Spacing.md, paddingBottom: Spacing.sm,
+  },
+  lightboxNavBtn: {
+    width: 52, height: 52, borderRadius: 26,
+    backgroundColor: 'rgba(255,255,255,0.12)',
+    alignItems: 'center', justifyContent: 'center',
+  },
+  lightboxNavBtnDisabled: { opacity: 0.25 },
 });

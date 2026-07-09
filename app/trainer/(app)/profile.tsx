@@ -10,7 +10,7 @@ import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/Button';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Colors, Spacing, FontSizes, BorderRadii, Shadows } from '@/constants/theme';
-import { Mail, MapPin, ExternalLink, Edit2, Check, X, Camera, BadgeCheck, ShieldAlert, Info } from 'lucide-react-native';
+import { Mail, MapPin, ExternalLink, Edit2, Check, X, Camera, BadgeCheck, ShieldAlert, Plus, Trash2, ImageIcon } from 'lucide-react-native';
 
 export default function TrainerProfile() {
   const { profile, refreshProfile, signOut } = useAuth();
@@ -23,21 +23,35 @@ export default function TrainerProfile() {
   const [neighborhood, setNeighborhood] = useState('');
   const [saving, setSaving] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [uploadingCover, setUploadingCover] = useState(false);
+  const [uploadingGallery, setUploadingGallery] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [isVerified, setIsVerified] = useState(false);
+  const [coverUrl, setCoverUrl] = useState<string | null>(null);
+  const [galleryPhotos, setGalleryPhotos] = useState<{ id: string; url: string }[]>([]);
 
   useEffect(() => {
     if (!profile) return;
     supabase
       .from('trainers')
-      .select('is_verified, neighborhood')
+      .select('is_verified, neighborhood, cover_photo_url')
       .eq('id', profile.id)
       .maybeSingle()
       .then(({ data }) => {
         if (data) {
           setIsVerified(data.is_verified ?? false);
           if (data.neighborhood) setNeighborhood(data.neighborhood);
+          if (data.cover_photo_url) setCoverUrl(data.cover_photo_url);
         }
+      });
+    supabase
+      .from('trainer_photos')
+      .select('id, url')
+      .eq('trainer_id', profile.id)
+      .eq('type', 'gallery')
+      .order('sort_order')
+      .then(({ data }) => {
+        if (data) setGalleryPhotos(data as { id: string; url: string }[]);
       });
   }, [profile?.id]);
 
@@ -113,6 +127,74 @@ export default function TrainerProfile() {
     input.click();
   };
 
+  const pickCover = async () => {
+    if (!profile) return;
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = async () => {
+      const file = input.files?.[0];
+      if (!file) return;
+      setUploadingCover(true);
+      try {
+        const ext = file.name.split('.').pop() ?? 'jpg';
+        const path = `${profile.id}/cover-${Date.now()}.${ext}`;
+        const arrayBuffer = await file.arrayBuffer();
+        const { error: upErr } = await supabase.storage
+          .from('trainer-photos')
+          .upload(path, arrayBuffer, { contentType: file.type || 'image/jpeg', upsert: true });
+        if (upErr) throw upErr;
+        const { data: urlData } = supabase.storage.from('trainer-photos').getPublicUrl(path);
+        await supabase.from('trainers').update({ cover_photo_url: urlData.publicUrl }).eq('id', profile.id);
+        setCoverUrl(urlData.publicUrl);
+      } catch (e: any) {
+        setSaveError(e.message);
+      } finally {
+        setUploadingCover(false);
+      }
+    };
+    input.click();
+  };
+
+  const addGalleryPhoto = async () => {
+    if (!profile) return;
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = async () => {
+      const file = input.files?.[0];
+      if (!file) return;
+      setUploadingGallery(true);
+      try {
+        const ext = file.name.split('.').pop() ?? 'jpg';
+        const path = `${profile.id}/gallery-${Date.now()}.${ext}`;
+        const arrayBuffer = await file.arrayBuffer();
+        const { error: upErr } = await supabase.storage
+          .from('trainer-photos')
+          .upload(path, arrayBuffer, { contentType: file.type || 'image/jpeg', upsert: true });
+        if (upErr) throw upErr;
+        const { data: urlData } = supabase.storage.from('trainer-photos').getPublicUrl(path);
+        const { data: row, error: dbErr } = await supabase
+          .from('trainer_photos')
+          .insert({ trainer_id: profile.id, url: urlData.publicUrl, type: 'gallery', sort_order: galleryPhotos.length })
+          .select('id, url')
+          .single();
+        if (dbErr) throw dbErr;
+        if (row) setGalleryPhotos((prev) => [...prev, row as { id: string; url: string }]);
+      } catch (e: any) {
+        setSaveError(e.message);
+      } finally {
+        setUploadingGallery(false);
+      }
+    };
+    input.click();
+  };
+
+  const deleteGalleryPhoto = async (photoId: string) => {
+    await supabase.from('trainer_photos').delete().eq('id', photoId);
+    setGalleryPhotos((prev) => prev.filter((p) => p.id !== photoId));
+  };
+
   if (!profile) return null;
 
   return (
@@ -165,6 +247,58 @@ export default function TrainerProfile() {
               </View>
             ) : null}
           </View>
+        </View>
+
+        {/* Foto de capa */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Foto de Capa</Text>
+          <TouchableOpacity style={styles.coverWrap} onPress={pickCover} disabled={uploadingCover} activeOpacity={0.8}>
+            {coverUrl ? (
+              <Image source={{ uri: coverUrl }} style={styles.coverImg} resizeMode="cover" />
+            ) : (
+              <View style={styles.coverPlaceholder}>
+                <ImageIcon size={22} color={Colors.neutral[400]} />
+                <Text style={styles.coverPlaceholderText}>{uploadingCover ? 'Enviando…' : 'Adicionar foto de capa'}</Text>
+              </View>
+            )}
+            {coverUrl && (
+              <View style={styles.coverEditBadge}>
+                <Camera size={13} color={Colors.white} />
+              </View>
+            )}
+            {uploadingCover && (
+              <View style={styles.coverUploadingOverlay}>
+                <Text style={styles.coverUploadingText}>Enviando…</Text>
+              </View>
+            )}
+          </TouchableOpacity>
+        </View>
+
+        {/* Galeria de fotos */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Galeria</Text>
+          {saveError ? <Text style={styles.errorText}>{saveError}</Text> : null}
+          <View style={styles.galleryGrid}>
+            {galleryPhotos.map((ph) => (
+              <View key={ph.id} style={styles.galleryThumb}>
+                <Image source={{ uri: ph.url }} style={styles.galleryThumbImg} resizeMode="cover" />
+                <TouchableOpacity style={styles.galleryDeleteBtn} onPress={() => deleteGalleryPhoto(ph.id)}>
+                  <Trash2 size={11} color={Colors.white} />
+                </TouchableOpacity>
+              </View>
+            ))}
+            <TouchableOpacity style={styles.galleryAddBtn} onPress={addGalleryPhoto} disabled={uploadingGallery} activeOpacity={0.7}>
+              {uploadingGallery ? (
+                <Text style={styles.galleryAddText}>…</Text>
+              ) : (
+                <>
+                  <Plus size={20} color={Colors.neutral[400]} />
+                  <Text style={styles.galleryAddText}>Adicionar</Text>
+                </>
+              )}
+            </TouchableOpacity>
+          </View>
+          <Text style={styles.galleryHint}>Fotos do seu trabalho, academia ou transformações de alunos</Text>
         </View>
 
         {/* Verification status */}
@@ -381,6 +515,45 @@ const styles = StyleSheet.create({
     justifyContent: 'center', ...Shadows.xs,
   },
   editFullBtnText: { fontSize: FontSizes.md, fontWeight: '600', color: Colors.neutral[700] },
+
+  // Gallery & Cover
+  coverWrap: {
+    height: 140, borderRadius: BorderRadii.xl, overflow: 'hidden',
+    borderWidth: 1.5, borderColor: Colors.neutral[200], position: 'relative',
+  },
+  coverImg: { width: '100%', height: '100%' },
+  coverPlaceholder: {
+    flex: 1, alignItems: 'center', justifyContent: 'center',
+    backgroundColor: Colors.white, gap: 6, borderStyle: 'dashed',
+  },
+  coverPlaceholderText: { fontSize: FontSizes.sm, color: Colors.neutral[500] },
+  coverEditBadge: {
+    position: 'absolute', bottom: 8, right: 8,
+    width: 30, height: 30, borderRadius: 15,
+    backgroundColor: 'rgba(0,0,0,0.5)', alignItems: 'center', justifyContent: 'center',
+    borderWidth: 1.5, borderColor: Colors.white,
+  },
+  coverUploadingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.45)', alignItems: 'center', justifyContent: 'center',
+  },
+  coverUploadingText: { color: Colors.white, fontWeight: '700', fontSize: FontSizes.sm },
+  galleryGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 8 },
+  galleryThumb: {
+    width: 88, height: 88, borderRadius: BorderRadii.md, overflow: 'hidden', position: 'relative',
+  },
+  galleryThumbImg: { width: '100%', height: '100%' },
+  galleryDeleteBtn: {
+    position: 'absolute', top: 4, right: 4, width: 22, height: 22, borderRadius: 11,
+    backgroundColor: 'rgba(0,0,0,0.55)', alignItems: 'center', justifyContent: 'center',
+  },
+  galleryAddBtn: {
+    width: 88, height: 88, borderRadius: BorderRadii.md,
+    borderWidth: 1.5, borderColor: Colors.neutral[200], borderStyle: 'dashed',
+    alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.white, gap: 4,
+  },
+  galleryAddText: { fontSize: FontSizes.xs, color: Colors.neutral[400], fontWeight: '600' },
+  galleryHint: { fontSize: FontSizes.xs, color: Colors.neutral[400] },
 
   // Verification
   verifyCard: {
