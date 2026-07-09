@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  KeyboardAvoidingView, Platform,
+  KeyboardAvoidingView, Platform, Image,
 } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -9,7 +9,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Input } from '@/components/Input';
 import { Button } from '@/components/Button';
 import { Colors, Spacing, FontSizes, BorderRadii } from '@/constants/theme';
-import { Dumbbell } from 'lucide-react-native';
 
 export default function LoginScreen() {
   const { signIn } = useAuth();
@@ -36,10 +35,11 @@ export default function LoginScreen() {
       <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
           <View style={styles.hero}>
-            <View style={styles.logoWrap}>
-              <Dumbbell size={36} color={Colors.white} />
-            </View>
-            <Text style={styles.brand}>SuperShape</Text>
+            <Image
+              source={require('@/assets/images/k-1aa6IzU5CK8N6qYmpX7_BKvZ5utI_00001.png')}
+              style={styles.logo}
+              resizeMode="contain"
+            />
             <Text style={styles.tagline}>Conecte-se ao personal certo</Text>
           </View>
 
@@ -86,14 +86,18 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.primary[700] },
   flex: { flex: 1 },
   scroll: { flexGrow: 1 },
-  hero: { alignItems: 'center', paddingTop: Spacing.xxxl, paddingBottom: Spacing.xxl, gap: Spacing.sm },
-  logoWrap: {
-    width: 72, height: 72, borderRadius: BorderRadii.xl,
-    backgroundColor: Colors.primary[500], alignItems: 'center', justifyContent: 'center',
-    marginBottom: Spacing.sm,
+  hero: {
+    alignItems: 'center',
+    paddingTop: Spacing.xxxl,
+    paddingBottom: Spacing.xxl,
+    paddingHorizontal: Spacing.xl,
+    gap: Spacing.md,
   },
-  brand: { fontSize: FontSizes.xxxl, fontWeight: '700', color: Colors.white, letterSpacing: -0.5 },
-  tagline: { fontSize: FontSizes.md, color: Colors.primary[200] },
+  logo: {
+    width: 260,
+    height: 80,
+  },
+  tagline: { fontSize: FontSizes.md, color: 'rgba(255,255,255,0.75)', textAlign: 'center' },
   card: {
     flex: 1, backgroundColor: Colors.white,
     borderTopLeftRadius: BorderRadii.xl, borderTopRightRadius: BorderRadii.xl,

@@ -71,7 +71,7 @@ export function AuthPromptModal({ visible, onClose, message }: Props) {
               <View style={s.logoBubble}>
                 <Dumbbell size={18} color={Colors.white} />
               </View>
-              <Text style={s.logoText}>SuperShape</Text>
+              <Text style={s.logoText}>99 Personal</Text>
             </View>
             <TouchableOpacity style={s.closeBtn} onPress={onClose}>
               <X size={18} color={Colors.neutral[500]} />

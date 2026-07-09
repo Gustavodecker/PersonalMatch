@@ -1,19 +1,19 @@
 {
   "expo": {
-    "name": "SuperShape",
-    "slug": "supershape",
+    "name": "99 Personal",
+    "slug": "99personal",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "supershape",
+    "scheme": "99personal",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.gustavomiguel.supershape"
+      "bundleIdentifier": "com.gustavomiguel.99personal"
     },
     "android": {
-      "package": "com.gustavomiguel.supershape"
+      "package": "com.gustavomiguel.99personal"
     },
     "web": {
       "bundler": "metro",

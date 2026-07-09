@@ -39,7 +39,7 @@ export default function SelectRoleScreen() {
           <View style={styles.logoWrap}>
             <Dumbbell size={22} color={Colors.white} strokeWidth={2.5} />
           </View>
-          <Text style={styles.appName}>SuperShape</Text>
+          <Text style={styles.appName}>99 Personal</Text>
         </View>
 
         {/* Avatar + greeting */}
@@ -62,7 +62,7 @@ export default function SelectRoleScreen() {
         )}
 
         {/* Question */}
-        <Text style={styles.question}>Como você deseja usar o SuperShape?</Text>
+        <Text style={styles.question}>Como você deseja usar o 99 Personal?</Text>
         <Text style={styles.questionSub}>
           Escolha o perfil que melhor descreve você. Isso personaliza sua experiência.
         </Text>

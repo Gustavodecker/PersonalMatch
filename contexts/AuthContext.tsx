@@ -42,7 +42,7 @@ type AuthContextType = {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-const APP_SCHEME = 'supershape';
+const APP_SCHEME = '99personal';
 
 /** SessionStorage is only available on web. Returns null on native. */
 const ss = () =>

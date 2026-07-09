@@ -187,12 +187,11 @@ const MobileWelcome: React.FC = () => {
       <SafeAreaView style={ww.overlay} edges={['top', 'bottom']} pointerEvents="box-none">
         {/* Top: logo */}
         <View style={ww.topBar}>
-          <View style={ww.logoWrap}>
-            <View style={ww.logoIcon}>
-              <Dumbbell size={16} color={Colors.white} strokeWidth={2.5} />
-            </View>
-            <Text style={ww.logoText}>SuperShape</Text>
-          </View>
+          <Image
+            source={require('@/assets/images/k-1aa6IzU5CK8N6qYmpX7_BKvZ5utI_00001.png')}
+            style={ww.logoImg}
+            resizeMode="contain"
+          />
           <TouchableOpacity
             onPress={() => router.push('/(auth)/login')}
             style={ww.skipBtn}
@@ -322,6 +321,7 @@ const ww = StyleSheet.create({
     paddingHorizontal: 24, paddingTop: 8, paddingBottom: 4,
   },
   logoWrap: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  logoImg: { width: 140, height: 40 },
   logoIcon: {
     width: 34, height: 34, borderRadius: 10,
     backgroundColor: Colors.primary[600],
@@ -459,10 +459,12 @@ const PublicHome: React.FC = () => {
             style={s.logo}
             onPress={() => scrollRef.current?.scrollTo({ y: 0, animated: true })}
           >
-            <View style={s.logoMark}>
-              <Dumbbell size={16} color={Colors.white} strokeWidth={2.5} />
-            </View>
-            <Text style={s.logoText}>SuperShape</Text>
+            <Image
+              source={require('@/assets/images/tbuxfSzx0HD3j4sIzoHhw_TFPbJRs3_00001_(1).png')}
+              style={s.logoMark}
+              resizeMode="contain"
+            />
+            <Text style={s.logoText}>99 Personal</Text>
           </TouchableOpacity>
 
           {IS_DESKTOP && (
@@ -982,7 +984,7 @@ const PublicHome: React.FC = () => {
             <View style={s.sectionPill}>
               <Text style={s.sectionPillText}>Transparência</Text>
             </View>
-            <Text style={s.sectionTitle}>Por que confiar no SuperShape?</Text>
+            <Text style={s.sectionTitle}>Por que confiar no 99 Personal?</Text>
             <Text style={s.sectionSub}>
               Uma plataforma onde alunos e profissionais se conectam com segurança.
             </Text>
@@ -1073,10 +1075,11 @@ const PublicHome: React.FC = () => {
           <View style={IS_DESKTOP ? s.footerDesktop : undefined}>
             {/* Brand */}
             <View style={s.footerBrand}>
-              <View style={s.footerLogo}>
-                <Dumbbell size={15} color={Colors.white} />
-              </View>
-              <Text style={s.footerLogoText}>SuperShape</Text>
+              <Image
+                source={require('@/assets/images/k-1aa6IzU5CK8N6qYmpX7_BKvZ5utI_00001.png')}
+                style={s.footerLogoImg}
+                resizeMode="contain"
+              />
             </View>
             {IS_DESKTOP && (
               <Text style={[s.footerTagline, { marginTop: 8, marginBottom: 0 }]}>
@@ -1118,7 +1121,7 @@ const PublicHome: React.FC = () => {
               </View>
               <View style={s.footerCol}>
                 <Text style={s.footerColHead}>Suporte</Text>
-                <TouchableOpacity onPress={() => Linking.openURL('https://wa.me/5547992222949?text=Oi%2C%20preciso%20de%20suporte%20no%20SuperShape')}>
+                <TouchableOpacity onPress={() => Linking.openURL('https://wa.me/5547992222949?text=Oi%2C%20preciso%20de%20suporte%20no%2099%20Personal')}>
                   <Text style={s.footerLink}>Falar com suporte</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => router.push('/termos')}><Text style={s.footerLink}>Termos de uso</Text></TouchableOpacity>
@@ -1126,10 +1129,10 @@ const PublicHome: React.FC = () => {
               </View>
               <View style={s.footerCol}>
                 <Text style={s.footerColHead}>Aplicativo</Text>
-                <TouchableOpacity onPress={() => Linking.openURL('https://apps.apple.com/app/supershape')}>
+                <TouchableOpacity onPress={() => Linking.openURL('https://apps.apple.com/app/99personal')}>
                   <Text style={s.footerLink}>Download iOS</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => Linking.openURL('https://play.google.com/store/apps/details?id=com.supershape')}>
+                <TouchableOpacity onPress={() => Linking.openURL('https://play.google.com/store/apps/details?id=com.99personal')}>
                   <Text style={s.footerLink}>Download Android</Text>
                 </TouchableOpacity>
               </View>
@@ -1137,7 +1140,7 @@ const PublicHome: React.FC = () => {
           </View>
 
           <View style={s.footerBottom}>
-            <Text style={s.footerCopy}>© 2026 SuperShape. Todos os direitos reservados.</Text>
+            <Text style={s.footerCopy}>© 2026 99 Personal. Todos os direitos reservados.</Text>
           </View>
         </View>
       </View>
@@ -1227,9 +1230,7 @@ const s = StyleSheet.create({
   },
   logo: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   logoMark: {
-    width: 34, height: 34, borderRadius: 10,
-    backgroundColor: Colors.primary[700],
-    alignItems: 'center', justifyContent: 'center',
+    width: 32, height: 32, borderRadius: 8,
   },
   logoText: {
     fontSize: 18, fontWeight: '800', color: Colors.neutral[900], letterSpacing: -0.4,
@@ -1778,7 +1779,8 @@ const s = StyleSheet.create({
     paddingBottom: 32,
   },
   footerDesktop: { flexDirection: IS_DESKTOP ? 'column' : undefined },
-  footerBrand: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 8 },
+  footerBrand: { marginBottom: 8 },
+  footerLogoImg: { width: 160, height: 48 },
   footerLogo: {
     width: 32, height: 32, borderRadius: 9,
     backgroundColor: Colors.neutral[700],

@@ -76,7 +76,7 @@ export function AdminShell({ children, title, actions }: Props) {
             <View style={s.drawerTop}>
               <View style={s.sidebarBrand}>
                 <Shield size={18} color={Colors.primary[400]} />
-                <Text style={s.sidebarBrandText}>SuperShape</Text>
+                <Text style={s.sidebarBrandText}>99 Personal</Text>
               </View>
               <TouchableOpacity onPress={() => setDrawerOpen(false)}>
                 <X size={22} color={Colors.neutral[400]} />
@@ -99,7 +99,7 @@ function SidebarContent({ onSignOut, profile }: { onSignOut: () => void; profile
     <View style={s.sidebar}>
       <View style={s.sidebarBrandRow}>
         <Shield size={20} color={Colors.primary[400]} />
-        <Text style={s.sidebarBrandText}>SuperShape</Text>
+        <Text style={s.sidebarBrandText}>99 Personal</Text>
         <Text style={s.sidebarAdminBadge}>Admin</Text>
       </View>
       <ScrollView style={s.sidebarScroll} showsVerticalScrollIndicator={false}>

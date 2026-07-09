@@ -105,7 +105,7 @@ export default function StudentDashboard() {
             <View style={{ flex: 1 }}>
               <View style={s.logoRow}>
                 <Dumbbell size={14} color="rgba(255,255,255,0.6)" />
-                <Text style={s.logoText}>SuperShape</Text>
+                <Text style={s.logoText}>99 Personal</Text>
               </View>
               <Text style={s.greeting}>{greeting}, {firstName}!</Text>
               <Text style={s.heroSub}>Encontre seu personal ideal</Text>
