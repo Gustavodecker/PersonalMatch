@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Redirect, Tabs, router } from 'expo-router';
+import { Redirect, Tabs, router, usePathname } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { LoadingScreen } from '@/components/LoadingScreen';
 import { Colors, Spacing, FontSizes, BorderRadii, Shadows } from '@/constants/theme';
@@ -12,8 +12,12 @@ type TrialState = 'loading' | 'ok' | 'warning' | 'expired';
 
 export default function TrainerAppLayout() {
   const { user, profile, loading, signOut } = useAuth();
+  const pathname = usePathname();
   const [trialState, setTrialState] = useState<TrialState>('loading');
   const [daysLeft, setDaysLeft] = useState(0);
+
+  // Overlay is suppressed only when the user is on the assinatura tab
+  const showExpiredOverlay = trialState === 'expired' && !pathname.endsWith('/assinatura');
 
   useEffect(() => {
     if (!profile || profile.role !== 'trainer') return;
@@ -45,7 +49,6 @@ export default function TrainerAppLayout() {
   };
 
   const handleGoToSubscription = () => {
-    setTrialState('ok');
     router.push('/trainer/(app)/assinatura');
   };
 
@@ -90,8 +93,8 @@ export default function TrainerAppLayout() {
         />
       </Tabs>
 
-      {/* Overlay rendered on top of Tabs so navigation stack stays intact */}
-      {trialState === 'expired' && (
+      {/* Overlay shown whenever expired and NOT on the assinatura tab */}
+      {showExpiredOverlay && (
         <View style={exp.overlay}>
           <View style={exp.card}>
             <View style={exp.iconWrap}>
