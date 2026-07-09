@@ -4,7 +4,6 @@ import {
   KeyboardAvoidingView, Platform,
 } from 'react-native';
 import { router } from 'expo-router';
-import { Redirect } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '@/contexts/AuthContext';
 import { Input } from '@/components/Input';
@@ -12,12 +11,37 @@ import { Button } from '@/components/Button';
 import { Colors, Spacing, FontSizes, BorderRadii } from '@/constants/theme';
 import { Dumbbell } from 'lucide-react-native';
 
+function GoogleIcon() {
+  return (
+    <View style={g.iconWrap}>
+      <Text style={g.iconText}>G</Text>
+    </View>
+  );
+}
+
+const g = StyleSheet.create({
+  iconWrap: {
+    width: 22, height: 22, borderRadius: 11,
+    backgroundColor: '#fff',
+    alignItems: 'center', justifyContent: 'center',
+    borderWidth: 1.5,
+    borderColor: '#dadce0',
+  },
+  iconText: {
+    fontSize: 13, fontWeight: '800',
+    color: '#4285F4',
+    letterSpacing: -0.2,
+    lineHeight: 17,
+  },
+});
+
 export default function LoginScreen() {
-  const { signIn, user, profile } = useAuth();
-  const [email, setEmail]       = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading]   = useState(false);
-  const [error, setError]       = useState<string | null>(null);
+  const { signIn, signInWithGoogle } = useAuth();
+  const [email, setEmail]         = useState('');
+  const [password, setPassword]   = useState('');
+  const [loading, setLoading]     = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const [error, setError]         = useState<string | null>(null);
 
   const handleLogin = async () => {
     if (!email || !password) { setError('Preencha e-mail e senha.'); return; }
@@ -30,6 +54,17 @@ export default function LoginScreen() {
     } else {
       router.replace('/');
     }
+  };
+
+  const handleGoogle = async () => {
+    setError(null);
+    setGoogleLoading(true);
+    const { error: err } = await signInWithGoogle();
+    if (err) {
+      setError(err);
+      setGoogleLoading(false);
+    }
+    // On success the page redirects — no need to reset loading
   };
 
   return (
@@ -48,6 +83,26 @@ export default function LoginScreen() {
             <Text style={styles.title}>Entrar</Text>
 
             {error ? <Text style={styles.errorMsg}>{error}</Text> : null}
+
+            {/* Google OAuth */}
+            <TouchableOpacity
+              style={styles.googleBtn}
+              onPress={handleGoogle}
+              disabled={googleLoading}
+              activeOpacity={0.85}
+            >
+              <GoogleIcon />
+              <Text style={styles.googleBtnText}>
+                {googleLoading ? 'Redirecionando…' : 'Continuar com Google'}
+              </Text>
+            </TouchableOpacity>
+
+            {/* Divider */}
+            <View style={styles.dividerRow}>
+              <View style={styles.dividerLine} />
+              <Text style={styles.dividerText}>ou entre com e-mail</Text>
+              <View style={styles.dividerLine} />
+            </View>
 
             <Input
               label="E-mail"
@@ -105,6 +160,27 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.error[50], color: Colors.error[700],
     borderRadius: BorderRadii.md, padding: Spacing.md, fontSize: FontSizes.sm, marginBottom: Spacing.sm,
   },
+
+  // Google button
+  googleBtn: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10,
+    backgroundColor: Colors.white,
+    borderWidth: 1.5, borderColor: '#dadce0',
+    borderRadius: BorderRadii.lg, paddingVertical: 13,
+    marginBottom: Spacing.sm,
+    shadowColor: Colors.neutral[900],
+    shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.06, shadowRadius: 4, elevation: 1,
+  },
+  googleBtnText: { fontSize: FontSizes.md, fontWeight: '600', color: Colors.neutral[800] },
+
+  // Divider
+  dividerRow: {
+    flexDirection: 'row', alignItems: 'center', gap: 10,
+    marginVertical: Spacing.sm,
+  },
+  dividerLine: { flex: 1, height: 1, backgroundColor: Colors.neutral[200] },
+  dividerText: { fontSize: FontSizes.sm, color: Colors.neutral[400], fontWeight: '500' },
+
   link: { alignItems: 'center', paddingVertical: Spacing.md, marginTop: Spacing.sm },
   linkText: { fontSize: FontSizes.md, color: Colors.neutral[600] },
   linkBold: { color: Colors.primary[600], fontWeight: '700' },
