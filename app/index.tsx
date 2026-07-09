@@ -433,7 +433,6 @@ const PublicHome: React.FC = () => {
         .from('trainers')
         .select('*, profile:profiles!trainers_id_fkey(*), specialties:trainer_specialties(specialty:specialties(*))')
         .eq('status', 'active')
-        .order('is_featured', { ascending: false })
         .order('rating', { ascending: false })
         .limit(6);
       setFeaturedTrainers(

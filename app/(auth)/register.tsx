@@ -13,65 +13,8 @@ import { ArrowLeft } from 'lucide-react-native';
 
 type Role = 'student' | 'trainer';
 
-function GoogleIcon() {
-  return (
-    <View style={g.iconWrap}>
-      <Text style={g.iconText}>G</Text>
-    </View>
-  );
-}
-
-function MicrosoftIcon() {
-  return (
-    <View style={g.msWrap}>
-      <View style={g.msGrid}>
-        <View style={[g.msCell, { backgroundColor: '#F25022' }]} />
-        <View style={[g.msCell, { backgroundColor: '#7FBA00' }]} />
-        <View style={[g.msCell, { backgroundColor: '#00A4EF' }]} />
-        <View style={[g.msCell, { backgroundColor: '#FFB900' }]} />
-      </View>
-    </View>
-  );
-}
-
-function AppleIcon() {
-  return (
-    <View style={g.iconWrap}>
-      <Text style={g.appleText}></Text>
-    </View>
-  );
-}
-
-const g = StyleSheet.create({
-  iconWrap: {
-    width: 22, height: 22, borderRadius: 11,
-    backgroundColor: '#fff',
-    alignItems: 'center', justifyContent: 'center',
-    borderWidth: 1.5, borderColor: '#dadce0',
-  },
-  iconText: {
-    fontSize: 13, fontWeight: '800',
-    color: '#4285F4',
-    letterSpacing: -0.2,
-    lineHeight: 17,
-  },
-  appleText: {
-    fontSize: 15, fontWeight: '600', color: '#000', lineHeight: 18,
-  },
-  msWrap: {
-    width: 22, height: 22, borderRadius: 3,
-    alignItems: 'center', justifyContent: 'center',
-    overflow: 'hidden',
-  },
-  msGrid: {
-    width: 18, height: 18,
-    flexDirection: 'row', flexWrap: 'wrap', gap: 1,
-  },
-  msCell: { width: 8, height: 8 },
-});
-
 export default function RegisterScreen() {
-  const { signUp, signInWithProvider } = useAuth();
+  const { signUp } = useAuth();
   const params = useLocalSearchParams<{ role?: string }>();
   const initialRole: Role = params.role === 'trainer' ? 'trainer' : 'student';
   const [fullName, setFullName]   = useState('');
@@ -79,7 +22,6 @@ export default function RegisterScreen() {
   const [password, setPassword]   = useState('');
   const [role, setRole]           = useState<Role>(initialRole);
   const [loading, setLoading]     = useState(false);
-  const [providerLoading, setProviderLoading] = useState<string | null>(null);
   const [error, setError]         = useState<string | null>(null);
 
   const handleRegister = async () => {
@@ -104,20 +46,6 @@ export default function RegisterScreen() {
     }
   };
 
-  const handleProvider = async (provider: 'google' | 'azure' | 'apple') => {
-    if (providerLoading) return;
-    setError(null);
-    setProviderLoading(provider);
-    const { error: err } = await signInWithProvider(provider, role);
-    if (err) {
-      setError(err);
-      setProviderLoading(null);
-    }
-  };
-
-  const isAnyLoading = loading || !!providerLoading;
-  const roleLabel = role === 'trainer' ? 'personal' : 'aluno';
-
   return (
     <SafeAreaView style={styles.safe}>
       <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
@@ -132,7 +60,6 @@ export default function RegisterScreen() {
           <View style={styles.card}>
             <Text style={styles.title}>Quem é você?</Text>
 
-            {/* Role selector */}
             <View style={styles.roleRow}>
               {(['student', 'trainer'] as Role[]).map((r) => (
                 <TouchableOpacity
@@ -151,58 +78,6 @@ export default function RegisterScreen() {
             </View>
 
             {error ? <Text style={styles.errorMsg}>{error}</Text> : null}
-
-            {/* Social OAuth buttons */}
-            <TouchableOpacity
-              style={styles.socialBtn}
-              onPress={() => handleProvider('google')}
-              disabled={isAnyLoading}
-              activeOpacity={0.85}
-            >
-              <GoogleIcon />
-              <Text style={styles.socialBtnText}>
-                {providerLoading === 'google'
-                  ? 'Redirecionando…'
-                  : `Cadastrar como ${roleLabel} com Google`}
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.socialBtn}
-              onPress={() => handleProvider('azure')}
-              disabled={isAnyLoading}
-              activeOpacity={0.85}
-            >
-              <MicrosoftIcon />
-              <Text style={styles.socialBtnText}>
-                {providerLoading === 'azure'
-                  ? 'Redirecionando…'
-                  : `Cadastrar como ${roleLabel} com Microsoft`}
-              </Text>
-            </TouchableOpacity>
-
-            {Platform.OS !== 'android' && (
-              <TouchableOpacity
-                style={[styles.socialBtn, styles.appleBtn]}
-                onPress={() => handleProvider('apple')}
-                disabled={isAnyLoading}
-                activeOpacity={0.85}
-              >
-                <AppleIcon />
-                <Text style={styles.appleBtnText}>
-                  {providerLoading === 'apple'
-                    ? 'Redirecionando…'
-                    : `Cadastrar como ${roleLabel} com Apple`}
-                </Text>
-              </TouchableOpacity>
-            )}
-
-            {/* Divider */}
-            <View style={styles.dividerRow}>
-              <View style={styles.dividerLine} />
-              <Text style={styles.dividerText}>ou com e-mail</Text>
-              <View style={styles.dividerLine} />
-            </View>
 
             <Input label="Nome completo" value={fullName} onChangeText={setFullName} autoCapitalize="words" placeholder="Seu nome" />
             <Input label="E-mail" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" placeholder="seu@email.com" />
@@ -249,27 +124,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.error[50], color: Colors.error[700],
     borderRadius: BorderRadii.md, padding: Spacing.md, fontSize: FontSizes.sm, marginBottom: Spacing.sm,
   },
-
-  socialBtn: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10,
-    backgroundColor: Colors.white,
-    borderWidth: 1.5, borderColor: '#dadce0',
-    borderRadius: BorderRadii.lg, paddingVertical: 13,
-    marginBottom: Spacing.xs,
-    shadowColor: Colors.neutral[900],
-    shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.06, shadowRadius: 4, elevation: 1,
-  },
-  socialBtnText: { fontSize: FontSizes.md, fontWeight: '600', color: Colors.neutral[800] },
-  appleBtn: { backgroundColor: '#000', borderColor: '#000' },
-  appleBtnText: { fontSize: FontSizes.md, fontWeight: '600', color: Colors.white },
-
-  dividerRow: {
-    flexDirection: 'row', alignItems: 'center', gap: 10,
-    marginVertical: Spacing.sm,
-  },
-  dividerLine: { flex: 1, height: 1, backgroundColor: Colors.neutral[200] },
-  dividerText: { fontSize: FontSizes.sm, color: Colors.neutral[400], fontWeight: '500' },
-
   link: { alignItems: 'center', paddingVertical: Spacing.md, marginTop: Spacing.sm },
   linkText: { fontSize: FontSizes.md, color: Colors.neutral[600] },
   linkBold: { color: Colors.primary[600], fontWeight: '700' },
