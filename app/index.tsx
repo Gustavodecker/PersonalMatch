@@ -2789,10 +2789,12 @@ marginLeft: IS_DESKTOP ? -18 : -6,
   },
 
   headerCtas: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
+flexDirection: 'row',
+alignItems: 'center',
+gap: 10,
+marginLeft: IS_DESKTOP ? 32 : 12,
+},
+
 
   btnLogin: {
     paddingHorizontal: 16,
