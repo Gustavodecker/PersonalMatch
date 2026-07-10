@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
   },
   topLogoWrap: { alignItems: 'center', justifyContent: 'center' },
-  topLogoImg: { width: 100, height: 100 },
+  topLogoImg: { width: 150, height: 150 },
 
   heroText: {
     paddingHorizontal: Spacing.xl,
