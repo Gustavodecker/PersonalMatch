@@ -644,8 +644,8 @@ const ww = StyleSheet.create({
   },
 
   logoIcon: {
-    width: 155,
-    height: 58,
+    width: 210,
+    height: 78,
   },
 
   skipBtn: {
@@ -2753,23 +2753,23 @@ const s = StyleSheet.create({
     paddingHorizontal: IS_DESKTOP
       ? 56
       : 20,
-    paddingVertical: IS_DESKTOP ? 10 : 8,
-    minHeight: IS_DESKTOP ? 78 : 68,
+    paddingVertical: IS_DESKTOP ? 8 : 6,
+    minHeight: IS_DESKTOP ? 92 : 76,
     maxWidth: 1200,
     alignSelf: 'center',
     width: '100%',
   },
 
   logo: {
-    height: 58,
-    alignItems: 'flex-start',
-    justifyContent: 'center',
-    flexShrink: 0,
-  },
+  height: IS_DESKTOP ? 80 : 62,
+  alignItems: 'flex-start',
+  justifyContent: 'center',
+  flexShrink: 0,
+},
 
   logoMark: {
-    width: IS_DESKTOP ? 170 : 130,
-    height: IS_DESKTOP ? 56 : 46,
+    width: IS_DESKTOP ? 230 : 170,
+    height: IS_DESKTOP ? 76 : 58,
   },
 
   headerNav: {
@@ -3996,8 +3996,8 @@ const s = StyleSheet.create({
   },
 
   footerLogo: {
-    width: IS_DESKTOP ? 165 : 145,
-    height: IS_DESKTOP ? 58 : 52,
+    width: IS_DESKTOP ? 220 : 180,
+    height: IS_DESKTOP ? 78 : 64,
   },
 
   footerTagline: {
