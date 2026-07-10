@@ -70,7 +70,7 @@ export default function RegisterScreen() {
             </TouchableOpacity>
             <View style={styles.topLogoWrap}>
               <Image
-                source={require('@/assets/images/logo.png')}
+                source={require('@/assets/images/logo-horizontal.png')}
                 style={styles.topLogoImg}
                 resizeMode="contain"
               />
