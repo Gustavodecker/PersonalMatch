@@ -2746,27 +2746,30 @@ const s = StyleSheet.create({
     elevation: 2,
   },
 
- headerInner: {
+headerInner: {
 flexDirection: 'row',
 alignItems: 'center',
 justifyContent: 'space-between',
-paddingHorizontal: IS_DESKTOP ? 24 : 16,
-paddingVertical: IS_DESKTOP ? 8 : 6,
-minHeight: IS_DESKTOP ? 96 : 76,
+paddingLeft: IS_DESKTOP ? 4 : 8,
+paddingRight: IS_DESKTOP ? 28 : 16,
+paddingVertical: IS_DESKTOP ? 6 : 6,
+minHeight: IS_DESKTOP ? 110 : 82,
 width: '100%',
 },
 
 logo: {
-height: IS_DESKTOP ? 88 : 68,
+height: IS_DESKTOP ? 100 : 72,
 alignItems: 'flex-start',
 justifyContent: 'center',
 flexShrink: 0,
 },
 
 logoMark: {
-width: IS_DESKTOP ? 280 : 190,
-height: IS_DESKTOP ? 88 : 64,
+width: IS_DESKTOP ? 580 : 420,
+height: IS_DESKTOP ? 200 : 82,
+marginLeft: IS_DESKTOP ? -18 : -6,
 },
+
 
 
   headerNav: {
