@@ -473,7 +473,7 @@ const PublicHome: React.FC = () => {
             onPress={() => scrollRef.current?.scrollTo({ y: 0, animated: true })}
           >
             <Image
-              source={require('@/assets/images/logo.png')}
+              source={require('@/assets/images/logo-horizontal.png')}
               style={s.logoHorizontal}
               resizeMode="contain"
             />
@@ -1244,7 +1244,7 @@ const s = StyleSheet.create({
     maxWidth: 1200, alignSelf: 'center', width: '100%',
   },
   logo: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  logoHorizontal: { width: IS_DESKTOP ? 300 : 300, height: IS_DESKTOP ? 300 : 300 },
+  logoHorizontal: { width: IS_DESKTOP ? 220 : 160, height: IS_DESKTOP ? 64 : 48 },
   logoMark: { width: 42, height: 42 },
   logoMarkNum: { fontSize: 17, fontWeight: '900', color: Colors.white, letterSpacing: 0 },
   logoText: {

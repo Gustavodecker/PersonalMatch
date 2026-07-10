@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
     gap: Spacing.lg,
   },
   logoWrap: { alignItems: 'center', justifyContent: 'center' },
-  logoImg: { width: 50, height: 50 },
+  logoImg: { width: 75, height: 75 },
   tagline: {
     fontSize: FontSizes.md,
     color: 'rgba(255,255,255,0.55)',
