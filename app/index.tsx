@@ -188,8 +188,8 @@ const MobileWelcome: React.FC = () => {
         {/* Top: logo */}
         <View style={ww.topBar}>
           <View style={ww.logoWrap}>
-            <Image source={require('@/assets/images/ChatGPT_Image_9_de_jul._de_2026,_21_23_46-Photoroom.png')} style={ww.logoIcon} />
-            <Text style={ww.logoText}>Personal</Text>
+            <Image source={require('@/assets/images/logo4.png')} style={ww.logoIcon} />
+            <Text style={ww.logoText}></Text>
           </View>
           <TouchableOpacity
             onPress={() => router.push('/(auth)/login')}
