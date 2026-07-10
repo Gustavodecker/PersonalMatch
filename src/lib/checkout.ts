@@ -1,40 +1,48 @@
-import { supabase } from '../../lib/supabase';
+import { Platform } from 'react-native';
+import { supabase } from './supabase';
+import type { StripeMode } from '../stripe-config';
 
 export async function createCheckoutSession(
   priceId: string,
-  mode: 'subscription' | 'payment'
-): Promise<string> {
+  mode: StripeMode,
+): Promise<{ url: string }> {
   const {
     data: { session },
   } = await supabase.auth.getSession();
 
-  if (!session) throw new Error('Usuário não autenticado');
-
-  const origin = typeof window !== 'undefined' ? window.location.origin : '';
-  const successUrl = `${origin}/subscription/success`;
-  const cancelUrl = `${origin}/subscription`;
-
-  const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
-
-  const response = await fetch(`${supabaseUrl}/functions/v1/create-checkout`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${session.access_token}`,
-    },
-    body: JSON.stringify({
-      price_id: priceId,
-      success_url: successUrl,
-      cancel_url: cancelUrl,
-      mode,
-    }),
-  });
-
-  if (!response.ok) {
-    const err = await response.json().catch(() => ({}));
-    throw new Error(err.message || 'Falha ao criar sessão de pagamento');
+  if (!session) {
+    throw new Error('Você precisa estar autenticado para assinar um plano.');
   }
 
-  const data = await response.json();
-  return data.url;
+  const baseUrl =
+    Platform.OS === 'web'
+      ? window.location.origin
+      : (process.env.EXPO_PUBLIC_APP_URL ?? '');
+
+  const successUrl = `${baseUrl}/checkout-success`;
+  const cancelUrl = `${baseUrl}/planos`;
+
+  const response = await fetch(
+    `${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/create-checkout`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${session.access_token}`,
+      },
+      body: JSON.stringify({
+        price_id: priceId,
+        success_url: successUrl,
+        cancel_url: cancelUrl,
+        mode,
+      }),
+    },
+  );
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(text || 'Erro ao criar sessão de pagamento.');
+  }
+
+  return response.json();
 }
