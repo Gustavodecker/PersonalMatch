@@ -187,10 +187,13 @@ const MobileWelcome: React.FC = () => {
       <SafeAreaView style={ww.overlay} edges={['top', 'bottom']} pointerEvents="box-none">
         {/* Top: logo */}
         <View style={ww.topBar}>
-          <View style={ww.logoWrap}>
-            <Image source={require('@/assets/images/logo4.png')} style={ww.logoIcon} />
-            <Text style={ww.logoText}></Text>
-          </View>
+         <View style={ww.logoWrap}>
+  <Image
+    source={require('@/assets/images/logo4.png')}
+    style={ww.logoIcon}
+    resizeMode="contain"
+  />
+</View>
           <TouchableOpacity
             onPress={() => router.push('/(auth)/login')}
             style={ww.skipBtn}
