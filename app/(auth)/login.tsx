@@ -128,10 +128,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.xl,
     gap: Spacing.lg,
   },
-  logoWrap: { flexDirection: 'row', alignItems: 'center', gap: 14 },
-  logoImg: { width: 72, height: 72 },
+  logoWrap: { flexDirection: 'row', alignItems: 'center', gap: 16 },
+  logoImg: { width: 100, height: 100 },
   logoWordMark: {
-    fontSize: 30, fontWeight: '900', color: Colors.white, letterSpacing: -0.5, lineHeight: 34,
+    fontSize: 40, fontWeight: '900', color: Colors.white, letterSpacing: -0.8, lineHeight: 44,
   },
   logoWordSub: {
     fontSize: 12, fontWeight: '600', color: 'rgba(255,255,255,0.45)',

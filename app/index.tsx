@@ -185,7 +185,7 @@ const MobileWelcome: React.FC = () => {
 
       {/* Fixed overlay content */}
       <SafeAreaView style={ww.overlay} edges={['top', 'bottom']} pointerEvents="box-none">
-        {/* Top: logo + entrar */}
+        {/* Top: logo centralizado + entrar absoluto */}
         <View style={ww.topBar}>
           <View style={ww.logoWrap}>
             <Image
@@ -319,13 +319,16 @@ const ww = StyleSheet.create({
   },
 
   topBar: {
-    flexDirection: 'row', alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20, paddingTop: 10, paddingBottom: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 14,
+    paddingBottom: 8,
+    position: 'relative',
   },
-  logoWrap: { flexDirection: 'row', alignItems: 'center', gap: 14 },
+  logoWrap: { flexDirection: 'row', alignItems: 'center', gap: 16 },
   logoImg: { width: 140, height: 40 },
-  logoIconImg: { width: 130, height: 130 },
+  logoIconImg: { width: 170, height: 170 },
   logoIconGrad: {
     width: 42, height: 42, borderRadius: 13,
     alignItems: 'center', justifyContent: 'center',
@@ -336,8 +339,9 @@ const ww = StyleSheet.create({
     backgroundColor: Colors.primary[600],
     alignItems: 'center', justifyContent: 'center',
   },
-  logoText: { fontSize: 38, fontWeight: '900', color: Colors.white, letterSpacing: -1 },
+  logoText: { fontSize: 48, fontWeight: '900', color: Colors.white, letterSpacing: -1.5 },
   skipBtn: {
+    position: 'absolute', right: 20, top: '50%',
     paddingHorizontal: 16, paddingVertical: 7,
     backgroundColor: 'rgba(255,255,255,0.12)',
     borderRadius: 99, borderWidth: 1, borderColor: 'rgba(255,255,255,0.18)',
