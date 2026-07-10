@@ -2768,8 +2768,8 @@ const s = StyleSheet.create({
 },
 
   logoMark: {
-    width: IS_DESKTOP ? 230 : 170,
-    height: IS_DESKTOP ? 76 : 58,
+    width: IS_DESKTOP ? 310 : 250,
+    height: IS_DESKTOP ? 96 : 78,
   },
 
   headerNav: {
