@@ -805,8 +805,8 @@ const s = StyleSheet.create({
   },
 
   logo: {
-    width: 145,
-    height: 58,
+    width: 185,
+    height: 72,
   },
 
   greeting: {
