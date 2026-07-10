@@ -2763,7 +2763,7 @@ const s = StyleSheet.create({
   logo: {
   height: IS_DESKTOP ? 10 : 12,
   alignItems: 'flex-start',
-  justifyContent: 'center',
+  justifyContent: 'Right',
   flexShrink: 0,
 },
 
