@@ -2787,7 +2787,8 @@ const s = StyleSheet.create({
   headerCtas: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 10,
+    marginLeft: IS_DESKTOP ? 32 : 12,
   },
 
   btnLogin: {
