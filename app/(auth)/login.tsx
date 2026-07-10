@@ -46,7 +46,7 @@ export default function LoginScreen() {
           <View style={styles.hero}>
             <View style={styles.logoWrap}>
               <Image
-                source={require('@/assets/images/logo.png')}
+                source={require('@/assets/images/logo-icon.png')}
                 style={styles.logoImg}
                 resizeMode="contain"
               />
@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
     gap: Spacing.lg,
   },
   logoWrap: { alignItems: 'center', justifyContent: 'center' },
-  logoImg: { width: 900, height: 900 },
+  logoImg: { width: 50, height: 50 },
   tagline: {
     fontSize: FontSizes.md,
     color: 'rgba(255,255,255,0.55)',
