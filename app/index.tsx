@@ -3996,8 +3996,8 @@ const s = StyleSheet.create({
   },
 
   footerLogo: {
-    width: IS_DESKTOP ? 220 : 180,
-    height: IS_DESKTOP ? 220 : 180,
+    width: IS_DESKTOP ? 322 : 322,
+    height: IS_DESKTOP ? 322 : 322,
   },
 
   footerTagline: {
