@@ -203,26 +203,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signUp = async (email: string, password: string, fullName: string, role: 'student' | 'trainer') => {
-    const { data, error } = await supabase.auth.signUp({ email, password });
+    // Pass full_name and role as user metadata so the DB trigger can create the
+    // profile + student/trainer rows automatically (bypassing RLS).
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { full_name: fullName, role } },
+    });
     if (error) return { error: error.message };
-    if (data.user) {
-      const { error: profileError } = await supabase.from('profiles').insert({
-        id: data.user.id, full_name: fullName, email, role,
-      });
-      if (profileError) return { error: profileError.message };
-      if (role === 'trainer') {
-        const now = new Date();
-        const trialEndsAt = new Date(now);
-        trialEndsAt.setDate(trialEndsAt.getDate() + 15);
-        await supabase.from('trainers').insert({
-          id: data.user.id, status: 'active',
-          subscription_plan: 'free_trial', subscription_status: 'trialing',
-          trial_started_at: now.toISOString(), trial_ends_at: trialEndsAt.toISOString(),
-        });
-      } else {
-        await supabase.from('students').insert({ id: data.user.id });
-      }
-    }
     return { error: null };
   };
 

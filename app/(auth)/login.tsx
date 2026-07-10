@@ -25,7 +25,12 @@ export default function LoginScreen() {
     const { error: err } = await signIn(email.trim().toLowerCase(), password);
     setLoading(false);
     if (err) {
-      setError('E-mail ou senha incorretos. Verifique e tente novamente.');
+      const msg = err.toLowerCase();
+      if (msg.includes('email') && msg.includes('confirm')) {
+        setError('Confirme seu e-mail antes de entrar. Verifique sua caixa de entrada.');
+      } else {
+        setError('E-mail ou senha incorretos. Verifique e tente novamente.');
+      }
     } else {
       router.replace('/');
     }
