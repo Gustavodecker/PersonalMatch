@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  KeyboardAvoidingView, Platform,
+  KeyboardAvoidingView, Platform, Image,
 } from 'react-native';
 import { router } from 'expo-router';
 import { Redirect } from 'expo-router';
@@ -10,7 +10,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Input } from '@/components/Input';
 import { Button } from '@/components/Button';
 import { Colors, Spacing, FontSizes, BorderRadii } from '@/constants/theme';
-import { Dumbbell } from 'lucide-react-native';
 
 export default function LoginScreen() {
   const { signIn, user, profile } = useAuth();
@@ -37,9 +36,7 @@ export default function LoginScreen() {
       <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
           <View style={styles.hero}>
-            <View style={styles.logoWrap}>
-              <Dumbbell size={36} color={Colors.white} />
-            </View>
+            <Image source={require('@/assets/images/ChatGPT_Image_9_de_jul._de_2026,_21_23_46-Photoroom.png')} style={styles.logoWrap} />
             <Text style={styles.brand}>SuperShape</Text>
             <Text style={styles.tagline}>Conecte-se ao personal certo</Text>
           </View>
@@ -90,7 +87,6 @@ const styles = StyleSheet.create({
   hero: { alignItems: 'center', paddingTop: Spacing.xxxl, paddingBottom: Spacing.xxl, gap: Spacing.sm },
   logoWrap: {
     width: 72, height: 72, borderRadius: BorderRadii.xl,
-    backgroundColor: Colors.primary[500], alignItems: 'center', justifyContent: 'center',
     marginBottom: Spacing.sm,
   },
   brand: { fontSize: FontSizes.xxxl, fontWeight: '700', color: Colors.white, letterSpacing: -0.5 },

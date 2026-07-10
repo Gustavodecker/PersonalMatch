@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  KeyboardAvoidingView, Platform,
+  KeyboardAvoidingView, Platform, Image,
 } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -9,7 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Input } from '@/components/Input';
 import { Button } from '@/components/Button';
 import { Colors, Spacing, FontSizes, BorderRadii } from '@/constants/theme';
-import { ArrowLeft, Dumbbell } from 'lucide-react-native';
+import { ArrowLeft } from 'lucide-react-native';
 import { getDashboardRoute } from '@/lib/role-routes';
 
 type Role = 'student' | 'trainer';
@@ -62,7 +62,7 @@ export default function SignupScreen() {
               <ArrowLeft size={22} color={Colors.white} />
             </TouchableOpacity>
             <View style={styles.logoRow}>
-              <Dumbbell size={20} color={Colors.white} />
+              <Image source={require('@/assets/images/ChatGPT_Image_9_de_jul._de_2026,_21_23_46-Photoroom.png')} style={{ width: 24, height: 24, borderRadius: 6 }} />
               <Text style={styles.brand}>SuperShape</Text>
             </View>
             <View style={{ width: 38 }} />

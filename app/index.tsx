@@ -188,9 +188,7 @@ const MobileWelcome: React.FC = () => {
         {/* Top: logo */}
         <View style={ww.topBar}>
           <View style={ww.logoWrap}>
-            <View style={ww.logoIcon}>
-              <Dumbbell size={16} color={Colors.white} strokeWidth={2.5} />
-            </View>
+            <Image source={require('@/assets/images/ChatGPT_Image_9_de_jul._de_2026,_21_23_46-Photoroom.png')} style={ww.logoIcon} />
             <Text style={ww.logoText}>SuperShape</Text>
           </View>
           <TouchableOpacity
@@ -324,8 +322,6 @@ const ww = StyleSheet.create({
   logoWrap: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   logoIcon: {
     width: 34, height: 34, borderRadius: 10,
-    backgroundColor: Colors.primary[600],
-    alignItems: 'center', justifyContent: 'center',
   },
   logoText: { fontSize: 17, fontWeight: '800', color: Colors.white, letterSpacing: -0.3 },
   skipBtn: {
@@ -461,9 +457,7 @@ const PublicHome: React.FC = () => {
             style={s.logo}
             onPress={() => scrollRef.current?.scrollTo({ y: 0, animated: true })}
           >
-            <View style={s.logoMark}>
-              <Dumbbell size={16} color={Colors.white} strokeWidth={2.5} />
-            </View>
+            <Image source={require('@/assets/images/ChatGPT_Image_9_de_jul._de_2026,_21_23_46-Photoroom.png')} style={s.logoMark} />
             <Text style={s.logoText}>SuperShape</Text>
           </TouchableOpacity>
 
@@ -1075,9 +1069,7 @@ const PublicHome: React.FC = () => {
           <View style={IS_DESKTOP ? s.footerDesktop : undefined}>
             {/* Brand */}
             <View style={s.footerBrand}>
-              <View style={s.footerLogo}>
-                <Dumbbell size={15} color={Colors.white} />
-              </View>
+              <Image source={require('@/assets/images/ChatGPT_Image_9_de_jul._de_2026,_21_23_46-Photoroom.png')} style={s.footerLogo} />
               <Text style={s.footerLogoText}>SuperShape</Text>
             </View>
             {IS_DESKTOP && (
@@ -1229,8 +1221,6 @@ const s = StyleSheet.create({
   logo: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   logoMark: {
     width: 34, height: 34, borderRadius: 10,
-    backgroundColor: Colors.primary[700],
-    alignItems: 'center', justifyContent: 'center',
   },
   logoText: {
     fontSize: 18, fontWeight: '800', color: Colors.neutral[900], letterSpacing: -0.4,
@@ -1782,8 +1772,6 @@ const s = StyleSheet.create({
   footerBrand: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 8 },
   footerLogo: {
     width: 32, height: 32, borderRadius: 9,
-    backgroundColor: Colors.neutral[700],
-    alignItems: 'center', justifyContent: 'center',
   },
   footerLogoText: { fontSize: 16, fontWeight: '700', color: Colors.neutral[200] },
   footerTagline: { fontSize: 13, color: Colors.neutral[600], marginBottom: 36, lineHeight: 20 },

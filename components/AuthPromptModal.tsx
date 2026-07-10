@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import {
   View, Text, StyleSheet, Modal, TouchableOpacity,
-  TextInput, KeyboardAvoidingView, Platform, ScrollView,
+  TextInput, KeyboardAvoidingView, Platform, ScrollView, Image,
 } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { Colors, FontSizes, Spacing, Shadows } from '@/constants/theme';
-import { X, Dumbbell, LogIn, UserPlus } from 'lucide-react-native';
+import { X, LogIn, UserPlus } from 'lucide-react-native';
 
 type Tab = 'login' | 'register';
 
@@ -68,9 +68,7 @@ export function AuthPromptModal({ visible, onClose, message }: Props) {
           {/* Header */}
           <View style={s.header}>
             <View style={s.logoRow}>
-              <View style={s.logoBubble}>
-                <Dumbbell size={18} color={Colors.white} />
-              </View>
+              <Image source={require('@/assets/images/ChatGPT_Image_9_de_jul._de_2026,_21_23_46-Photoroom.png')} style={s.logoBubble} />
               <Text style={s.logoText}>SuperShape</Text>
             </View>
             <TouchableOpacity style={s.closeBtn} onPress={onClose}>
@@ -193,7 +191,6 @@ const s = StyleSheet.create({
   logoRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   logoBubble: {
     width: 32, height: 32, borderRadius: 10,
-    backgroundColor: Colors.primary[700], alignItems: 'center', justifyContent: 'center',
   },
   logoText: { fontSize: FontSizes.lg, fontWeight: '800', color: Colors.primary[800] },
   closeBtn: {

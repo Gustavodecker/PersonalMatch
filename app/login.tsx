@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
-  ActivityIndicator, KeyboardAvoidingView, Platform,
+  ActivityIndicator, KeyboardAvoidingView, Platform, Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Mail, Lock, Eye, EyeOff, Dumbbell } from 'lucide-react-native';
+import { Mail, Lock, Eye, EyeOff } from 'lucide-react-native';
 import { router } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { getDashboardRoute } from '@/lib/role-routes';
@@ -46,9 +46,7 @@ export default function LoginScreen() {
       >
         <View style={styles.content}>
           <View style={styles.logoRow}>
-            <View style={styles.logoIcon}>
-              <Dumbbell size={28} color="#ffffff" />
-            </View>
+            <Image source={require('@/assets/images/ChatGPT_Image_9_de_jul._de_2026,_21_23_46-Photoroom.png')} style={styles.logoIcon} />
             <Text style={styles.brand}>SuperShape</Text>
           </View>
 
@@ -133,7 +131,6 @@ const styles = StyleSheet.create({
   },
   logoIcon: {
     width: 48, height: 48, borderRadius: 14,
-    backgroundColor: '#2563eb', alignItems: 'center', justifyContent: 'center',
   },
   brand: { fontSize: 24, fontWeight: '800', color: '#1f2937', letterSpacing: -0.5 },
   header: { alignItems: 'center', marginBottom: 32 },
