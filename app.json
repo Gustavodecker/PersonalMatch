@@ -10,10 +10,10 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.gustavomiguel.99personal"
+      "bundleIdentifier": "com.personal99"
     },
     "android": {
-      "package": "com.gustavomiguel.99personal"
+      "package": "com.personal99"
     },
     "web": {
       "bundler": "metro",
