@@ -47,7 +47,7 @@ export default function LoginScreen() {
         <View style={styles.content}>
           <View style={styles.logoRow}>
             <Image source={require('@/assets/images/ChatGPT_Image_9_de_jul._de_2026,_21_23_46-Photoroom.png')} style={styles.logoIcon} />
-            <Text style={styles.brand}>SuperShape</Text>
+            <Text style={styles.brand}>Personal</Text>
           </View>
 
           <View style={styles.header}>
