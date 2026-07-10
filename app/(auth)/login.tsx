@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  KeyboardAvoidingView, Platform, Image,
+  KeyboardAvoidingView, Platform,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
@@ -44,12 +44,20 @@ export default function LoginScreen() {
 
           {/* Hero */}
           <View style={styles.hero}>
-            <View style={styles.logoCard}>
-              <Image
-                source={require('@/assets/images/k-1aa6IzU5CK8N6qYmpX7_BKvZ5utI_00001.png')}
-                style={styles.logoImage}
-                resizeMode="contain"
-              />
+            {/* Logo mark — texto sobre gradiente, sem PNG */}
+            <View style={styles.logoWrap}>
+              <LinearGradient
+                colors={[Colors.primary[500], Colors.teal[500]]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.logoBadge}
+              >
+                <Text style={styles.logoBadgeNum}>99</Text>
+              </LinearGradient>
+              <View>
+                <Text style={styles.logoWordPersonal}>Personal</Text>
+                <Text style={styles.logoWordSub}>trainer marketplace</Text>
+              </View>
             </View>
             <Text style={styles.tagline}>Conecte-se ao personal certo</Text>
           </View>
@@ -124,21 +132,31 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.xl,
     gap: Spacing.lg,
   },
-  logoCard: {
-    backgroundColor: Colors.white,
-    borderRadius: 22,
-    paddingHorizontal: 32,
-    paddingVertical: 20,
-    shadowColor: Colors.primary[900],
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.25,
-    shadowRadius: 20,
-    elevation: 10,
+  logoWrap: {
+    flexDirection: 'row', alignItems: 'center', gap: 14,
   },
-  logoImage: { width: 220, height: 68 },
+  logoBadge: {
+    width: 56, height: 56, borderRadius: 18,
+    alignItems: 'center', justifyContent: 'center',
+    shadowColor: Colors.primary[900],
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.4,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  logoBadgeNum: {
+    fontSize: 22, fontWeight: '900', color: Colors.white, letterSpacing: -1,
+  },
+  logoWordPersonal: {
+    fontSize: 28, fontWeight: '900', color: Colors.white, letterSpacing: -0.8, lineHeight: 32,
+  },
+  logoWordSub: {
+    fontSize: 11, fontWeight: '600', color: 'rgba(255,255,255,0.45)',
+    textTransform: 'uppercase', letterSpacing: 0.8,
+  },
   tagline: {
     fontSize: FontSizes.md,
-    color: 'rgba(255,255,255,0.65)',
+    color: 'rgba(255,255,255,0.55)',
     textAlign: 'center',
     letterSpacing: 0.3,
   },
