@@ -264,8 +264,8 @@ const styles = StyleSheet.create({
   },
 
   logo: {
-    width: 175,
-    height: 92,
+    width: 275,
+    height: 122,
   },
 
   /* CARD */
