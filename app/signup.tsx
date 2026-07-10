@@ -63,7 +63,7 @@ export default function SignupScreen() {
             </TouchableOpacity>
             <View style={styles.logoRow}>
               <Image
-                source={require('@/assets/images/logo.png')}
+                source={require('@/assets/images/logo-icon.png')}
                 style={styles.logoIcon}
                 resizeMode="contain"
               />
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
   },
   back: { padding: Spacing.xs },
   logoRow: { alignItems: 'center', justifyContent: 'center' },
-  logoIcon: { width: 90, height: 90 },
+  logoIcon: { width: 200, height: 200 },
   card: {
     flex: 1, backgroundColor: Colors.white,
     borderTopLeftRadius: BorderRadii.xl, borderTopRightRadius: BorderRadii.xl,

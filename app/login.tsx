@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   logoHorizontal: {
-    width: 300, height: 96,
+    width: 900, height: 288,
   },
   header: { alignItems: 'center', marginBottom: 32 },
   title: { fontSize: 28, fontWeight: 'bold', color: '#1f2937', marginBottom: 6 },
