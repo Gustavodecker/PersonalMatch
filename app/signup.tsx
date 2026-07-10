@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
   },
   back: { padding: Spacing.xs },
   logoRow: { alignItems: 'center', justifyContent: 'center' },
-  logoIcon: { width: 200, height: 200 },
+  logoIcon: { width: 100, height: 100 },
   card: {
     flex: 1, backgroundColor: Colors.white,
     borderTopLeftRadius: BorderRadii.xl, borderTopRightRadius: BorderRadii.xl,
