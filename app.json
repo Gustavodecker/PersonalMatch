@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "SuperShape",
-    "slug": "supershape",
+    "name": "99personal",
+    "slug": "99personal",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/ChatGPT_Image_9_de_jul._de_2026,_21_23_46-Photoroom.png",
     "scheme": "supershape",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
