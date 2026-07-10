@@ -37,7 +37,7 @@ export default function LoginScreen() {
         <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
           <View style={styles.hero}>
             <Image source={require('@/assets/images/ChatGPT_Image_9_de_jul._de_2026,_21_23_46-Photoroom.png')} style={styles.logoWrap} />
-            <Text style={styles.brand}>SuperShape</Text>
+            <Text style={styles.brand}>Personal</Text>
             <Text style={styles.tagline}>Conecte-se ao personal certo</Text>
           </View>
 
