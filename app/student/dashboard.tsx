@@ -9,7 +9,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { StatusBadge } from '@/components/StatusBadge';
-import { Colors, Spacing, FontSizes, Shadows, BorderRadii } from '@/constants/theme';
+import { Colors, Spacing, FontSizes, Shadows } from '@/constants/theme';
 import { TrainerWithProfile, Lead } from '@/types/database';
 import {
   Search, Clock, ChevronRight, Dumbbell, ArrowRight,
@@ -104,12 +104,8 @@ export default function StudentDashboard() {
           <View style={s.heroTop}>
             <View style={{ flex: 1 }}>
               <View style={s.logoRow}>
-                <Image
-                  source={require('@/assets/images/logo-icon.png')}
-                  style={s.logoIcon}
-                  resizeMode="contain"
-                />
-                <Text style={s.logoText}>99 Personal</Text>
+                <Dumbbell size={14} color="rgba(255,255,255,0.6)" />
+                <Text style={s.logoText}>SuperShape</Text>
               </View>
               <Text style={s.greeting}>{greeting}, {firstName}!</Text>
               <Text style={s.heroSub}>Encontre seu personal ideal</Text>
@@ -363,16 +359,15 @@ const s = StyleSheet.create({
     paddingHorizontal: Spacing.lg,
     paddingTop: Spacing.md,
     paddingBottom: 20,
-    borderBottomLeftRadius: BorderRadii.xxl,
-    borderBottomRightRadius: BorderRadii.xxl,
+    borderBottomLeftRadius: 28,
+    borderBottomRightRadius: 28,
   },
   heroTop: {
     flexDirection: 'row', alignItems: 'flex-start',
     marginBottom: Spacing.md,
   },
-  logoRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 },
-  logoIcon: { width: 28, height: 28, borderRadius: BorderRadii.sm },
-  logoText: { fontSize: FontSizes.xs, fontWeight: '700', color: 'rgba(255,255,255,0.55)', letterSpacing: 1, textTransform: 'uppercase' },
+  logoRow: { flexDirection: 'row', alignItems: 'center', gap: 5, marginBottom: 4 },
+  logoText: { fontSize: FontSizes.xs, fontWeight: '700', color: 'rgba(255,255,255,0.5)', letterSpacing: 1, textTransform: 'uppercase' },
   greeting: { fontSize: 26, fontWeight: '800', color: Colors.white, letterSpacing: -0.4 },
   heroSub: { fontSize: FontSizes.md, color: 'rgba(255,255,255,0.6)', marginTop: 2 },
   avatarBtn: {},
@@ -385,13 +380,13 @@ const s = StyleSheet.create({
   avatarInitial: { color: Colors.white, fontWeight: '700', fontSize: FontSizes.lg },
   searchBar: {
     flexDirection: 'row', alignItems: 'center', gap: 10,
-    backgroundColor: Colors.white, borderRadius: BorderRadii.lg,
+    backgroundColor: Colors.white, borderRadius: 14,
     paddingLeft: Spacing.md, paddingRight: 6, paddingVertical: 6,
     marginBottom: 12, ...Shadows.md,
   },
   searchPlaceholder: { flex: 1, fontSize: FontSizes.md, color: Colors.neutral[400] },
   searchArrowWrap: {
-    width: 36, height: 36, borderRadius: BorderRadii.md,
+    width: 36, height: 36, borderRadius: 10,
     backgroundColor: Colors.primary[600], alignItems: 'center', justifyContent: 'center',
   },
   quickRow: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
@@ -415,7 +410,7 @@ const s = StyleSheet.create({
   // Categories
   catScroll: { gap: 10, paddingTop: 10, paddingBottom: 4 },
   catCard: {
-    width: 120, height: 76, borderRadius: BorderRadii.lg, overflow: 'hidden',
+    width: 120, height: 76, borderRadius: 14, overflow: 'hidden',
     position: 'relative',
   },
   catImg: { width: '100%', height: '100%' },
@@ -427,7 +422,7 @@ const s = StyleSheet.create({
   // Trainer cards (horizontal scroll)
   trainerScroll: { paddingHorizontal: Spacing.lg, gap: 14, paddingBottom: 8, paddingTop: 4 },
   trainerCard: {
-    width: 160, backgroundColor: Colors.white, borderRadius: BorderRadii.lg, overflow: 'hidden',
+    width: 160, backgroundColor: Colors.white, borderRadius: 18, overflow: 'hidden',
     ...Shadows.md,
   },
   trainerCardCover: { height: 110, position: 'relative' },
@@ -453,7 +448,7 @@ const s = StyleSheet.create({
   trainerCardActions: { paddingHorizontal: 10, paddingBottom: 10 },
   trainerWaBtn: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 5,
-    backgroundColor: Colors.primary[600], borderRadius: BorderRadii.md, paddingVertical: 8,
+    backgroundColor: Colors.primary[600], borderRadius: 10, paddingVertical: 8,
   },
   trainerWaBtnText: { fontSize: 11, fontWeight: '700', color: Colors.white },
 
@@ -475,7 +470,7 @@ const s = StyleSheet.create({
   leadsList: { gap: 10, marginTop: 10 },
   leadCard: {
     flexDirection: 'row', alignItems: 'center', gap: 12,
-    backgroundColor: Colors.white, borderRadius: BorderRadii.lg, padding: 14,
+    backgroundColor: Colors.white, borderRadius: 14, padding: 14,
     ...Shadows.sm,
   },
   leadAvatar: {
@@ -493,13 +488,13 @@ const s = StyleSheet.create({
   loadingText: { color: Colors.neutral[500], fontSize: FontSizes.md },
   emptyBox: {
     marginHorizontal: Spacing.lg, backgroundColor: Colors.white,
-    borderRadius: BorderRadii.xl, padding: 32, alignItems: 'center', gap: 10, ...Shadows.sm,
+    borderRadius: 20, padding: 32, alignItems: 'center', gap: 10, ...Shadows.sm,
   },
   emptyTitle: { fontSize: FontSizes.lg, fontWeight: '700', color: Colors.neutral[700], textAlign: 'center' },
   emptyDesc: { fontSize: FontSizes.sm, color: Colors.neutral[500], textAlign: 'center', lineHeight: 20 },
   emptyBtn: {
     flexDirection: 'row', alignItems: 'center', gap: 6,
-    backgroundColor: Colors.primary[600], borderRadius: BorderRadii.md, paddingVertical: 10, paddingHorizontal: 18, marginTop: 4,
+    backgroundColor: Colors.primary[600], borderRadius: 12, paddingVertical: 10, paddingHorizontal: 18, marginTop: 4,
   },
   emptyBtnText: { fontSize: FontSizes.sm, fontWeight: '700', color: Colors.white },
 });

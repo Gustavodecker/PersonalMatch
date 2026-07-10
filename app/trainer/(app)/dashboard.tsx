@@ -10,7 +10,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { StatusBadge } from '@/components/StatusBadge';
-import { Colors, Spacing, FontSizes, Shadows, BorderRadii } from '@/constants/theme';
+import { Colors, Spacing, FontSizes, Shadows } from '@/constants/theme';
 import { Lead, Appointment } from '@/types/database';
 import { getPlanById, type PlanId } from '@/src/stripe-config';
 import {
@@ -401,8 +401,8 @@ const s = StyleSheet.create({
     paddingHorizontal: Spacing.lg,
     paddingTop: Spacing.md,
     paddingBottom: 20,
-    borderBottomLeftRadius: BorderRadii.xxl,
-    borderBottomRightRadius: BorderRadii.xxl,
+    borderBottomLeftRadius: 28,
+    borderBottomRightRadius: 28,
     marginBottom: 16,
   },
   heroTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 },
@@ -488,7 +488,7 @@ const s = StyleSheet.create({
   listPad: { paddingHorizontal: Spacing.lg, gap: 10, marginBottom: 4 },
 
   aptCard: {
-    backgroundColor: Colors.white, borderRadius: BorderRadii.lg, padding: 14,
+    backgroundColor: Colors.white, borderRadius: 14, padding: 14,
     flexDirection: 'row', alignItems: 'center', gap: 12, ...Shadows.sm,
   },
   aptDateBadge: {
@@ -507,7 +507,7 @@ const s = StyleSheet.create({
   aptTimeText: { fontSize: FontSizes.xs, color: Colors.neutral[500] },
 
   leadCard: {
-    backgroundColor: Colors.white, borderRadius: BorderRadii.lg, padding: 14,
+    backgroundColor: Colors.white, borderRadius: 14, padding: 14,
     flexDirection: 'row', alignItems: 'center', gap: 12, ...Shadows.sm,
   },
   leadAvatar: {
@@ -523,7 +523,7 @@ const s = StyleSheet.create({
   leadRight: { alignItems: 'flex-end', gap: 6 },
   whatsappBtn: {
     flexDirection: 'row', alignItems: 'center', gap: 4,
-    backgroundColor: Colors.secondary[600], borderRadius: BorderRadii.sm,
+    backgroundColor: '#16A34A', borderRadius: 8,
     paddingHorizontal: 9, paddingVertical: 5,
   },
   whatsappBtnText: { fontSize: FontSizes.xs, fontWeight: '700', color: Colors.white },
@@ -541,7 +541,7 @@ const s = StyleSheet.create({
 
   emptyBox: {
     padding: Spacing.xl, backgroundColor: Colors.white,
-    borderRadius: BorderRadii.xl, alignItems: 'center', gap: 8, ...Shadows.sm,
+    borderRadius: 20, alignItems: 'center', gap: 8, ...Shadows.sm,
   },
   emptyIconWrap: {
     width: 64, height: 64, borderRadius: 20,
@@ -551,7 +551,7 @@ const s = StyleSheet.create({
   emptyDesc: { fontSize: FontSizes.sm, color: Colors.neutral[500], textAlign: 'center', lineHeight: 20 },
   emptyBtn: {
     flexDirection: 'row', alignItems: 'center', gap: 6,
-    backgroundColor: Colors.primary[600], borderRadius: BorderRadii.md, paddingVertical: 10, paddingHorizontal: 18, marginTop: 6,
+    backgroundColor: Colors.primary[600], borderRadius: 12, paddingVertical: 10, paddingHorizontal: 18, marginTop: 6,
   },
   emptyBtnText: { fontSize: FontSizes.sm, fontWeight: '700', color: Colors.white },
 });

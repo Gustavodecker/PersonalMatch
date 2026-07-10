@@ -18,7 +18,7 @@ import {
   MessageSquare, Monitor, Users, Heart,
   DollarSign, Target, CheckCircle, Phone, Calendar, LogIn,
   Home, Building2, ShieldCheck, Eye, Lock, Award,
-  ChevronRight, Image as ImageIcon, ChevronLeft, Instagram, X,
+  ChevronRight, Image as ImageIcon, ChevronLeft, Instagram,
 } from 'lucide-react-native';
 
 const COVER_PLACEHOLDER = 'https://images.pexels.com/photos/1552242/pexels-photo-1552242.jpeg?auto=compress&cs=tinysrgb&w=1200&h=500&fit=crop';
@@ -97,7 +97,6 @@ export default function TrainerDetailScreen() {
   const [selectedClassTypeId, setSelectedClassTypeId] = useState<string | null>(null);
 
   const [galleryExpanded, setGalleryExpanded] = useState(false);
-  const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
 
   useEffect(() => { if (id) loadTrainer(); }, [id]);
 
@@ -725,12 +724,7 @@ export default function TrainerDetailScreen() {
               </View>
               <View style={s.galleryGrid}>
                 {displayedGallery.map((url, idx) => (
-                  <TouchableOpacity
-                    key={idx}
-                    style={[s.galleryCell, idx === 0 && s.galleryCellLarge]}
-                    onPress={() => setLightboxIdx(idx)}
-                    activeOpacity={0.85}
-                  >
+                  <View key={idx} style={[s.galleryCell, idx === 0 && s.galleryCellLarge]}>
                     <Image source={{ uri: url }} style={s.galleryImg} resizeMode="cover" />
                     {idx === 5 && !galleryExpanded && galleryImages.length > 6 && (
                       <View style={s.galleryMoreOverlay}>
@@ -738,7 +732,7 @@ export default function TrainerDetailScreen() {
                         <Text style={s.galleryMoreText}>+{galleryImages.length - 6}</Text>
                       </View>
                     )}
-                  </TouchableOpacity>
+                  </View>
                 ))}
               </View>
             </View>
@@ -950,58 +944,6 @@ export default function TrainerDetailScreen() {
         message={authMessage}
       />
 
-      {/* Photo lightbox */}
-      <Modal
-        visible={lightboxIdx !== null}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setLightboxIdx(null)}
-        statusBarTranslucent
-      >
-        <View style={s.lightboxBg}>
-          <SafeAreaView style={s.lightboxSafe} edges={['top', 'bottom']}>
-            {/* Close */}
-            <TouchableOpacity style={s.lightboxClose} onPress={() => setLightboxIdx(null)} activeOpacity={0.8}>
-              <X size={22} color={Colors.white} />
-            </TouchableOpacity>
-
-            {/* Counter */}
-            {lightboxIdx !== null && (
-              <Text style={s.lightboxCounter}>{lightboxIdx + 1} / {galleryImages.length}</Text>
-            )}
-
-            {/* Image */}
-            {lightboxIdx !== null && (
-              <Image
-                source={{ uri: galleryImages[lightboxIdx] }}
-                style={s.lightboxImg}
-                resizeMode="contain"
-              />
-            )}
-
-            {/* Prev / Next */}
-            <View style={s.lightboxNav}>
-              <TouchableOpacity
-                style={[s.lightboxNavBtn, lightboxIdx === 0 && s.lightboxNavBtnDisabled]}
-                onPress={() => setLightboxIdx((i) => (i !== null && i > 0 ? i - 1 : i))}
-                disabled={lightboxIdx === 0}
-                activeOpacity={0.75}
-              >
-                <ChevronLeft size={26} color={Colors.white} />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[s.lightboxNavBtn, lightboxIdx === galleryImages.length - 1 && s.lightboxNavBtnDisabled]}
-                onPress={() => setLightboxIdx((i) => (i !== null && i < galleryImages.length - 1 ? i + 1 : i))}
-                disabled={lightboxIdx === galleryImages.length - 1}
-                activeOpacity={0.75}
-              >
-                <ChevronRight size={26} color={Colors.white} />
-              </TouchableOpacity>
-            </View>
-          </SafeAreaView>
-        </View>
-      </Modal>
-
       {/* Booking modal */}
       <Modal visible={bookModal} transparent animationType="slide">
         <View style={s.modalBg}>
@@ -1162,16 +1104,15 @@ const s = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: Spacing.lg },
   notFound: { fontSize: FontSizes.xl, color: Colors.neutral[600] },
 
-  coverWrap: { height: 340, position: 'relative' },
+  coverWrap: { height: 320, position: 'relative' },
   cover: { width: '100%', height: '100%' },
   coverNav: {
     position: 'absolute', top: 0, left: 0, right: 0,
     flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: Spacing.md,
   },
   navBtn: {
-    width: 44, height: 44, borderRadius: 22,
-    backgroundColor: 'rgba(0,0,0,0.4)', alignItems: 'center', justifyContent: 'center',
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)',
+    width: 42, height: 42, borderRadius: 21,
+    backgroundColor: 'rgba(0,0,0,0.36)', alignItems: 'center', justifyContent: 'center',
   },
   coverBadges: { position: 'absolute', bottom: 80, left: 16, flexDirection: 'row', gap: 6 },
   featuredBadge: {
@@ -1195,8 +1136,8 @@ const s = StyleSheet.create({
   profileCard: {
     backgroundColor: Colors.white,
     marginHorizontal: Spacing.md,
-    marginTop: -56,
-    borderRadius: 28,
+    marginTop: -52,
+    borderRadius: 24,
     padding: Spacing.lg,
     paddingTop: Spacing.md,
     ...Shadows.lg,
@@ -1205,10 +1146,10 @@ const s = StyleSheet.create({
   },
   profileTop: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between' },
   avatar: {
-    width: 96, height: 96, borderRadius: 48,
+    width: 88, height: 88, borderRadius: 44,
     borderWidth: 4, borderColor: Colors.white,
     backgroundColor: Colors.neutral[200],
-    marginTop: -72,
+    marginTop: -64,
   },
   profileRight: { alignItems: 'flex-end', gap: 4, paddingBottom: 4 },
   pricePill: {
@@ -1225,7 +1166,7 @@ const s = StyleSheet.create({
   priceConsulte: { fontSize: FontSizes.sm, fontWeight: '600', color: Colors.neutral[500] },
   monthlyRate: { fontSize: FontSizes.xs, color: Colors.neutral[500], fontWeight: '500' },
 
-  trainerName: { fontSize: 26, fontWeight: '800', color: Colors.neutral[900], letterSpacing: -0.5, marginTop: 2 },
+  trainerName: { fontSize: 24, fontWeight: '800', color: Colors.neutral[900], letterSpacing: -0.4 },
   infoRow: { flexDirection: 'row', alignItems: 'center', gap: 5 },
   infoText: { fontSize: FontSizes.sm, color: Colors.neutral[600], fontWeight: '500' },
   instagramRow: {
@@ -1238,13 +1179,12 @@ const s = StyleSheet.create({
 
   statsStrip: {
     flexDirection: 'row', alignItems: 'center',
-    backgroundColor: Colors.primary[50], borderRadius: 18, padding: 16, marginTop: 8,
-    borderWidth: 1, borderColor: Colors.primary[100],
+    backgroundColor: Colors.primary[50], borderRadius: 16, padding: 14, marginTop: 6,
   },
-  stripItem: { flex: 1, alignItems: 'center', gap: 4 },
-  stripVal: { fontSize: FontSizes.md, fontWeight: '800', color: Colors.primary[900], textAlign: 'center' },
-  stripLbl: { fontSize: 10, color: Colors.primary[500], textAlign: 'center', letterSpacing: 0.2 },
-  stripDivider: { width: 1, height: 38, backgroundColor: Colors.primary[100] },
+  stripItem: { flex: 1, alignItems: 'center', gap: 3 },
+  stripVal: { fontSize: FontSizes.sm, fontWeight: '700', color: Colors.primary[900], textAlign: 'center' },
+  stripLbl: { fontSize: 10, color: Colors.primary[500], textAlign: 'center' },
+  stripDivider: { width: 1, height: 36, backgroundColor: Colors.primary[100] },
 
   // Layout
   body: { paddingHorizontal: Spacing.md, paddingTop: Spacing.lg },
@@ -1264,8 +1204,8 @@ const s = StyleSheet.create({
 
   section: { marginBottom: Spacing.xl },
   sectionTitle: {
-    fontSize: FontSizes.sm, fontWeight: '800', color: Colors.neutral[500],
-    textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 14,
+    fontSize: FontSizes.xs, fontWeight: '700', color: Colors.neutral[400],
+    textTransform: 'uppercase', letterSpacing: 1.0, marginBottom: 14,
   },
   sectionHeaderRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 },
   seeAllText: { fontSize: FontSizes.sm, fontWeight: '600', color: Colors.primary[600] },
@@ -1434,22 +1374,22 @@ const s = StyleSheet.create({
   stickyBar: {
     position: 'absolute', bottom: 0, left: 0, right: 0,
     backgroundColor: Colors.white, flexDirection: 'row', alignItems: 'center', gap: 8,
-    paddingHorizontal: Spacing.md, paddingVertical: 14, paddingBottom: 28,
+    paddingHorizontal: Spacing.md, paddingVertical: 12, paddingBottom: 24,
     borderTopWidth: 1, borderTopColor: Colors.neutral[100], ...Shadows.lg,
   },
   waBtn: {
     flexDirection: 'row', alignItems: 'center', gap: 6,
-    backgroundColor: '#16A34A', paddingHorizontal: 16, paddingVertical: 14, borderRadius: 16,
+    backgroundColor: '#22C55E', paddingHorizontal: 14, paddingVertical: 13, borderRadius: 14,
   },
   waBtnText: { fontSize: FontSizes.sm, fontWeight: '700', color: Colors.white },
   contactBtn: {
     flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
-    backgroundColor: Colors.primary[600], paddingVertical: 14, borderRadius: 16,
+    backgroundColor: Colors.primary[600], paddingVertical: 13, borderRadius: 14,
   },
   contactBtnText: { fontSize: FontSizes.sm, fontWeight: '700', color: Colors.white },
   bookBtn: {
     flexDirection: 'row', alignItems: 'center', gap: 6,
-    backgroundColor: Colors.primary[50], paddingHorizontal: 16, paddingVertical: 14, borderRadius: 16,
+    backgroundColor: Colors.primary[50], paddingHorizontal: 14, paddingVertical: 13, borderRadius: 14,
     borderWidth: 1.5, borderColor: Colors.primary[200],
   },
   bookBtnText: { fontSize: FontSizes.sm, fontWeight: '700', color: Colors.primary[700] },
@@ -1541,36 +1481,4 @@ const s = StyleSheet.create({
   classChipTextActive: { color: Colors.secondary[700] },
   classChipDur: { fontSize: FontSizes.xs, color: Colors.neutral[400] },
   classChipDurActive: { color: Colors.secondary[500] },
-
-  // Lightbox
-  lightboxBg: {
-    flex: 1, backgroundColor: 'rgba(0,0,0,0.97)',
-  },
-  lightboxSafe: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  lightboxClose: {
-    position: 'absolute', top: 0, right: 16,
-    width: 44, height: 44, borderRadius: 22,
-    backgroundColor: 'rgba(255,255,255,0.12)',
-    alignItems: 'center', justifyContent: 'center', zIndex: 10,
-  },
-  lightboxCounter: {
-    position: 'absolute', top: 0, left: 0, right: 0,
-    textAlign: 'center', lineHeight: 44,
-    fontSize: FontSizes.sm, fontWeight: '700', color: 'rgba(255,255,255,0.7)',
-  },
-  lightboxImg: {
-    width: '100%',
-    height: '80%',
-  },
-  lightboxNav: {
-    position: 'absolute', bottom: 0, left: 0, right: 0,
-    flexDirection: 'row', justifyContent: 'space-between',
-    paddingHorizontal: Spacing.md, paddingBottom: Spacing.sm,
-  },
-  lightboxNavBtn: {
-    width: 52, height: 52, borderRadius: 26,
-    backgroundColor: 'rgba(255,255,255,0.12)',
-    alignItems: 'center', justifyContent: 'center',
-  },
-  lightboxNavBtnDisabled: { opacity: 0.25 },
 });

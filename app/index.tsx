@@ -185,21 +185,19 @@ const MobileWelcome: React.FC = () => {
 
       {/* Fixed overlay content */}
       <SafeAreaView style={ww.overlay} edges={['top', 'bottom']} pointerEvents="box-none">
-        {/* Top: logo centralizado + entrar absoluto */}
+        {/* Top: logo */}
         <View style={ww.topBar}>
           <View style={ww.logoWrap}>
-            <Image
-              source={require('@/assets/images/logo-icon.png')}
-              style={ww.logoIconImg}
-              resizeMode="contain"
-            />
-            <Text style={ww.logoText}>Personal</Text>
+            <View style={ww.logoIcon}>
+              <Dumbbell size={16} color={Colors.white} strokeWidth={2.5} />
+            </View>
+            <Text style={ww.logoText}>SuperShape</Text>
           </View>
           <TouchableOpacity
             onPress={() => router.push('/(auth)/login')}
             style={ww.skipBtn}
           >
-            <Text style={ww.skipText}>Entrar1</Text>
+            <Text style={ww.skipText}>Entrar</Text>
           </TouchableOpacity>
         </View>
 
@@ -319,29 +317,18 @@ const ww = StyleSheet.create({
   },
 
   topBar: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 14,
-    paddingBottom: 8,
-    position: 'relative',
+    flexDirection: 'row', alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 24, paddingTop: 8, paddingBottom: 4,
   },
-  logoWrap: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  logoImg: { width: 140, height: 40 },
-  logoIconImg: { width: 48, height: 48 },
-  logoIconGrad: {
-    width: 42, height: 42, borderRadius: 13,
-    alignItems: 'center', justifyContent: 'center',
-  },
-  logoIconNum: { fontSize: 17, fontWeight: '900', color: Colors.white, letterSpacing: 0 },
+  logoWrap: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   logoIcon: {
     width: 34, height: 34, borderRadius: 10,
     backgroundColor: Colors.primary[600],
     alignItems: 'center', justifyContent: 'center',
   },
-  logoText: { fontSize: 24, fontWeight: '900', color: Colors.white, letterSpacing: -0.8 },
+  logoText: { fontSize: 17, fontWeight: '800', color: Colors.white, letterSpacing: -0.3 },
   skipBtn: {
-    position: 'absolute', right: 20, top: '50%',
     paddingHorizontal: 16, paddingVertical: 7,
     backgroundColor: 'rgba(255,255,255,0.12)',
     borderRadius: 99, borderWidth: 1, borderColor: 'rgba(255,255,255,0.18)',
@@ -446,6 +433,8 @@ const PublicHome: React.FC = () => {
         .from('trainers')
         .select('*, profile:profiles!trainers_id_fkey(*), specialties:trainer_specialties(specialty:specialties(*))')
         .eq('status', 'active')
+        .in('subscription_status', ['trialing', 'active'])
+        .order('is_featured', { ascending: false })
         .order('rating', { ascending: false })
         .limit(6);
       setFeaturedTrainers(
@@ -472,11 +461,10 @@ const PublicHome: React.FC = () => {
             style={s.logo}
             onPress={() => scrollRef.current?.scrollTo({ y: 0, animated: true })}
           >
-            <Image
-              source={require('@/assets/images/logo-horizontal.png')}
-              style={s.logoHorizontal}
-              resizeMode="contain"
-            />
+            <View style={s.logoMark}>
+              <Dumbbell size={16} color={Colors.white} strokeWidth={2.5} />
+            </View>
+            <Text style={s.logoText}>SuperShape</Text>
           </TouchableOpacity>
 
           {IS_DESKTOP && (
@@ -996,7 +984,7 @@ const PublicHome: React.FC = () => {
             <View style={s.sectionPill}>
               <Text style={s.sectionPillText}>Transparência</Text>
             </View>
-            <Text style={s.sectionTitle}>Por que confiar no 99 Personal?</Text>
+            <Text style={s.sectionTitle}>Por que confiar no SuperShape?</Text>
             <Text style={s.sectionSub}>
               Uma plataforma onde alunos e profissionais se conectam com segurança.
             </Text>
@@ -1087,14 +1075,10 @@ const PublicHome: React.FC = () => {
           <View style={IS_DESKTOP ? s.footerDesktop : undefined}>
             {/* Brand */}
             <View style={s.footerBrand}>
-              <View style={s.footerLogoRow}>
-                <Image
-                  source={require('@/assets/images/logo-icon.png')}
-                  style={s.footerLogoBadge}
-                  resizeMode="contain"
-                />
-                <Text style={s.footerLogoName}>99 Personal</Text>
+              <View style={s.footerLogo}>
+                <Dumbbell size={15} color={Colors.white} />
               </View>
+              <Text style={s.footerLogoText}>SuperShape</Text>
             </View>
             {IS_DESKTOP && (
               <Text style={[s.footerTagline, { marginTop: 8, marginBottom: 0 }]}>
@@ -1136,7 +1120,7 @@ const PublicHome: React.FC = () => {
               </View>
               <View style={s.footerCol}>
                 <Text style={s.footerColHead}>Suporte</Text>
-                <TouchableOpacity onPress={() => Linking.openURL('https://wa.me/5547992222949?text=Oi%2C%20preciso%20de%20suporte%20no%2099%20Personal')}>
+                <TouchableOpacity onPress={() => Linking.openURL('https://wa.me/5547992222949?text=Oi%2C%20preciso%20de%20suporte%20no%20SuperShape')}>
                   <Text style={s.footerLink}>Falar com suporte</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => router.push('/termos')}><Text style={s.footerLink}>Termos de uso</Text></TouchableOpacity>
@@ -1144,10 +1128,10 @@ const PublicHome: React.FC = () => {
               </View>
               <View style={s.footerCol}>
                 <Text style={s.footerColHead}>Aplicativo</Text>
-                <TouchableOpacity onPress={() => Linking.openURL('https://apps.apple.com/app/99personal')}>
+                <TouchableOpacity onPress={() => Linking.openURL('https://apps.apple.com/app/supershape')}>
                   <Text style={s.footerLink}>Download iOS</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => Linking.openURL('https://play.google.com/store/apps/details?id=com.99personal')}>
+                <TouchableOpacity onPress={() => Linking.openURL('https://play.google.com/store/apps/details?id=com.supershape')}>
                   <Text style={s.footerLink}>Download Android</Text>
                 </TouchableOpacity>
               </View>
@@ -1155,7 +1139,7 @@ const PublicHome: React.FC = () => {
           </View>
 
           <View style={s.footerBottom}>
-            <Text style={s.footerCopy}>© 2026 99 Personal. Todos os direitos reservados.</Text>
+            <Text style={s.footerCopy}>© 2026 SuperShape. Todos os direitos reservados.</Text>
           </View>
         </View>
       </View>
@@ -1190,11 +1174,10 @@ const TrainerRedirect: React.FC<{ userId: string }> = ({ userId }) => {
 // ─── Root export ───────────────────────────────────────────────────────────────
 
 const Index: React.FC = () => {
-  const { user, profile, loading, needsRoleSelection } = useAuth();
+  const { user, profile, loading } = useAuth();
   const [loadingRedirect, setLoadingRedirect] = useState(true);
   useEffect(() => { if (!loading) setLoadingRedirect(false); }, [loading]);
   if (loading || loadingRedirect) return <LoadingScreen />;
-  if (user && !profile && needsRoleSelection) return <Redirect href="/select-role" />;
   if (user && profile) {
     if (profile.role === 'student') return <Redirect href="/student/dashboard" />;
     if (profile.role === 'trainer') return <TrainerRedirect userId={user.id} />;
@@ -1244,11 +1227,13 @@ const s = StyleSheet.create({
     maxWidth: 1200, alignSelf: 'center', width: '100%',
   },
   logo: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  logoHorizontal: { width: 200, height: 56 },
-  logoMark: { width: 42, height: 42 },
-  logoMarkNum: { fontSize: 17, fontWeight: '900', color: Colors.white, letterSpacing: 0 },
+  logoMark: {
+    width: 34, height: 34, borderRadius: 10,
+    backgroundColor: Colors.primary[700],
+    alignItems: 'center', justifyContent: 'center',
+  },
   logoText: {
-    fontSize: 20, fontWeight: '800', color: Colors.neutral[900], letterSpacing: -0.4,
+    fontSize: 18, fontWeight: '800', color: Colors.neutral[900], letterSpacing: -0.4,
   },
   headerNav: { flexDirection: 'row', alignItems: 'center', gap: 30 },
   navLink: { fontSize: 14, fontWeight: '500', color: Colors.neutral[600] },
@@ -1794,12 +1779,7 @@ const s = StyleSheet.create({
     paddingBottom: 32,
   },
   footerDesktop: { flexDirection: IS_DESKTOP ? 'column' : undefined },
-  footerBrand: { marginBottom: 8 },
-  footerLogoRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  footerLogoBadge: { width: 44, height: 44 },
-  footerLogoBadgeNum: { fontSize: 18, fontWeight: '900', color: Colors.white, letterSpacing: 0 },
-  footerLogoName: { fontSize: 22, fontWeight: '900', color: Colors.white, letterSpacing: -0.5 },
-  footerLogoImg: { width: 200, height: 60 },
+  footerBrand: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 8 },
   footerLogo: {
     width: 32, height: 32, borderRadius: 9,
     backgroundColor: Colors.neutral[700],

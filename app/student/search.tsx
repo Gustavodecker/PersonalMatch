@@ -153,6 +153,7 @@ export default function StudentSearch() {
         specialties:trainer_specialties(specialty:specialties(*))
       `)
       .eq('status', 'active')
+      .order('is_featured', { ascending: false })
       .order('rating', { ascending: false });
     if (data) {
       setAll(data.map((t: any) => ({
@@ -722,7 +723,7 @@ const s = StyleSheet.create({
   coverName: { fontSize: FontSizes.md, fontWeight: '700', color: Colors.white, letterSpacing: -0.2 },
   coverLocRow: { flexDirection: 'row', alignItems: 'center', gap: 3, marginTop: 2 },
   coverLocText: { fontSize: 11, color: 'rgba(255,255,255,0.8)' },
-  coverPrice: { fontSize: FontSizes.lg, fontWeight: '800', color: Colors.white },
+  coverPrice: { fontSize: FontSizes.lg, fontWeight: '800', color: '#4ADE80' },
   coverPriceUnit: { fontSize: 10, color: 'rgba(255,255,255,0.7)' },
 
   cardBody: { padding: 14, gap: 10 },
@@ -749,12 +750,12 @@ const s = StyleSheet.create({
     paddingTop: 10, borderTopWidth: 1, borderTopColor: Colors.neutral[100],
   },
   btnView: {
-    flex: 1, backgroundColor: Colors.primary[600], borderRadius: 14, paddingVertical: 12,
+    flex: 1, backgroundColor: Colors.primary[600], borderRadius: 12, paddingVertical: 11,
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4,
   },
   btnViewTxt: { fontSize: FontSizes.sm, fontWeight: '700', color: Colors.white },
   btnWa: {
-    flex: 1, backgroundColor: '#16A34A', borderRadius: 14, paddingVertical: 12,
+    flex: 1, backgroundColor: '#22C55E', borderRadius: 12, paddingVertical: 11,
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
   },
   btnWaTxt: { fontSize: FontSizes.sm, fontWeight: '700', color: Colors.white },

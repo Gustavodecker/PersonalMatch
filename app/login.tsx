@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
-  ActivityIndicator, KeyboardAvoidingView, Platform, Image,
+  ActivityIndicator, KeyboardAvoidingView, Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Mail, Lock, Eye, EyeOff } from 'lucide-react-native';
+import { Mail, Lock, Eye, EyeOff, Dumbbell } from 'lucide-react-native';
 import { router } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { getDashboardRoute } from '@/lib/role-routes';
@@ -46,11 +46,10 @@ export default function LoginScreen() {
       >
         <View style={styles.content}>
           <View style={styles.logoRow}>
-            <Image
-              source={require('@/assets/images/logo-icon.png')}
-              style={styles.logoHorizontal}
-              resizeMode="contain"
-            />
+            <View style={styles.logoIcon}>
+              <Dumbbell size={28} color="#ffffff" />
+            </View>
+            <Text style={styles.brand}>SuperShape</Text>
           </View>
 
           <View style={styles.header}>
@@ -129,12 +128,14 @@ const styles = StyleSheet.create({
   keyboardView: { flex: 1 },
   content: { flex: 1, padding: 24, justifyContent: 'center' },
   logoRow: {
-    alignItems: 'center', justifyContent: 'center',
-    marginBottom: 32,
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+    gap: 10, marginBottom: 32,
   },
-  logoHorizontal: {
-    width: 50, height: 50,
+  logoIcon: {
+    width: 48, height: 48, borderRadius: 14,
+    backgroundColor: '#2563eb', alignItems: 'center', justifyContent: 'center',
   },
+  brand: { fontSize: 24, fontWeight: '800', color: '#1f2937', letterSpacing: -0.5 },
   header: { alignItems: 'center', marginBottom: 32 },
   title: { fontSize: 28, fontWeight: 'bold', color: '#1f2937', marginBottom: 6 },
   subtitle: { fontSize: 16, color: '#6b7280' },

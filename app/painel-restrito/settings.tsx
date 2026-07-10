@@ -35,15 +35,15 @@ const SECTIONS: Section[] = [
   {
     title: 'Identidade',
     fields: [
-      { key: 'marketplace_name', label: 'Nome do marketplace', placeholder: 'Ex: 99 Personal' },
-      { key: 'primary_color',    label: 'Cor primária (hex)', placeholder: '#2E72D8' },
+      { key: 'marketplace_name', label: 'Nome do marketplace', placeholder: 'Ex: SuperShape' },
+      { key: 'primary_color',    label: 'Cor primária (hex)', placeholder: '#2D4EDE' },
     ],
   },
   {
     title: 'Suporte',
     fields: [
       { key: 'support_whatsapp', label: 'WhatsApp de suporte', placeholder: '+55 11 99999-9999' },
-      { key: 'support_email',    label: 'E-mail de suporte',   placeholder: 'suporte@99personal.com.br' },
+      { key: 'support_email',    label: 'E-mail de suporte',   placeholder: 'suporte@supershape.com.br' },
     ],
   },
   {

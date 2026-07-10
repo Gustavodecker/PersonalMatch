@@ -109,7 +109,7 @@ export default function SuccessScreen() {
           <Text style={styles.supportTitle}>Precisa de Ajuda?</Text>
           <Text style={styles.supportText}>
             Entre em contato com nosso suporte através do email:{'\n'}
-            <Text style={styles.supportEmail}>suporte@99personal.com.br</Text>
+            <Text style={styles.supportEmail}>suporte@supershape.com.br</Text>
           </Text>
         </View>
       </View>

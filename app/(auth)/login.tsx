@@ -1,18 +1,19 @@
 import { useState } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  KeyboardAvoidingView, Platform, Image,
+  KeyboardAvoidingView, Platform,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
+import { Redirect } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '@/contexts/AuthContext';
 import { Input } from '@/components/Input';
 import { Button } from '@/components/Button';
 import { Colors, Spacing, FontSizes, BorderRadii } from '@/constants/theme';
+import { Dumbbell } from 'lucide-react-native';
 
 export default function LoginScreen() {
-  const { signIn } = useAuth();
+  const { signIn, user, profile } = useAuth();
   const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading]   = useState(false);
@@ -25,12 +26,7 @@ export default function LoginScreen() {
     const { error: err } = await signIn(email.trim().toLowerCase(), password);
     setLoading(false);
     if (err) {
-      const msg = err.toLowerCase();
-      if (msg.includes('email') && msg.includes('confirm')) {
-        setError('Confirme seu e-mail antes de entrar. Verifique sua caixa de entrada.');
-      } else {
-        setError('E-mail ou senha incorretos. Verifique e tente novamente.');
-      }
+      setError('E-mail ou senha incorretos.');
     } else {
       router.replace('/');
     }
@@ -38,37 +34,20 @@ export default function LoginScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
-      <LinearGradient
-        colors={[Colors.primary[800], Colors.primary[600]]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={StyleSheet.absoluteFill}
-      />
       <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
-
-          {/* Hero */}
           <View style={styles.hero}>
             <View style={styles.logoWrap}>
-              <Image
-                source={require('@/assets/images/logo-icon.png')}
-                style={styles.logoImg}
-                resizeMode="contain"
-              />
+              <Dumbbell size={36} color={Colors.white} />
             </View>
+            <Text style={styles.brand}>SuperShape</Text>
             <Text style={styles.tagline}>Conecte-se ao personal certo</Text>
           </View>
 
-          {/* Form card */}
           <View style={styles.card}>
-            <Text style={styles.title}>Boas-vindas de volta</Text>
-            <Text style={styles.subtitle}>Entre com sua conta para continuar</Text>
+            <Text style={styles.title}>Entrar</Text>
 
-            {error ? (
-              <View style={styles.errorBox}>
-                <Text style={styles.errorMsg}>{error}</Text>
-              </View>
-            ) : null}
+            {error ? <Text style={styles.errorMsg}>{error}</Text> : null}
 
             <Input
               label="E-mail"
@@ -86,29 +65,16 @@ export default function LoginScreen() {
               placeholder="••••••••"
             />
 
-            <View style={styles.btnWrap}>
-              <Button onPress={handleLogin} loading={loading} size="lg" style={styles.btn}>
-                Entrar
-              </Button>
-            </View>
+            <Button onPress={handleLogin} loading={loading} size="lg">Entrar</Button>
 
-            <View style={styles.divider}>
-              <View style={styles.divLine} />
-              <Text style={styles.divText}>ou</Text>
-              <View style={styles.divLine} />
-            </View>
-
-            <TouchableOpacity
-              style={styles.registerBtn}
-              onPress={() => router.push('/(auth)/register')}
-            >
-              <Text style={styles.registerText}>
-                Não tem conta? <Text style={styles.registerBold}>Criar conta grátis</Text>
+            <TouchableOpacity style={styles.link} onPress={() => router.push('/(auth)/register')}>
+              <Text style={styles.linkText}>
+                Não tem conta? <Text style={styles.linkBold}>Cadastre-se</Text>
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.homeLink} onPress={() => router.replace('/')}>
-              <Text style={styles.homeLinkText}>← Voltar à página inicial</Text>
+              <Text style={styles.homeLinkText}>Voltar ao início</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -118,78 +84,30 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: Colors.primary[800] },
+  safe: { flex: 1, backgroundColor: Colors.primary[700] },
   flex: { flex: 1 },
   scroll: { flexGrow: 1 },
-
-  hero: {
-    alignItems: 'center',
-    paddingTop: Spacing.xxxl + 8,
-    paddingBottom: Spacing.xl + 4,
-    paddingHorizontal: Spacing.xl,
-    gap: Spacing.lg,
+  hero: { alignItems: 'center', paddingTop: Spacing.xxxl, paddingBottom: Spacing.xxl, gap: Spacing.sm },
+  logoWrap: {
+    width: 72, height: 72, borderRadius: BorderRadii.xl,
+    backgroundColor: Colors.primary[500], alignItems: 'center', justifyContent: 'center',
+    marginBottom: Spacing.sm,
   },
-  logoWrap: { alignItems: 'center', justifyContent: 'center' },
-  logoImg: { width: 75, height: 75 },
-  tagline: {
-    fontSize: FontSizes.md,
-    color: 'rgba(255,255,255,0.55)',
-    textAlign: 'center',
-    letterSpacing: 0.3,
-  },
-
+  brand: { fontSize: FontSizes.xxxl, fontWeight: '700', color: Colors.white, letterSpacing: -0.5 },
+  tagline: { fontSize: FontSizes.md, color: Colors.primary[200] },
   card: {
-    flex: 1,
-    backgroundColor: Colors.white,
-    borderTopLeftRadius: 32,
-    borderTopRightRadius: 32,
-    paddingHorizontal: Spacing.xl,
-    paddingTop: 36,
-    paddingBottom: 32,
+    flex: 1, backgroundColor: Colors.white,
+    borderTopLeftRadius: BorderRadii.xl, borderTopRightRadius: BorderRadii.xl,
+    padding: Spacing.xl, paddingTop: Spacing.xxl, gap: Spacing.xs,
   },
-  title: {
-    fontSize: FontSizes.xxxl,
-    fontWeight: '800',
-    color: Colors.neutral[900],
-    letterSpacing: -0.6,
-    marginBottom: 4,
-  },
-  subtitle: {
-    fontSize: FontSizes.md,
-    color: Colors.neutral[500],
-    marginBottom: Spacing.xl,
-  },
-
-  errorBox: {
-    backgroundColor: Colors.error[50],
-    borderWidth: 1,
-    borderColor: Colors.error[100],
-    borderRadius: BorderRadii.md,
-    padding: Spacing.md,
-    marginBottom: Spacing.md,
-  },
+  title: { fontSize: FontSizes.xxl, fontWeight: '700', color: Colors.neutral[900], marginBottom: Spacing.md },
   errorMsg: {
-    fontSize: FontSizes.sm,
-    color: Colors.error[700],
-    fontWeight: '500',
+    backgroundColor: Colors.error[50], color: Colors.error[700],
+    borderRadius: BorderRadii.md, padding: Spacing.md, fontSize: FontSizes.sm, marginBottom: Spacing.sm,
   },
-
-  btnWrap: { marginTop: Spacing.sm },
-  btn: { width: '100%' },
-
-  divider: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.md,
-    marginVertical: Spacing.lg,
-  },
-  divLine: { flex: 1, height: 1, backgroundColor: Colors.neutral[200] },
-  divText: { fontSize: FontSizes.sm, color: Colors.neutral[400], fontWeight: '500' },
-
-  registerBtn: { alignItems: 'center', paddingVertical: Spacing.sm },
-  registerText: { fontSize: FontSizes.md, color: Colors.neutral[600] },
-  registerBold: { color: Colors.primary[600], fontWeight: '700' },
-
-  homeLink: { alignItems: 'center', paddingTop: Spacing.lg },
+  link: { alignItems: 'center', paddingVertical: Spacing.md, marginTop: Spacing.sm },
+  linkText: { fontSize: FontSizes.md, color: Colors.neutral[600] },
+  linkBold: { color: Colors.primary[600], fontWeight: '700' },
+  homeLink: { alignItems: 'center', paddingVertical: Spacing.sm },
   homeLinkText: { fontSize: FontSizes.sm, color: Colors.neutral[400] },
 });
