@@ -1069,8 +1069,8 @@ const PublicHome: React.FC = () => {
           <View style={IS_DESKTOP ? s.footerDesktop : undefined}>
             {/* Brand */}
             <View style={s.footerBrand}>
-              <Image source={require('@/assets/images/ChatGPT_Image_9_de_jul._de_2026,_21_23_46-Photoroom.png')} style={s.footerLogo} />
-              <Text style={s.footerLogoText}>Personal</Text>
+              <Image source={require('@/assets/images/logo4.png')} style={s.footerLogo} />
+              <Text style={s.footerLogoText}></Text>
             </View>
             {IS_DESKTOP && (
               <Text style={[s.footerTagline, { marginTop: 8, marginBottom: 0 }]}>
