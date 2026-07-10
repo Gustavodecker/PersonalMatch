@@ -69,7 +69,7 @@ export function AuthPromptModal({ visible, onClose, message }: Props) {
           <View style={s.header}>
             <View style={s.logoRow}>
               <Image source={require('@/assets/images/ChatGPT_Image_9_de_jul._de_2026,_21_23_46-Photoroom.png')} style={s.logoBubble} />
-              <Text style={s.logoText}>SuperShape</Text>
+              <Text style={s.logoText}>Personal</Text>
             </View>
             <TouchableOpacity style={s.closeBtn} onPress={onClose}>
               <X size={18} color={Colors.neutral[500]} />
