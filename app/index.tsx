@@ -199,7 +199,7 @@ const MobileWelcome: React.FC = () => {
             onPress={() => router.push('/(auth)/login')}
             style={ww.skipBtn}
           >
-            <Text style={ww.skipText}>Entrar</Text>
+            <Text style={ww.skipText}>Entrar1</Text>
           </TouchableOpacity>
         </View>
 
