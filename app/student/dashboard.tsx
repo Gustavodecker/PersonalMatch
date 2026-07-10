@@ -105,7 +105,7 @@ export default function StudentDashboard() {
             <View style={{ flex: 1 }}>
               <View style={s.logoRow}>
                 <Image source={require('@/assets/images/ChatGPT_Image_9_de_jul._de_2026,_21_23_46-Photoroom.png')} style={{ width: 18, height: 18, borderRadius: 4 }} />
-                <Text style={s.logoText}>SuperShape</Text>
+                <Text style={s.logoText}>Personal</Text>
               </View>
               <Text style={s.greeting}>{greeting}, {firstName}!</Text>
               <Text style={s.heroSub}>Encontre seu personal ideal</Text>
