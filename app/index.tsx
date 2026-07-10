@@ -1244,7 +1244,7 @@ const s = StyleSheet.create({
     maxWidth: 1200, alignSelf: 'center', width: '100%',
   },
   logo: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  logoHorizontal: { width: 900, height: 900 },
+  logoHorizontal: { width: 200, height: 200 },
   logoMark: { width: 42, height: 42 },
   logoMarkNum: { fontSize: 17, fontWeight: '900', color: Colors.white, letterSpacing: 0 },
   logoText: {
