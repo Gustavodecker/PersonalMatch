@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  KeyboardAvoidingView, Platform,
+  KeyboardAvoidingView, Platform, Image,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -68,10 +68,11 @@ export default function RegisterScreen() {
             <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
               <ArrowLeft size={20} color={Colors.white} />
             </TouchableOpacity>
-            <View style={styles.topLogoPill}>
-              <View style={styles.topLogoDot} />
-              <Text style={styles.topLogoPillText}>99 Personal</Text>
-            </View>
+            <Image
+              source={require('@/assets/images/logo.png')}
+              style={styles.topLogoImg}
+              resizeMode="contain"
+            />
             <View style={styles.backBtn} />
           </View>
 
@@ -183,19 +184,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.12)',
     alignItems: 'center', justifyContent: 'center',
   },
-  topLogoPill: {
-    flexDirection: 'row', alignItems: 'center', gap: 7,
-    backgroundColor: 'rgba(255,255,255,0.15)',
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.28)',
-    borderRadius: 999, paddingHorizontal: 14, paddingVertical: 7,
-  },
-  topLogoDot: {
-    width: 8, height: 8, borderRadius: 4,
-    backgroundColor: Colors.teal[400],
-  },
-  topLogoPillText: {
-    fontSize: FontSizes.sm, fontWeight: '800', color: Colors.white, letterSpacing: 0.2,
-  },
+  topLogoImg: { width: 44, height: 44 },
 
   heroText: {
     paddingHorizontal: Spacing.xl,

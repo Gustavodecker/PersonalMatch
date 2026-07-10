@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  KeyboardAvoidingView, Platform,
+  KeyboardAvoidingView, Platform, Image,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
@@ -44,16 +44,12 @@ export default function LoginScreen() {
 
           {/* Hero */}
           <View style={styles.hero}>
-            {/* Logo mark — texto sobre gradiente, sem PNG */}
             <View style={styles.logoWrap}>
-              <LinearGradient
-                colors={[Colors.primary[500], Colors.teal[500]]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.logoBadge}
-              >
-                <Text style={styles.logoBadgeNum}>99</Text>
-              </LinearGradient>
+              <Image
+                source={require('@/assets/images/logo.png')}
+                style={styles.logoImg}
+                resizeMode="contain"
+              />
               <View>
                 <Text style={styles.logoWordPersonal}>Personal</Text>
                 <Text style={styles.logoWordSub}>trainer marketplace</Text>
@@ -135,17 +131,13 @@ const styles = StyleSheet.create({
   logoWrap: {
     flexDirection: 'row', alignItems: 'center', gap: 16,
   },
-  logoBadge: {
-    width: 72, height: 72, borderRadius: 22,
-    alignItems: 'center', justifyContent: 'center',
+  logoImg: {
+    width: 76, height: 76,
     shadowColor: Colors.primary[900],
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.45,
     shadowRadius: 20,
     elevation: 10,
-  },
-  logoBadgeNum: {
-    fontSize: 28, fontWeight: '900', color: Colors.white, letterSpacing: 0,
   },
   logoWordPersonal: {
     fontSize: 32, fontWeight: '900', color: Colors.white, letterSpacing: -0.5, lineHeight: 36,

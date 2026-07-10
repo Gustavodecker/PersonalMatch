@@ -188,15 +188,12 @@ const MobileWelcome: React.FC = () => {
         {/* Top: logo */}
         <View style={ww.topBar}>
           <View style={ww.logoWrap}>
-            <LinearGradient
-              colors={[Colors.primary[500], Colors.teal[500]]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={ww.logoIconGrad}
-            >
-              <Text style={ww.logoIconNum}>99</Text>
-            </LinearGradient>
-            <Text style={ww.logoText}>Personal</Text>
+            <Image
+              source={require('@/assets/images/logo.png')}
+              style={ww.logoIconImg}
+              resizeMode="contain"
+            />
+            <Text style={ww.logoText}>99 Personal</Text>
           </View>
           <TouchableOpacity
             onPress={() => router.push('/(auth)/login')}
@@ -328,17 +325,12 @@ const ww = StyleSheet.create({
   },
   logoWrap: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   logoImg: { width: 140, height: 40 },
+  logoIconImg: { width: 42, height: 42 },
   logoIconGrad: {
     width: 42, height: 42, borderRadius: 13,
     alignItems: 'center', justifyContent: 'center',
-    shadowColor: Colors.primary[900],
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.4,
-    shadowRadius: 6,
-    elevation: 4,
   },
   logoIconNum: { fontSize: 17, fontWeight: '900', color: Colors.white, letterSpacing: 0 },
-  logoIconImg: { width: 36, height: 36, borderRadius: 10 },
   logoIcon: {
     width: 34, height: 34, borderRadius: 10,
     backgroundColor: Colors.primary[600],
@@ -476,15 +468,12 @@ const PublicHome: React.FC = () => {
             style={s.logo}
             onPress={() => scrollRef.current?.scrollTo({ y: 0, animated: true })}
           >
-            <LinearGradient
-              colors={[Colors.primary[500], Colors.teal[500]]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
+            <Image
+              source={require('@/assets/images/logo.png')}
               style={s.logoMark}
-            >
-              <Text style={s.logoMarkNum}>99</Text>
-            </LinearGradient>
-            <Text style={s.logoText}>Personal</Text>
+              resizeMode="contain"
+            />
+            <Text style={s.logoText}>99 Personal</Text>
           </TouchableOpacity>
 
           {IS_DESKTOP && (
@@ -1096,15 +1085,12 @@ const PublicHome: React.FC = () => {
             {/* Brand */}
             <View style={s.footerBrand}>
               <View style={s.footerLogoRow}>
-                <LinearGradient
-                  colors={[Colors.primary[500], Colors.teal[500]]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
+                <Image
+                  source={require('@/assets/images/logo.png')}
                   style={s.footerLogoBadge}
-                >
-                  <Text style={s.footerLogoBadgeNum}>99</Text>
-                </LinearGradient>
-                <Text style={s.footerLogoName}>Personal</Text>
+                  resizeMode="contain"
+                />
+                <Text style={s.footerLogoName}>99 Personal</Text>
               </View>
             </View>
             {IS_DESKTOP && (
@@ -1255,10 +1241,7 @@ const s = StyleSheet.create({
     maxWidth: 1200, alignSelf: 'center', width: '100%',
   },
   logo: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  logoMark: {
-    width: 42, height: 42, borderRadius: 13,
-    alignItems: 'center', justifyContent: 'center',
-  },
+  logoMark: { width: 42, height: 42 },
   logoMarkNum: { fontSize: 17, fontWeight: '900', color: Colors.white, letterSpacing: 0 },
   logoText: {
     fontSize: 20, fontWeight: '800', color: Colors.neutral[900], letterSpacing: -0.4,
@@ -1809,10 +1792,7 @@ const s = StyleSheet.create({
   footerDesktop: { flexDirection: IS_DESKTOP ? 'column' : undefined },
   footerBrand: { marginBottom: 8 },
   footerLogoRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  footerLogoBadge: {
-    width: 44, height: 44, borderRadius: 14,
-    alignItems: 'center', justifyContent: 'center',
-  },
+  footerLogoBadge: { width: 44, height: 44 },
   footerLogoBadgeNum: { fontSize: 18, fontWeight: '900', color: Colors.white, letterSpacing: 0 },
   footerLogoName: { fontSize: 22, fontWeight: '900', color: Colors.white, letterSpacing: -0.5 },
   footerLogoImg: { width: 160, height: 48 },
