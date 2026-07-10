@@ -1220,7 +1220,7 @@ const s = StyleSheet.create({
   },
   logo: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   logoMark: {
-    width: 34, height: 34, borderRadius: 10,
+    width: 84, height: 84, borderRadius: 10,
   },
   logoText: {
     fontSize: 18, fontWeight: '800', color: Colors.neutral[900], letterSpacing: -0.4,
