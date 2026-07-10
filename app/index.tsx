@@ -2758,6 +2758,18 @@ width: '100%',
 position: 'relative',
 },
 
+headerInner: {
+flexDirection: 'row',
+alignItems: 'center',
+justifyContent: 'flex-end',
+paddingLeft: 0,
+paddingRight: IS_DESKTOP ? 28 : 16,
+paddingVertical: IS_DESKTOP ? 6 : 6,
+minHeight: IS_DESKTOP ? 110 : 82,
+width: '100%',
+position: 'relative',
+},
+
 logo: {
 position: 'absolute',
 left: IS_DESKTOP ? -35 : -12,
@@ -2766,12 +2778,6 @@ bottom: 0,
 height: '100%',
 alignItems: 'flex-start',
 justifyContent: 'center',
-},
-
-logoMark: {
-width: IS_DESKTOP ? 880 : 620,
-height: IS_DESKTOP ? 200 : 82,
-marginLeft: IS_DESKTOP ? -18 : -6,
 },
 
 
