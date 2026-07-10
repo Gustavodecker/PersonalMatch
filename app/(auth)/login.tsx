@@ -36,8 +36,8 @@ export default function LoginScreen() {
       <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
           <View style={styles.hero}>
-            <Image source={require('@/assets/images/ChatGPT_Image_9_de_jul._de_2026,_21_23_46-Photoroom.png')} style={styles.logoWrap} />
-            <Text style={styles.brand}>Personal</Text>
+            <Image source={require('@/assets/images/logo3.png')} style={styles.logoWrap} />
+            <Text style={styles.brand}></Text>
             <Text style={styles.tagline}>Conecte-se ao personal certo</Text>
           </View>
 
