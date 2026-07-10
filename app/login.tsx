@@ -66,7 +66,7 @@ export default function LoginScreen() {
           <View style={styles.logoContainer}>
             <Image
               source={require(
-                '@/assets/images/ChatGPT_Image_9_de_jul._de_2026,_21_23_46-Photoroom.png'
+                '@/assets/images/logo4.png'
               )}
               style={styles.logo}
               resizeMode="contain"
