@@ -86,9 +86,10 @@ const styles = StyleSheet.create({
   scroll: { flexGrow: 1 },
   hero: { alignItems: 'center', paddingTop: Spacing.xxxl, paddingBottom: Spacing.xxl, gap: Spacing.sm },
   logoWrap: {
-    width: 72, height: 72, borderRadius: BorderRadii.xl,
-    marginBottom: Spacing.sm,
-  },
+width: 280,
+height: 110,
+marginBottom: Spacing.sm,
+},
   brand: { fontSize: FontSizes.xxxl, fontWeight: '700', color: Colors.white, letterSpacing: -0.5 },
   tagline: { fontSize: FontSizes.md, color: Colors.primary[200] },
   card: {
