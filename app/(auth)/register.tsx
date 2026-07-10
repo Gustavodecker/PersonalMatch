@@ -188,8 +188,8 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
   },
   topLogoWrap: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  topLogoImg: { width: 44, height: 44 },
-  topLogoText: { fontSize: 20, fontWeight: '800', color: Colors.white, letterSpacing: -0.3 },
+  topLogoImg: { width: 56, height: 56 },
+  topLogoText: { fontSize: 22, fontWeight: '800', color: Colors.white, letterSpacing: -0.3 },
 
   heroText: {
     paddingHorizontal: Spacing.xl,
