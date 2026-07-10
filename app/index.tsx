@@ -189,7 +189,7 @@ const MobileWelcome: React.FC = () => {
         <View style={ww.topBar}>
           <View style={ww.logoWrap}>
             <Image source={require('@/assets/images/ChatGPT_Image_9_de_jul._de_2026,_21_23_46-Photoroom.png')} style={ww.logoIcon} />
-            <Text style={ww.logoText}>SuperShape</Text>
+            <Text style={ww.logoText}>Personal</Text>
           </View>
           <TouchableOpacity
             onPress={() => router.push('/(auth)/login')}
@@ -458,7 +458,7 @@ const PublicHome: React.FC = () => {
             onPress={() => scrollRef.current?.scrollTo({ y: 0, animated: true })}
           >
             <Image source={require('@/assets/images/ChatGPT_Image_9_de_jul._de_2026,_21_23_46-Photoroom.png')} style={s.logoMark} />
-            <Text style={s.logoText}>SuperShape</Text>
+            <Text style={s.logoText}>Personal</Text>
           </TouchableOpacity>
 
           {IS_DESKTOP && (
@@ -978,7 +978,7 @@ const PublicHome: React.FC = () => {
             <View style={s.sectionPill}>
               <Text style={s.sectionPillText}>Transparência</Text>
             </View>
-            <Text style={s.sectionTitle}>Por que confiar no SuperShape?</Text>
+            <Text style={s.sectionTitle}>Por que confiar no Personal?</Text>
             <Text style={s.sectionSub}>
               Uma plataforma onde alunos e profissionais se conectam com segurança.
             </Text>
@@ -1070,7 +1070,7 @@ const PublicHome: React.FC = () => {
             {/* Brand */}
             <View style={s.footerBrand}>
               <Image source={require('@/assets/images/ChatGPT_Image_9_de_jul._de_2026,_21_23_46-Photoroom.png')} style={s.footerLogo} />
-              <Text style={s.footerLogoText}>SuperShape</Text>
+              <Text style={s.footerLogoText}>Personal</Text>
             </View>
             {IS_DESKTOP && (
               <Text style={[s.footerTagline, { marginTop: 8, marginBottom: 0 }]}>
@@ -1112,7 +1112,7 @@ const PublicHome: React.FC = () => {
               </View>
               <View style={s.footerCol}>
                 <Text style={s.footerColHead}>Suporte</Text>
-                <TouchableOpacity onPress={() => Linking.openURL('https://wa.me/5547992222949?text=Oi%2C%20preciso%20de%20suporte%20no%20SuperShape')}>
+                <TouchableOpacity onPress={() => Linking.openURL('https://wa.me/5547992222949?text=Oi%2C%20preciso%20de%20suporte%20no%20Personal')}>
                   <Text style={s.footerLink}>Falar com suporte</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => router.push('/termos')}><Text style={s.footerLink}>Termos de uso</Text></TouchableOpacity>
@@ -1120,10 +1120,10 @@ const PublicHome: React.FC = () => {
               </View>
               <View style={s.footerCol}>
                 <Text style={s.footerColHead}>Aplicativo</Text>
-                <TouchableOpacity onPress={() => Linking.openURL('https://apps.apple.com/app/supershape')}>
+                <TouchableOpacity onPress={() => Linking.openURL('https://apps.apple.com/app/Personal')}>
                   <Text style={s.footerLink}>Download iOS</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => Linking.openURL('https://play.google.com/store/apps/details?id=com.supershape')}>
+                <TouchableOpacity onPress={() => Linking.openURL('https://play.google.com/store/apps/details?id=com.Personal')}>
                   <Text style={s.footerLink}>Download Android</Text>
                 </TouchableOpacity>
               </View>
@@ -1131,7 +1131,7 @@ const PublicHome: React.FC = () => {
           </View>
 
           <View style={s.footerBottom}>
-            <Text style={s.footerCopy}>© 2026 SuperShape. Todos os direitos reservados.</Text>
+            <Text style={s.footerCopy}>© 2026 Personal. Todos os direitos reservados.</Text>
           </View>
         </View>
       </View>
