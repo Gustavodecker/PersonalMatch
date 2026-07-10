@@ -14,7 +14,7 @@ import {
   Tag, Globe, ExternalLink,
 } from 'lucide-react-native';
 
-const WEB_APP_URL = (process.env.EXPO_PUBLIC_WEB_URL ?? process.env.EXPO_PUBLIC_SUPABASE_URL?.replace('supabase.co', 'vercel.app') ?? 'https://supershape.com.br');
+const WEB_APP_URL = (process.env.EXPO_PUBLIC_WEB_URL ?? process.env.EXPO_PUBLIC_SUPABASE_URL?.replace('supabase.co', 'vercel.app') ?? 'https://99personal.com.br');
 
 type Subscription = {
   plan: PlanId;
