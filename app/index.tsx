@@ -2761,7 +2761,7 @@ const s = StyleSheet.create({
   },
 
   logo: {
-  height: IS_DESKTOP ? 10 : 62,
+  height: IS_DESKTOP ? 10 : 12,
   alignItems: 'flex-start',
   justifyContent: 'center',
   flexShrink: 0,
