@@ -215,8 +215,8 @@ const styles = StyleSheet.create({
   },
 
   logo: {
-    width: 190,
-    height: 105,
+    width: 290,
+    height: 205,
   },
 
   /* CABEÇALHO */
