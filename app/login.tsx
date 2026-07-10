@@ -47,7 +47,7 @@ export default function LoginScreen() {
         <View style={styles.content}>
           <View style={styles.logoRow}>
             <Image
-              source={require('@/assets/images/logo-horizontal.png')}
+              source={require('@/assets/images/logo-icon.png')}
               style={styles.logoHorizontal}
               resizeMode="contain"
             />
