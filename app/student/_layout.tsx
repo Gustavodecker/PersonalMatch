@@ -18,9 +18,13 @@ export default function StudentLayout() {
         tabBarInactiveTintColor: Colors.neutral[400],
         tabBarStyle: {
           borderTopColor: Colors.neutral[200],
+          borderTopWidth: 1,
           backgroundColor: Colors.white,
+          height: 64,
+          paddingBottom: 10,
+          paddingTop: 8,
         },
-        tabBarLabelStyle: { fontSize: 11, fontWeight: '600' },
+        tabBarLabelStyle: { fontSize: 11, fontWeight: '600', marginTop: 2 },
       }}
     >
       <Tabs.Screen name="dashboard"    options={{ title: 'Início',    tabBarIcon: ({ color, size }) => <Home size={size} color={color} /> }} />

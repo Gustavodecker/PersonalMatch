@@ -326,9 +326,9 @@ const ww = StyleSheet.create({
     paddingBottom: 8,
     position: 'relative',
   },
-  logoWrap: { flexDirection: 'row', alignItems: 'center', gap: 16 },
+  logoWrap: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   logoImg: { width: 140, height: 40 },
-  logoIconImg: { width: 170, height: 170 },
+  logoIconImg: { width: 48, height: 48 },
   logoIconGrad: {
     width: 42, height: 42, borderRadius: 13,
     alignItems: 'center', justifyContent: 'center',
@@ -339,7 +339,7 @@ const ww = StyleSheet.create({
     backgroundColor: Colors.primary[600],
     alignItems: 'center', justifyContent: 'center',
   },
-  logoText: { fontSize: 48, fontWeight: '900', color: Colors.white, letterSpacing: -1.5 },
+  logoText: { fontSize: 24, fontWeight: '900', color: Colors.white, letterSpacing: -0.8 },
   skipBtn: {
     position: 'absolute', right: 20, top: '50%',
     paddingHorizontal: 16, paddingVertical: 7,
@@ -1244,7 +1244,7 @@ const s = StyleSheet.create({
     maxWidth: 1200, alignSelf: 'center', width: '100%',
   },
   logo: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  logoHorizontal: { width: 200, height: 200 },
+  logoHorizontal: { width: 200, height: 56 },
   logoMark: { width: 42, height: 42 },
   logoMarkNum: { fontSize: 17, fontWeight: '900', color: Colors.white, letterSpacing: 0 },
   logoText: {
