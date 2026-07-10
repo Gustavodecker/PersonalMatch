@@ -2746,31 +2746,28 @@ const s = StyleSheet.create({
     elevation: 2,
   },
 
-  headerInner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: IS_DESKTOP
-      ? 56
-      : 20,
-    paddingVertical: IS_DESKTOP ? 8 : 6,
-    minHeight: IS_DESKTOP ? 92 : 76,
-    maxWidth: 1200,
-    alignSelf: 'center',
-    width: '100%',
-  },
-
-  logo: {
-  height: IS_DESKTOP ? 80 : 62,
-  alignItems: 'flex-start',
-  justifyContent: 'center',
-  flexShrink: 0,
+ headerInner: {
+flexDirection: 'row',
+alignItems: 'center',
+justifyContent: 'space-between',
+paddingHorizontal: IS_DESKTOP ? 24 : 16,
+paddingVertical: IS_DESKTOP ? 8 : 6,
+minHeight: IS_DESKTOP ? 96 : 76,
+width: '100%',
 },
 
-  logoMark: {
-    width: IS_DESKTOP ? 310 : 250,
-    height: IS_DESKTOP ? 96 : 78,
-  },
+logo: {
+height: IS_DESKTOP ? 88 : 68,
+alignItems: 'flex-start',
+justifyContent: 'center',
+flexShrink: 0,
+},
+
+logoMark: {
+width: IS_DESKTOP ? 280 : 190,
+height: IS_DESKTOP ? 88 : 64,
+},
+
 
   headerNav: {
     flexDirection: 'row',
