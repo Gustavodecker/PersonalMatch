@@ -10,17 +10,17 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ArrowLeft, Zap } from 'lucide-react-native';
-import { useAuth } from '@/hooks/useAuth';
-import { useSubscription } from '@/hooks/useSubscription';
-import { PlanCard } from '@/components/PlanCard';
-import { PRODUCTS_LIST } from '@/stripe-config';
-import type { StripeProduct } from '@/stripe-config';
-import { createCheckoutSession } from '@/lib/checkout';
+import { useAuth } from '@/contexts/AuthContext';
+import { useSubscription } from '@/src/hooks/useSubscription';
+import { PlanCard } from '@/src/components/PlanCard';
+import { STRIPE_PRODUCTS } from '@/src/stripe-config';
+import type { StripeProduct } from '@/src/stripe-config';
+import { createCheckoutSession } from '@/src/lib/checkout';
 
 export default function PlanosScreen() {
   const router = useRouter();
   const { user } = useAuth();
-  const { plan: currentPlan } = useSubscription(user?.id);
+  const { planName: currentPlan } = useSubscription(user?.id);
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -78,7 +78,7 @@ export default function PlanosScreen() {
           </View>
           <Text style={styles.title}>Escolha seu Plano</Text>
           <Text style={styles.subtitle}>
-            Impulsione sua carreira e alcance mais alunos com os planos SuperShape
+            Impulsione sua carreira e alcance mais alunos com os planos 99personal
           </Text>
         </View>
 
@@ -89,7 +89,7 @@ export default function PlanosScreen() {
         )}
 
         <View style={styles.cardsContainer}>
-          {PRODUCTS_LIST.map((product) => (
+          {STRIPE_PRODUCTS.map((product) => (
             <PlanCard
               key={product.priceId}
               product={product}

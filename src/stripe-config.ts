@@ -1,3 +1,5 @@
+export type StripeMode = 'subscription' | 'payment';
+
 export interface StripeProduct {
   id: string;
   priceId: string;

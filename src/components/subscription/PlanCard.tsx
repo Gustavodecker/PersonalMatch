@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { Check, Zap, Crown } from 'lucide-react-native';
-import { StripeProduct } from '@/stripe-config';
+import { StripeProduct } from '@/src/stripe-config';
 
 interface PlanCardProps {
   product: StripeProduct;

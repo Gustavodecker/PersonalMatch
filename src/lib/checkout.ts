@@ -1,5 +1,5 @@
 import { Platform } from 'react-native';
-import { supabase } from './supabase';
+import { supabase } from '@/lib/supabase';
 import type { StripeMode } from '../stripe-config';
 
 export async function createCheckoutSession(
@@ -17,13 +17,13 @@ export async function createCheckoutSession(
   const baseUrl =
     Platform.OS === 'web'
       ? window.location.origin
-      : (process.env.EXPO_PUBLIC_APP_URL ?? '');
+      : (process.env.EXPO_PUBLIC_WEB_URL ?? '');
 
   const successUrl = `${baseUrl}/checkout-success`;
   const cancelUrl = `${baseUrl}/planos`;
 
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/create-checkout`,
+    `${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/stripe-checkout`,
     {
       method: 'POST',
       headers: {
@@ -31,10 +31,10 @@ export async function createCheckoutSession(
         Authorization: `Bearer ${session.access_token}`,
       },
       body: JSON.stringify({
-        price_id: priceId,
-        success_url: successUrl,
-        cancel_url: cancelUrl,
-        mode,
+        action: 'checkout',
+        priceId,
+        successUrl,
+        cancelUrl,
       }),
     },
   );

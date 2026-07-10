@@ -1,19 +1,32 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { PLAN_COLORS, PLAN_LABELS } from '../stripe-config';
 import { useSubscription } from '../hooks/useSubscription';
+
+const PLAN_LABELS: Record<string, string> = {
+  free: 'Gratuito',
+  free_trial: 'Teste grátis',
+  pro: 'Pro',
+  premium: 'Premium',
+};
+
+const PLAN_COLORS: Record<string, string> = {
+  free: '#6B7280',
+  free_trial: '#2563EB',
+  pro: '#2563EB',
+  premium: '#D97706',
+};
 
 interface Props {
   userId: string | undefined | null;
 }
 
 export function SubscriptionBadge({ userId }: Props) {
-  const { plan, loading } = useSubscription(userId);
+  const { planName, loading } = useSubscription(userId);
 
-  if (loading || !plan) return null;
+  if (loading || !planName) return null;
 
-  const label = PLAN_LABELS[plan] ?? plan;
-  const color = PLAN_COLORS[plan] ?? '#6B7280';
+  const label = PLAN_LABELS[planName] ?? planName;
+  const color = PLAN_COLORS[planName] ?? '#6B7280';
 
   return (
     <View

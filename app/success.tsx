@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'rea
 import { router, useLocalSearchParams } from 'expo-router';
 import { CircleCheck as CheckCircle, ArrowRight } from 'lucide-react-native';
 import { supabase } from '@/lib/supabase';
-import { useSubscription } from '@/hooks/useSubscription';
+import { useSubscription } from '@/src/hooks/useSubscription';
 
 export default function SuccessScreen() {
   const { session_id } = useLocalSearchParams<{ session_id?: string }>();

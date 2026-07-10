@@ -9,11 +9,11 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { ArrowLeft, Shield } from 'lucide-react-native';
-import { STRIPE_PRODUCTS } from '@/stripe-config';
-import { createCheckoutSession, redirectToCheckout } from '@/lib/stripe';
+import { STRIPE_PRODUCTS } from '@/src/stripe-config';
+import { createCheckoutSession, redirectToCheckout } from '@/src/lib/stripe';
 import { supabase } from '@/lib/supabase';
-import { useSubscription } from '@/hooks/useSubscription';
-import PlanCard from '@/components/subscription/PlanCard';
+import { useSubscription } from '@/src/hooks/useSubscription';
+import PlanCard from '@/src/components/subscription/PlanCard';
 
 export default function SubscriptionScreen() {
   const [loadingPriceId, setLoadingPriceId] = useState<string | null>(null);
@@ -62,7 +62,7 @@ export default function SubscriptionScreen() {
           </View>
           <Text style={styles.heroTitle}>Escolha seu plano</Text>
           <Text style={styles.heroSubtitle}>
-            Aumente sua visibilidade e conquiste mais alunos com os planos SuperShape.
+            Aumente sua visibilidade e conquiste mais alunos com os planos 99personal.
           </Text>
         </View>
 
