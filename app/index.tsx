@@ -2768,7 +2768,7 @@ const s = StyleSheet.create({
 },
 
   logoMark: {
-    width: IS_DESKTOP ? 100 : 10,
+    width: IS_DESKTOP ? 100 : 100,
     height: IS_DESKTOP ? 222 : 222,
   },
 
