@@ -2765,7 +2765,7 @@ flexShrink: 0,
 },
 
 logoMark: {
-width: IS_DESKTOP ? 580 : 420,
+width: IS_DESKTOP ? 880 : 620,
 height: IS_DESKTOP ? 200 : 82,
 marginLeft: IS_DESKTOP ? -18 : -6,
 },
