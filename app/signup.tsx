@@ -63,11 +63,10 @@ export default function SignupScreen() {
             </TouchableOpacity>
             <View style={styles.logoRow}>
               <Image
-                source={require('@/assets/images/tbuxfSzx0HD3j4sIzoHhw_TFPbJRs3_00001_(1).png')}
+                source={require('@/assets/images/logo.png')}
                 style={styles.logoIcon}
                 resizeMode="contain"
               />
-              <Text style={styles.brand}>99 Personal</Text>
             </View>
             <View style={{ width: 38 }} />
           </View>
@@ -143,9 +142,8 @@ const styles = StyleSheet.create({
     padding: Spacing.lg,
   },
   back: { padding: Spacing.xs },
-  logoRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  logoIcon: { width: 32, height: 32, borderRadius: 10 },
-  brand: { fontSize: FontSizes.lg, fontWeight: '700', color: Colors.white },
+  logoRow: { alignItems: 'center', justifyContent: 'center' },
+  logoIcon: { width: 56, height: 56 },
   card: {
     flex: 1, backgroundColor: Colors.white,
     borderTopLeftRadius: BorderRadii.xl, borderTopRightRadius: BorderRadii.xl,

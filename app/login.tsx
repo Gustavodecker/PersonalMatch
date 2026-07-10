@@ -47,11 +47,10 @@ export default function LoginScreen() {
         <View style={styles.content}>
           <View style={styles.logoRow}>
             <Image
-              source={require('@/assets/images/tbuxfSzx0HD3j4sIzoHhw_TFPbJRs3_00001_(1).png')}
-              style={styles.logoIcon}
+              source={require('@/assets/images/logo-horizontal.png')}
+              style={styles.logoHorizontal}
               resizeMode="contain"
             />
-            <Text style={styles.brand}>99 Personal</Text>
           </View>
 
           <View style={styles.header}>
@@ -130,13 +129,12 @@ const styles = StyleSheet.create({
   keyboardView: { flex: 1 },
   content: { flex: 1, padding: 24, justifyContent: 'center' },
   logoRow: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    gap: 10, marginBottom: 32,
+    alignItems: 'center', justifyContent: 'center',
+    marginBottom: 32,
   },
-  logoIcon: {
-    width: 48, height: 48, borderRadius: 14,
+  logoHorizontal: {
+    width: 200, height: 64,
   },
-  brand: { fontSize: 24, fontWeight: '800', color: '#1f2937', letterSpacing: -0.5 },
   header: { alignItems: 'center', marginBottom: 32 },
   title: { fontSize: 28, fontWeight: 'bold', color: '#1f2937', marginBottom: 6 },
   subtitle: { fontSize: 16, color: '#6b7280' },

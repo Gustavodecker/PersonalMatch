@@ -70,11 +70,10 @@ export default function RegisterScreen() {
             </TouchableOpacity>
             <View style={styles.topLogoWrap}>
               <Image
-                source={require('@/assets/images/logo-icon.png')}
+                source={require('@/assets/images/logo.png')}
                 style={styles.topLogoImg}
                 resizeMode="contain"
               />
-              <Text style={styles.topLogoText}>Personal</Text>
             </View>
             <View style={styles.backBtn} />
           </View>
@@ -88,7 +87,7 @@ export default function RegisterScreen() {
           {/* Card */}
           <View style={styles.card}>
             {/* Role selector */}
-            <Text style={styles.roleLabel}>Como você vai usar o 99 Personal?</Text>
+            <Text style={styles.roleLabel}>Como você vai usar o Personal?</Text>
             <View style={styles.roleRow}>
               {ROLES.map((r) => {
                 const Icon = r.icon;
@@ -187,9 +186,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.12)',
     alignItems: 'center', justifyContent: 'center',
   },
-  topLogoWrap: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  topLogoImg: { width: 90, height: 90 },
-  topLogoText: { fontSize: 32, fontWeight: '900', color: Colors.white, letterSpacing: -0.5 },
+  topLogoWrap: { alignItems: 'center', justifyContent: 'center' },
+  topLogoImg: { width: 100, height: 100 },
 
   heroText: {
     paddingHorizontal: Spacing.xl,

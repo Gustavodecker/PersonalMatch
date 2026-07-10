@@ -37,11 +37,10 @@ export default function SelectRoleScreen() {
         {/* Header */}
         <View style={styles.header}>
           <Image
-            source={require('@/assets/images/tbuxfSzx0HD3j4sIzoHhw_TFPbJRs3_00001_(1).png')}
+            source={require('@/assets/images/logo.png')}
             style={styles.logoWrap}
             resizeMode="contain"
           />
-          <Text style={styles.appName}>99 Personal</Text>
         </View>
 
         {/* Avatar + greeting */}
@@ -64,7 +63,7 @@ export default function SelectRoleScreen() {
         )}
 
         {/* Question */}
-        <Text style={styles.question}>Como você deseja usar o 99 Personal?</Text>
+        <Text style={styles.question}>Como você deseja usar o Personal?</Text>
         <Text style={styles.questionSub}>
           Escolha o perfil que melhor descreve você. Isso personaliza sua experiência.
         </Text>
@@ -147,12 +146,11 @@ const styles = StyleSheet.create({
   },
 
   header: {
-    flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: Spacing.xxl,
+    alignItems: 'center', justifyContent: 'center', marginBottom: Spacing.xxl,
   },
   logoWrap: {
-    width: 44, height: 44, borderRadius: 14,
+    width: 80, height: 80,
   },
-  appName: { fontSize: FontSizes.xl, fontWeight: '800', color: Colors.white },
 
   userRow: {
     flexDirection: 'row', alignItems: 'center', gap: 14,
