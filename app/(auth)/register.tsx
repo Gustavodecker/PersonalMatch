@@ -68,11 +68,14 @@ export default function RegisterScreen() {
             <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
               <ArrowLeft size={20} color={Colors.white} />
             </TouchableOpacity>
-            <Image
-              source={require('@/assets/images/logo-icon.png')}
-              style={styles.topLogoImg}
-              resizeMode="contain"
-            />
+            <View style={styles.topLogoWrap}>
+              <Image
+                source={require('@/assets/images/logo-icon.png')}
+                style={styles.topLogoImg}
+                resizeMode="contain"
+              />
+              <Text style={styles.topLogoText}>Personal</Text>
+            </View>
             <View style={styles.backBtn} />
           </View>
 
@@ -184,7 +187,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.12)',
     alignItems: 'center', justifyContent: 'center',
   },
+  topLogoWrap: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   topLogoImg: { width: 44, height: 44 },
+  topLogoText: { fontSize: 20, fontWeight: '800', color: Colors.white, letterSpacing: -0.3 },
 
   heroText: {
     paddingHorizontal: Spacing.xl,

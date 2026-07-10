@@ -193,7 +193,7 @@ const MobileWelcome: React.FC = () => {
               style={ww.logoIconImg}
               resizeMode="contain"
             />
-            <Text style={ww.logoText}>99 Personal</Text>
+            <Text style={ww.logoText}>Personal</Text>
           </View>
           <TouchableOpacity
             onPress={() => router.push('/(auth)/login')}
@@ -325,7 +325,7 @@ const ww = StyleSheet.create({
   },
   logoWrap: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   logoImg: { width: 140, height: 40 },
-  logoIconImg: { width: 42, height: 42 },
+  logoIconImg: { width: 56, height: 56 },
   logoIconGrad: {
     width: 42, height: 42, borderRadius: 13,
     alignItems: 'center', justifyContent: 'center',
@@ -336,7 +336,7 @@ const ww = StyleSheet.create({
     backgroundColor: Colors.primary[600],
     alignItems: 'center', justifyContent: 'center',
   },
-  logoText: { fontSize: 17, fontWeight: '800', color: Colors.white, letterSpacing: -0.3 },
+  logoText: { fontSize: 22, fontWeight: '800', color: Colors.white, letterSpacing: -0.3 },
   skipBtn: {
     paddingHorizontal: 16, paddingVertical: 7,
     backgroundColor: 'rgba(255,255,255,0.12)',

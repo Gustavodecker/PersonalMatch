@@ -51,7 +51,7 @@ export default function LoginScreen() {
                 resizeMode="contain"
               />
               <View>
-                <Text style={styles.logoWordMark}>99 Personal</Text>
+                <Text style={styles.logoWordMark}>Personal</Text>
                 <Text style={styles.logoWordSub}>trainer marketplace</Text>
               </View>
             </View>
