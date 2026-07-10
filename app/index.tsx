@@ -2769,7 +2769,7 @@ const s = StyleSheet.create({
 
   logoMark: {
     width: IS_DESKTOP ? 310 : 250,
-    height: IS_DESKTOP ? 2 : 2,
+    height: IS_DESKTOP ? 12 : 12,
   },
 
   headerNav: {
