@@ -1,268 +1,172 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Platform } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { CircleCheck as CheckCircle, Hop as Home, CreditCard } from 'lucide-react-native';
-import { useRouter } from 'expo-router';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { router, useLocalSearchParams } from 'expo-router';
+import { CircleCheck as CheckCircle, ArrowRight } from 'lucide-react-native';
 import { supabase } from '@/lib/supabase';
+import { useSubscription } from '@/hooks/useSubscription';
 
 export default function SuccessScreen() {
-  const [loading, setLoading] = useState(true);
-  const [subscriptionInfo, setSubscriptionInfo] = useState<any>(null);
-  const router = useRouter();
+  const { session_id } = useLocalSearchParams<{ session_id?: string }>();
+  const [userId, setUserId] = useState<string | undefined>(undefined);
+  const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    // Wait a moment for webhook to process, then fetch subscription
-    const timer = setTimeout(() => {
-      fetchSubscriptionInfo();
-    }, 3000);
-
-    return () => clearTimeout(timer);
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUserId(session?.user.id);
+      // Give webhook a moment to process
+      setTimeout(() => setChecking(false), 2000);
+    });
   }, []);
 
-  const fetchSubscriptionInfo = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('stripe_user_subscriptions')
-        .select('subscription_status, price_id, current_period_end')
-        .maybeSingle();
-
-      if (error) {
-        console.error('Error fetching subscription:', error);
-      } else {
-        setSubscriptionInfo(data);
-      }
-    } catch (error) {
-      console.error('Error:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const formatEndDate = (timestamp: number | null) => {
-    if (!timestamp) return '';
-    return new Date(timestamp * 1000).toLocaleDateString('pt-BR');
-  };
+  const { planName } = useSubscription(userId);
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
-        <View style={styles.iconContainer}>
-          <CheckCircle size={80} color="#10b981" fill="#10b981" />
+    <View style={styles.container}>
+      <View style={styles.card}>
+        <View style={styles.iconWrapper}>
+          <CheckCircle size={64} color="#22C55E" strokeWidth={1.5} />
         </View>
 
-        <Text style={styles.title}>Pagamento Confirmado!</Text>
+        <Text style={styles.title}>Pagamento confirmado!</Text>
         <Text style={styles.subtitle}>
-          Sua assinatura foi ativada com sucesso
+          Sua assinatura foi ativada com sucesso. Bem-vindo ao plano{' '}
+          <Text style={styles.planName}>
+            {checking ? '...' : planName.charAt(0).toUpperCase() + planName.slice(1)}
+          </Text>
+          !
         </Text>
 
-        {loading ? (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#2563eb" />
-            <Text style={styles.loadingText}>
-              Processando sua assinatura...
-            </Text>
-          </View>
-        ) : subscriptionInfo?.subscription_status === 'active' ? (
-          <View style={styles.subscriptionInfo}>
-            <Text style={styles.subscriptionTitle}>
-              Assinatura Ativa
-            </Text>
-            <Text style={styles.subscriptionDetails}>
-              Válida até {formatEndDate(subscriptionInfo.current_period_end)}
-            </Text>
-            <Text style={styles.successMessage}>
-              Agora você tem acesso completo a todos os recursos da plataforma!
-            </Text>
-          </View>
-        ) : (
-          <View style={styles.processingInfo}>
-            <Text style={styles.processingTitle}>
-              Processamento em Andamento
-            </Text>
-            <Text style={styles.processingText}>
-              Sua assinatura está sendo processada. Você receberá uma confirmação em breve.
-            </Text>
+        {checking && (
+          <View style={styles.checkingRow}>
+            <ActivityIndicator size="small" color="#6366F1" />
+            <Text style={styles.checkingText}>Ativando seu plano...</Text>
           </View>
         )}
 
-        <View style={styles.actions}>
-          <TouchableOpacity
-            style={styles.primaryButton}
-            onPress={() => router.push('/')}
-          >
-            <Home size={20} color="#ffffff" />
-            <Text style={styles.primaryButtonText}>Ir para Início</Text>
-          </TouchableOpacity>
-
-          {Platform.OS === 'web' && (
-            <TouchableOpacity
-              style={styles.secondaryButton}
-              onPress={() => router.push('/pricing')}
-            >
-              <CreditCard size={20} color="#2563eb" />
-              <Text style={styles.secondaryButtonText}>Ver Meus Planos</Text>
-            </TouchableOpacity>
-          )}
+        <View style={styles.benefits}>
+          <Text style={styles.benefitsTitle}>O que acontece agora?</Text>
+          <Text style={styles.benefitItem}>✓ Seu perfil já está sendo destacado</Text>
+          <Text style={styles.benefitItem}>✓ Novos recursos foram desbloqueados</Text>
+          <Text style={styles.benefitItem}>✓ Você receberá um e-mail de confirmação</Text>
         </View>
 
-        <View style={styles.supportInfo}>
-          <Text style={styles.supportTitle}>Precisa de Ajuda?</Text>
-          <Text style={styles.supportText}>
-            Entre em contato com nosso suporte através do email:{'\n'}
-            <Text style={styles.supportEmail}>suporte@99personal.com.br</Text>
-          </Text>
-        </View>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => router.replace('/(tabs)')}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.buttonText}>Ir para o início</Text>
+          <ArrowRight size={18} color="#fff" />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.secondaryButton}
+          onPress={() => router.replace('/subscription')}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.secondaryButtonText}>Ver meu plano</Text>
+        </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8fafc',
-  },
-  content: {
-    flex: 1,
-    padding: 24,
+    backgroundColor: '#F0FDF4',
     justifyContent: 'center',
     alignItems: 'center',
+    padding: 24,
   },
-  iconContainer: {
-    marginBottom: 32,
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 24,
+    padding: 32,
+    width: '100%',
+    maxWidth: 440,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.08,
+    shadowRadius: 24,
+    elevation: 6,
+  },
+  iconWrapper: {
+    marginBottom: 24,
   },
   title: {
     fontSize: 28,
-    fontWeight: 'bold',
-    color: '#1f2937',
-    textAlign: 'center',
+    fontWeight: '800',
+    color: '#111827',
     marginBottom: 12,
+    textAlign: 'center',
   },
   subtitle: {
     fontSize: 16,
-    color: '#6b7280',
+    color: '#6B7280',
     textAlign: 'center',
-    marginBottom: 32,
     lineHeight: 24,
-  },
-  loadingContainer: {
-    alignItems: 'center',
-    marginBottom: 32,
-  },
-  loadingText: {
-    marginTop: 16,
-    fontSize: 14,
-    color: '#6b7280',
-  },
-  subscriptionInfo: {
-    backgroundColor: '#ffffff',
-    borderRadius: 16,
-    padding: 24,
-    marginBottom: 32,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-    width: '100%',
-  },
-  subscriptionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#10b981',
-    marginBottom: 8,
-  },
-  subscriptionDetails: {
-    fontSize: 14,
-    color: '#6b7280',
     marginBottom: 16,
   },
-  successMessage: {
+  planName: {
+    color: '#6366F1',
+    fontWeight: '700',
+  },
+  checkingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 16,
+  },
+  checkingText: {
+    fontSize: 14,
+    color: '#6366F1',
+  },
+  benefits: {
+    width: '100%',
+    backgroundColor: '#F9FAFB',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 24,
+    gap: 8,
+  },
+  benefitsTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#374151',
+    marginBottom: 4,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  benefitItem: {
     fontSize: 14,
     color: '#374151',
-    textAlign: 'center',
-    lineHeight: 20,
+    lineHeight: 22,
   },
-  processingInfo: {
-    backgroundColor: '#ffffff',
-    borderRadius: 16,
-    padding: 24,
-    marginBottom: 32,
+  button: {
+    flexDirection: 'row',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: '#6366F1',
+    borderRadius: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 24,
     width: '100%',
-  },
-  processingTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#f59e0b',
     marginBottom: 12,
   },
-  processingText: {
-    fontSize: 14,
-    color: '#6b7280',
-    textAlign: 'center',
-    lineHeight: 20,
-  },
-  actions: {
-    width: '100%',
-    gap: 12,
-    marginBottom: 32,
-  },
-  primaryButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#2563eb',
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    borderRadius: 12,
-  },
-  primaryButtonText: {
-    marginLeft: 8,
+  buttonText: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#ffffff',
+    fontWeight: '700',
+    color: '#fff',
   },
   secondaryButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#ffffff',
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#e5e7eb',
+    paddingVertical: 12,
   },
   secondaryButtonText: {
-    marginLeft: 8,
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#2563eb',
-  },
-  supportInfo: {
-    alignItems: 'center',
-  },
-  supportTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#374151',
-    marginBottom: 8,
-  },
-  supportText: {
-    fontSize: 14,
-    color: '#6b7280',
-    textAlign: 'center',
-    lineHeight: 20,
-  },
-  supportEmail: {
-    color: '#2563eb',
-    fontWeight: '600',
+    fontSize: 15,
+    color: '#6B7280',
+    fontWeight: '500',
   },
 });

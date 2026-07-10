@@ -1,25 +1,17 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase } from '@/lib/supabase';
 
 export interface SubscriptionInfo {
-  plan: string | null;
-  status: string | null;
-  isActive: boolean;
+  plan: string;
+  status: string;
   currentPeriodEnd: string | null;
-  loading: boolean;
-  error: string | null;
-  refetch: () => void;
+  cancelAtPeriodEnd: boolean;
 }
 
-const ACTIVE_STATUSES = ['active', 'trialing'];
-
-export function useSubscription(userId: string | undefined | null): SubscriptionInfo {
-  const [plan, setPlan] = useState<string | null>(null);
-  const [status, setStatus] = useState<string | null>(null);
-  const [currentPeriodEnd, setCurrentPeriodEnd] = useState<string | null>(null);
+export function useSubscription(userId?: string) {
+  const [subscription, setSubscription] = useState<SubscriptionInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [tick, setTick] = useState(0);
 
   useEffect(() => {
     if (!userId) {
@@ -27,52 +19,46 @@ export function useSubscription(userId: string | undefined | null): Subscription
       return;
     }
 
-    let isMounted = true;
-    setLoading(true);
+    let mounted = true;
 
-    async function fetchData() {
+    async function fetch() {
       try {
-        const { data, error: dbError } = await supabase
+        const { data, error: dbErr } = await supabase
           .from('subscriptions')
-          .select('plan, status, current_period_end')
+          .select('plan, status, current_period_end, cancel_at_period_end')
           .eq('trainer_id', userId)
-          .order('created_at', { ascending: false })
-          .limit(1)
           .maybeSingle();
 
-        if (!isMounted) return;
+        if (dbErr) throw dbErr;
 
-        if (dbError) {
-          setError(dbError.message);
-        } else if (data) {
-          setPlan(data.plan);
-          setStatus(data.status);
-          setCurrentPeriodEnd(data.current_period_end);
-        } else {
-          setPlan(null);
-          setStatus(null);
-          setCurrentPeriodEnd(null);
+        if (mounted) {
+          setSubscription(
+            data
+              ? {
+                  plan: data.plan,
+                  status: data.status,
+                  currentPeriodEnd: data.current_period_end,
+                  cancelAtPeriodEnd: data.cancel_at_period_end,
+                }
+              : null
+          );
         }
-      } catch {
-        if (isMounted) setError('Erro ao carregar assinatura.');
+      } catch (err: any) {
+        if (mounted) setError(err.message);
       } finally {
-        if (isMounted) setLoading(false);
+        if (mounted) setLoading(false);
       }
     }
 
-    fetchData();
-    return () => {
-      isMounted = false;
-    };
-  }, [userId, tick]);
+    fetch();
 
-  return {
-    plan,
-    status,
-    isActive: ACTIVE_STATUSES.includes(status ?? ''),
-    currentPeriodEnd,
-    loading,
-    error,
-    refetch: () => setTick((t) => t + 1),
-  };
+    return () => {
+      mounted = false;
+    };
+  }, [userId]);
+
+  const isActive = subscription?.status === 'active' || subscription?.status === 'trialing';
+  const planName = subscription?.plan ?? 'free';
+
+  return { subscription, loading, error, isActive, planName };
 }

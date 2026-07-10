@@ -1,5 +1,3 @@
-export type StripeMode = 'subscription' | 'payment';
-
 export interface StripeProduct {
   id: string;
   priceId: string;
@@ -9,63 +7,51 @@ export interface StripeProduct {
   price: number;
   currencySymbol: string;
   currency: string;
-  mode: StripeMode;
+  mode: 'subscription' | 'payment';
 }
 
-export const STRIPE_PRODUCTS = {
-  pro: {
+export const STRIPE_PRODUCTS: StripeProduct[] = [
+  {
     id: 'prod_Ug8CEtM8Mg8lPy',
-    priceId: 'price_1TglwS2cJEMqtkzYOVP6WWTE',
+    priceId: 'price_1TlIhLGT3oj5YeOVfAEhPfpu',
     name: 'Pro',
-    description: 'Ideal para personal trainers em crescimento',
+    description: 'Para treinadores que querem crescer e destacar seu perfil',
     features: [
-      'Perfil destacado nas buscas',
+      'Perfil em destaque na busca',
       'Até 10 fotos na galeria',
-      'Agendamento online ilimitado',
-      'Estatísticas de perfil',
+      'Agendamentos ilimitados',
+      'Badge Pro no perfil',
       'Suporte prioritário',
     ],
-    price: 29.90,
+    price: 29.9,
     currencySymbol: 'R$',
     currency: 'brl',
-    mode: 'subscription' as StripeMode,
+    mode: 'subscription',
   },
-  premium: {
+  {
     id: 'prod_Ug8FadHaciIELP',
-    priceId: 'price_1TglzK2cJEMqtkzYXz6Zhmd0',
+    priceId: 'price_1TlIhLGT3oj5YeOVEVxrxALk',
     name: 'Premium',
-    description: 'Para personal trainers que querem se destacar',
+    description: 'Para treinadores que querem o máximo de visibilidade',
     features: [
       'Tudo do plano Pro',
       'Fotos ilimitadas na galeria',
-      'Destaque no topo das buscas',
-      'Selo verificado no perfil',
-      'Análises avançadas de performance',
-      'Suporte VIP 24/7',
+      'Badge verificado no perfil',
+      'Posição de topo na busca',
+      'Relatórios e analytics',
+      'Suporte 24/7',
     ],
-    price: 59.90,
+    price: 59.9,
     currencySymbol: 'R$',
     currency: 'brl',
-    mode: 'subscription' as StripeMode,
+    mode: 'subscription',
   },
-} satisfies Record<string, StripeProduct>;
+];
 
-export const PRODUCTS_LIST: StripeProduct[] = Object.values(STRIPE_PRODUCTS);
+export function getProductByPriceId(priceId: string): StripeProduct | undefined {
+  return STRIPE_PRODUCTS.find((p) => p.priceId === priceId);
+}
 
-export const PLAN_LABELS: Record<string, string> = {
-  free_trial: 'Teste Grátis',
-  free: 'Grátis',
-  pro: 'Pro',
-  premium: 'Premium',
-};
-
-export const PLAN_COLORS: Record<string, string> = {
-  free_trial: '#6B7280',
-  free: '#6B7280',
-  pro: '#2563EB',
-  premium: '#7C3AED',
-};
-
-export function getPlanByPriceId(priceId: string): StripeProduct | undefined {
-  return PRODUCTS_LIST.find((p) => p.priceId === priceId);
+export function getProductByName(name: string): StripeProduct | undefined {
+  return STRIPE_PRODUCTS.find((p) => p.name.toLowerCase() === name.toLowerCase());
 }
