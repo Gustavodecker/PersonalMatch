@@ -1,2 +1,0 @@
-ALTER TABLE trainers
-  ADD COLUMN IF NOT EXISTS gym_hourly_rate DECIMAL(10,2);

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Redirect, Tabs, router } from 'expo-router';
+import { Redirect, Tabs, router, usePathname } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { LoadingScreen } from '@/components/LoadingScreen';
 import { Colors, Spacing, FontSizes, BorderRadii, Shadows } from '@/constants/theme';
@@ -11,9 +11,13 @@ import { supabase } from '@/lib/supabase';
 type TrialState = 'loading' | 'ok' | 'warning' | 'expired';
 
 export default function TrainerAppLayout() {
-  const { user, profile, loading } = useAuth();
+  const { user, profile, loading, signOut } = useAuth();
+  const pathname = usePathname();
   const [trialState, setTrialState] = useState<TrialState>('loading');
   const [daysLeft, setDaysLeft] = useState(0);
+
+  // Overlay is suppressed only when the user is on the assinatura tab
+  const showExpiredOverlay = trialState === 'expired' && !pathname.endsWith('/assinatura');
 
   useEffect(() => {
     if (!profile || profile.role !== 'trainer') return;
@@ -39,31 +43,14 @@ export default function TrainerAppLayout() {
   if (!user) return <Redirect href="/(auth)/login" />;
   if (profile && profile.role !== 'trainer' && profile.role !== 'admin') return <Redirect href="/" />;
 
-  if (trialState === 'expired') {
-    return (
-      <SafeAreaView style={exp.safe}>
-        <View style={exp.card}>
-          <View style={exp.iconWrap}>
-            <AlertTriangle size={40} color={Colors.error[600]} />
-          </View>
-          <Text style={exp.title}>Período de teste encerrado</Text>
-          <Text style={exp.desc}>
-            Seu período de teste gratuito de 15 dias expirou. Assine um plano para continuar recebendo alunos e aparecer nas buscas.
-          </Text>
-          <TouchableOpacity
-            style={exp.btn}
-            onPress={() => router.push('/trainer/(app)/assinatura')}
-          >
-            <CreditCard size={18} color={Colors.white} />
-            <Text style={exp.btnText}>Ver planos e assinar</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={exp.logoutBtn} onPress={() => router.replace('/')}>
-            <Text style={exp.logoutText}>Sair da conta</Text>
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
-    );
-  }
+  const handleSignOut = async () => {
+    await signOut();
+    router.replace('/');
+  };
+
+  const handleGoToSubscription = () => {
+    router.push('/trainer/(app)/assinatura');
+  };
 
   return (
     <SafeAreaView
@@ -105,15 +92,43 @@ export default function TrainerAppLayout() {
           }}
         />
       </Tabs>
+
+      {/* Overlay shown whenever expired and NOT on the assinatura tab */}
+      {showExpiredOverlay && (
+        <View style={exp.overlay}>
+          <View style={exp.card}>
+            <View style={exp.iconWrap}>
+              <AlertTriangle size={40} color={Colors.error[600]} />
+            </View>
+            <Text style={exp.title}>Período de teste encerrado</Text>
+            <Text style={exp.desc}>
+              Seu período de teste gratuito de 15 dias expirou. Assine um plano para continuar recebendo alunos e aparecer nas buscas.
+            </Text>
+            <TouchableOpacity style={exp.btn} onPress={handleGoToSubscription}>
+              <CreditCard size={18} color={Colors.white} />
+              <Text style={exp.btnText}>Ver planos e assinar</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={exp.logoutBtn} onPress={handleSignOut}>
+              <Text style={exp.logoutText}>Sair da conta</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
     </SafeAreaView>
   );
 }
 
 const exp = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: Colors.neutral[50], justifyContent: 'center', alignItems: 'center' },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(15,23,42,0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   card: {
     margin: Spacing.xl, backgroundColor: Colors.white, borderRadius: BorderRadii.xl,
     padding: Spacing.xl, alignItems: 'center', gap: Spacing.md, ...Shadows.md,
+    width: '85%',
   },
   iconWrap: {
     width: 72, height: 72, borderRadius: 36, backgroundColor: Colors.error[50],

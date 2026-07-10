@@ -19,8 +19,6 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     storage,
     autoRefreshToken: true,
     persistSession: true,
-    // On web: detect code/token in URL after OAuth redirect.
-    // On native: session is exchanged manually via WebBrowser + exchangeCodeForSession.
-    detectSessionInUrl: Platform.OS === 'web',
+    detectSessionInUrl: false,
   },
 });
