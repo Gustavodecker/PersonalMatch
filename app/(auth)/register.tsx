@@ -70,7 +70,7 @@ export default function RegisterScreen() {
             </TouchableOpacity>
             <View style={styles.topLogoWrap}>
               <Image
-                source={require('@/assets/images/logo-horizontal.png')}
+                source={require('@/assets/images/logo.png')}
                 style={styles.topLogoImg}
                 resizeMode="contain"
               />
@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
   },
   topLogoWrap: { alignItems: 'center', justifyContent: 'center' },
-  topLogoImg: { width: 150, height: 150 },
+  topLogoImg: { width: 280, height: 280 },
 
   heroText: {
     paddingHorizontal: Spacing.xl,
