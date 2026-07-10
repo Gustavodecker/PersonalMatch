@@ -46,12 +46,12 @@ export default function LoginScreen() {
           <View style={styles.hero}>
             <View style={styles.logoWrap}>
               <Image
-                source={require('@/assets/images/logo.png')}
+                source={require('@/assets/images/logo-icon.png')}
                 style={styles.logoImg}
                 resizeMode="contain"
               />
               <View>
-                <Text style={styles.logoWordPersonal}>Personal</Text>
+                <Text style={styles.logoWordMark}>99 Personal</Text>
                 <Text style={styles.logoWordSub}>trainer marketplace</Text>
               </View>
             </View>
@@ -128,19 +128,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.xl,
     gap: Spacing.lg,
   },
-  logoWrap: {
-    flexDirection: 'row', alignItems: 'center', gap: 16,
-  },
-  logoImg: {
-    width: 76, height: 76,
-    shadowColor: Colors.primary[900],
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.45,
-    shadowRadius: 20,
-    elevation: 10,
-  },
-  logoWordPersonal: {
-    fontSize: 32, fontWeight: '900', color: Colors.white, letterSpacing: -0.5, lineHeight: 36,
+  logoWrap: { flexDirection: 'row', alignItems: 'center', gap: 14 },
+  logoImg: { width: 72, height: 72 },
+  logoWordMark: {
+    fontSize: 30, fontWeight: '900', color: Colors.white, letterSpacing: -0.5, lineHeight: 34,
   },
   logoWordSub: {
     fontSize: 12, fontWeight: '600', color: 'rgba(255,255,255,0.45)',

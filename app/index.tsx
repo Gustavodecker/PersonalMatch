@@ -189,7 +189,7 @@ const MobileWelcome: React.FC = () => {
         <View style={ww.topBar}>
           <View style={ww.logoWrap}>
             <Image
-              source={require('@/assets/images/logo.png')}
+              source={require('@/assets/images/logo-icon.png')}
               style={ww.logoIconImg}
               resizeMode="contain"
             />
@@ -469,11 +469,10 @@ const PublicHome: React.FC = () => {
             onPress={() => scrollRef.current?.scrollTo({ y: 0, animated: true })}
           >
             <Image
-              source={require('@/assets/images/logo.png')}
-              style={s.logoMark}
+              source={require('@/assets/images/logo-horizontal.png')}
+              style={s.logoHorizontal}
               resizeMode="contain"
             />
-            <Text style={s.logoText}>99 Personal</Text>
           </TouchableOpacity>
 
           {IS_DESKTOP && (
@@ -1086,7 +1085,7 @@ const PublicHome: React.FC = () => {
             <View style={s.footerBrand}>
               <View style={s.footerLogoRow}>
                 <Image
-                  source={require('@/assets/images/logo.png')}
+                  source={require('@/assets/images/logo-icon.png')}
                   style={s.footerLogoBadge}
                   resizeMode="contain"
                 />
@@ -1241,6 +1240,7 @@ const s = StyleSheet.create({
     maxWidth: 1200, alignSelf: 'center', width: '100%',
   },
   logo: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  logoHorizontal: { width: IS_DESKTOP ? 180 : 140, height: IS_DESKTOP ? 56 : 44 },
   logoMark: { width: 42, height: 42 },
   logoMarkNum: { fontSize: 17, fontWeight: '900', color: Colors.white, letterSpacing: 0 },
   logoText: {
@@ -1795,7 +1795,7 @@ const s = StyleSheet.create({
   footerLogoBadge: { width: 44, height: 44 },
   footerLogoBadgeNum: { fontSize: 18, fontWeight: '900', color: Colors.white, letterSpacing: 0 },
   footerLogoName: { fontSize: 22, fontWeight: '900', color: Colors.white, letterSpacing: -0.5 },
-  footerLogoImg: { width: 160, height: 48 },
+  footerLogoImg: { width: 200, height: 60 },
   footerLogo: {
     width: 32, height: 32, borderRadius: 9,
     backgroundColor: Colors.neutral[700],

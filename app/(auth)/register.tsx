@@ -69,7 +69,7 @@ export default function RegisterScreen() {
               <ArrowLeft size={20} color={Colors.white} />
             </TouchableOpacity>
             <Image
-              source={require('@/assets/images/logo.png')}
+              source={require('@/assets/images/logo-icon.png')}
               style={styles.topLogoImg}
               resizeMode="contain"
             />
