@@ -133,26 +133,26 @@ const styles = StyleSheet.create({
     gap: Spacing.lg,
   },
   logoWrap: {
-    flexDirection: 'row', alignItems: 'center', gap: 14,
+    flexDirection: 'row', alignItems: 'center', gap: 16,
   },
   logoBadge: {
-    width: 56, height: 56, borderRadius: 18,
+    width: 72, height: 72, borderRadius: 22,
     alignItems: 'center', justifyContent: 'center',
     shadowColor: Colors.primary[900],
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.4,
-    shadowRadius: 16,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.45,
+    shadowRadius: 20,
+    elevation: 10,
   },
   logoBadgeNum: {
-    fontSize: 22, fontWeight: '900', color: Colors.white, letterSpacing: -1,
+    fontSize: 28, fontWeight: '900', color: Colors.white, letterSpacing: 0,
   },
   logoWordPersonal: {
-    fontSize: 28, fontWeight: '900', color: Colors.white, letterSpacing: -0.8, lineHeight: 32,
+    fontSize: 32, fontWeight: '900', color: Colors.white, letterSpacing: -0.5, lineHeight: 36,
   },
   logoWordSub: {
-    fontSize: 11, fontWeight: '600', color: 'rgba(255,255,255,0.45)',
-    textTransform: 'uppercase', letterSpacing: 0.8,
+    fontSize: 12, fontWeight: '600', color: 'rgba(255,255,255,0.45)',
+    textTransform: 'uppercase', letterSpacing: 1,
   },
   tagline: {
     fontSize: FontSizes.md,

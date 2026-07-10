@@ -326,10 +326,10 @@ const ww = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 24, paddingTop: 8, paddingBottom: 4,
   },
-  logoWrap: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  logoWrap: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   logoImg: { width: 140, height: 40 },
   logoIconGrad: {
-    width: 34, height: 34, borderRadius: 10,
+    width: 42, height: 42, borderRadius: 13,
     alignItems: 'center', justifyContent: 'center',
     shadowColor: Colors.primary[900],
     shadowOffset: { width: 0, height: 3 },
@@ -337,7 +337,7 @@ const ww = StyleSheet.create({
     shadowRadius: 6,
     elevation: 4,
   },
-  logoIconNum: { fontSize: 14, fontWeight: '900', color: Colors.white, letterSpacing: -0.5 },
+  logoIconNum: { fontSize: 17, fontWeight: '900', color: Colors.white, letterSpacing: 0 },
   logoIconImg: { width: 36, height: 36, borderRadius: 10 },
   logoIcon: {
     width: 34, height: 34, borderRadius: 10,
@@ -1256,12 +1256,12 @@ const s = StyleSheet.create({
   },
   logo: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   logoMark: {
-    width: 34, height: 34, borderRadius: 10,
+    width: 42, height: 42, borderRadius: 13,
     alignItems: 'center', justifyContent: 'center',
   },
-  logoMarkNum: { fontSize: 14, fontWeight: '900', color: Colors.white, letterSpacing: -0.5 },
+  logoMarkNum: { fontSize: 17, fontWeight: '900', color: Colors.white, letterSpacing: 0 },
   logoText: {
-    fontSize: 18, fontWeight: '800', color: Colors.neutral[900], letterSpacing: -0.4,
+    fontSize: 20, fontWeight: '800', color: Colors.neutral[900], letterSpacing: -0.4,
   },
   headerNav: { flexDirection: 'row', alignItems: 'center', gap: 30 },
   navLink: { fontSize: 14, fontWeight: '500', color: Colors.neutral[600] },
@@ -1810,11 +1810,11 @@ const s = StyleSheet.create({
   footerBrand: { marginBottom: 8 },
   footerLogoRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   footerLogoBadge: {
-    width: 36, height: 36, borderRadius: 10,
+    width: 44, height: 44, borderRadius: 14,
     alignItems: 'center', justifyContent: 'center',
   },
-  footerLogoBadgeNum: { fontSize: 15, fontWeight: '900', color: Colors.white, letterSpacing: -0.5 },
-  footerLogoName: { fontSize: 20, fontWeight: '900', color: Colors.white, letterSpacing: -0.5 },
+  footerLogoBadgeNum: { fontSize: 18, fontWeight: '900', color: Colors.white, letterSpacing: 0 },
+  footerLogoName: { fontSize: 22, fontWeight: '900', color: Colors.white, letterSpacing: -0.5 },
   footerLogoImg: { width: 160, height: 48 },
   footerLogo: {
     width: 32, height: 32, borderRadius: 9,
