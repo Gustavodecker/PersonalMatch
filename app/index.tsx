@@ -457,8 +457,8 @@ const PublicHome: React.FC = () => {
             style={s.logo}
             onPress={() => scrollRef.current?.scrollTo({ y: 0, animated: true })}
           >
-            <Image source={require('@/assets/images/ChatGPT_Image_9_de_jul._de_2026,_21_23_46-Photoroom.png')} style={s.logoMark} />
-            <Text style={s.logoText}>Personal</Text>
+            <Image source={require('@/assets/images/logo4.png')} style={s.logoMark} />
+            <Text style={s.logoText}></Text>
           </TouchableOpacity>
 
           {IS_DESKTOP && (
