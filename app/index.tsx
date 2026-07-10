@@ -321,11 +321,11 @@ const ww = StyleSheet.create({
   topBar: {
     flexDirection: 'row', alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 24, paddingTop: 8, paddingBottom: 4,
+    paddingHorizontal: 20, paddingTop: 6, paddingBottom: 4,
   },
-  logoWrap: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  logoWrap: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   logoImg: { width: 140, height: 40 },
-  logoIconImg: { width: 56, height: 56 },
+  logoIconImg: { width: 90, height: 90 },
   logoIconGrad: {
     width: 42, height: 42, borderRadius: 13,
     alignItems: 'center', justifyContent: 'center',
@@ -336,7 +336,7 @@ const ww = StyleSheet.create({
     backgroundColor: Colors.primary[600],
     alignItems: 'center', justifyContent: 'center',
   },
-  logoText: { fontSize: 22, fontWeight: '800', color: Colors.white, letterSpacing: -0.3 },
+  logoText: { fontSize: 28, fontWeight: '900', color: Colors.white, letterSpacing: -0.5 },
   skipBtn: {
     paddingHorizontal: 16, paddingVertical: 7,
     backgroundColor: 'rgba(255,255,255,0.12)',
