@@ -2746,28 +2746,7 @@ const s = StyleSheet.create({
     elevation: 2,
   },
 
- headerInner: {
-flexDirection: 'row',
-alignItems: 'center',
-justifyContent: 'space-between',
-paddingHorizontal: IS_DESKTOP ? 24 : 16,
-paddingVertical: IS_DESKTOP ? 8 : 6,
-minHeight: IS_DESKTOP ? 96 : 76,
-width: '100%',
-},
-
-logo: {
-height: IS_DESKTOP ? 88 : 68,
-alignItems: 'flex-start',
-justifyContent: 'center',
-flexShrink: 0,
-},
-
-logoMark: {
-width: IS_DESKTOP ? 280 : 190,
-height: IS_DESKTOP ? 88 : 64,
-},
-
+ 
 
   headerNav: {
     flexDirection: 'row',
