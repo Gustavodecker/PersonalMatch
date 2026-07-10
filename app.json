@@ -18,7 +18,7 @@
     "web": {
       "bundler": "metro",
       "output": "single",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/ChatGPT_Image_9_de_jul._de_2026,_21_23_46-Photoroom.png"
     },
     "plugins": ["expo-router", "expo-font", "expo-web-browser"],
     "experiments": {

@@ -2746,31 +2746,35 @@ const s = StyleSheet.create({
     elevation: 2,
   },
 
-  headerInner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: IS_DESKTOP
-      ? 56
-      : 20,
-    paddingVertical: IS_DESKTOP ? 8 : 6,
-    minHeight: IS_DESKTOP ? 92 : 76,
-    maxWidth: 1200,
-    alignSelf: 'center',
-    width: '100%',
-  },
-
-  logo: {
-  height: IS_DESKTOP ? 10 : 12,
-  alignItems: 'flex-start',
-  justifyContent: 'center',
-  flexShrink: 0,
+headerInner: {
+flexDirection: 'row',
+alignItems: 'center',
+justifyContent: 'flex-end',
+paddingLeft: 0,
+paddingRight: IS_DESKTOP ? 28 : 16,
+paddingVertical: IS_DESKTOP ? 6 : 6,
+minHeight: IS_DESKTOP ? 110 : 82,
+width: '100%',
+position: 'relative',
 },
 
-  logoMark: {
-    width: IS_DESKTOP ? 322 : 322,
-    height: IS_DESKTOP ? 322 : 322,
-  },
+logo: {
+position: 'absolute',
+left: IS_DESKTOP ? -35 : -12,
+top: 0,
+bottom: 0,
+height: '100%',
+alignItems: 'flex-start',
+justifyContent: 'center',
+},
+
+logoMark: {
+width: IS_DESKTOP ? 880 : 620,
+height: IS_DESKTOP ? 200 : 82,
+marginLeft: IS_DESKTOP ? -18 : -6,
+},
+
+
 
   headerNav: {
     flexDirection: 'row',
@@ -2787,8 +2791,7 @@ const s = StyleSheet.create({
   headerCtas: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
-    marginLeft: IS_DESKTOP ? 32 : 12,
+    gap: 8,
   },
 
   btnLogin: {
@@ -3997,8 +4000,8 @@ const s = StyleSheet.create({
   },
 
   footerLogo: {
-    width: IS_DESKTOP ? 122 : 122,
-    height: IS_DESKTOP ? 122 : 122,
+    width: IS_DESKTOP ? 220 : 180,
+    height: IS_DESKTOP ? 78 : 64,
   },
 
   footerTagline: {
