@@ -63,7 +63,7 @@ export default function SignupScreen() {
             </TouchableOpacity>
             <View style={styles.logoRow}>
               <Image source={require('@/assets/images/ChatGPT_Image_9_de_jul._de_2026,_21_23_46-Photoroom.png')} style={{ width: 24, height: 24, borderRadius: 6 }} />
-              <Text style={styles.brand}>SuperShape</Text>
+              <Text style={styles.brand}>Personal</Text>
             </View>
             <View style={{ width: 38 }} />
           </View>
