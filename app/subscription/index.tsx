@@ -24,7 +24,7 @@ export default function SubscriptionScreen() {
   const handleSelect = async (product: StripeProduct) => {
     setLoadingId(product.priceId);
     try {
-      const url = await createCheckoutSession(product.priceId, product.mode);
+      const { url } = await createCheckoutSession(product.priceId, product.mode);
       if (Platform.OS === 'web' && typeof window !== 'undefined') {
         window.location.href = url;
       }

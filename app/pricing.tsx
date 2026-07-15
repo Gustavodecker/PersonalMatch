@@ -150,7 +150,7 @@ export default function PricingScreen() {
 
         <View style={styles.plansContainer}>
           {PLANS.filter((p) => p.id !== 'free').map((product: Plan, index: number) => {
-            const isCurrent = isCurrentPlan(product.priceId);
+            const isCurrent = isCurrentPlan(product.priceId ?? '');
             const isLoading = checkoutLoading === product.id;
 
             return (

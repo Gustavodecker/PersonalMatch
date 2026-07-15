@@ -21,7 +21,7 @@ interface Props {
 }
 
 export function SubscriptionBadge({ userId }: Props) {
-  const { planName, loading } = useSubscription(userId);
+  const { planName, loading } = useSubscription(userId ?? undefined);
 
   if (loading || !planName) return null;
 
