@@ -40,13 +40,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } else {
         setLoading(false);
       }
+    }).catch(() => {
+      setLoading(false);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => {
       setSession(s);
       setUser(s?.user ?? null);
       if (s?.user) {
-        (async () => { await fetchProfile(s.user.id); })();
+        (async () => {
+          try { await fetchProfile(s.user.id); }
+          catch { /* ignore profile fetch errors */ }
+        })();
       } else {
         setProfile(null);
       }

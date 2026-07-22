@@ -7,7 +7,7 @@
     "icon": "./assets/images/ChatGPT_Image_9_de_jul._de_2026,_21_23_46-Photoroom.png",
     "scheme": "99personal",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.personal99"
@@ -25,8 +25,7 @@
       "expo-router",
       "expo-font",
       "expo-web-browser",
-      "expo-secure-store",
-      "expo-dev-client"
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true
