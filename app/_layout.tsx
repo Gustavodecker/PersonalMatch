@@ -11,6 +11,8 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useFrameworkReady } from '@/hooks/useFrameworkReady';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { isSupabaseConfigured } from '@/lib/supabase';
+import ConfigErrorScreen from '@/components/ConfigErrorScreen';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -28,6 +30,15 @@ export default function RootLayout() {
   }, [fontsLoaded]);
 
   if (!fontsLoaded) return null;
+
+  if (!isSupabaseConfigured) {
+    return (
+      <>
+        <ConfigErrorScreen />
+        <StatusBar style="dark" />
+      </>
+    );
+  }
 
   return (
     <SafeAreaProvider>

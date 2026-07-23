@@ -7,24 +7,37 @@
     "development": {
       "developmentClient": true,
       "distribution": "internal",
+      "environment": "development",
       "env": {
         "EAS_BUILD_NO_EXPO_GO_WARNING": "true"
       }
     },
     "preview": {
       "distribution": "internal",
+      "environment": "preview",
+      "android": {
+        "buildType": "apk"
+      },
       "env": {
         "EAS_BUILD_NO_EXPO_GO_WARNING": "true"
       }
     },
     "production": {
       "autoIncrement": true,
+      "environment": "production",
+      "android": {
+        "buildType": "app-bundle"
+      },
       "env": {
         "EAS_BUILD_NO_EXPO_GO_WARNING": "true"
       }
     }
   },
   "submit": {
-    "production": {}
+    "production": {
+      "ios": {
+        "ascAppId": "6791005658"
+      }
+    }
   }
 }

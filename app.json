@@ -1,16 +1,19 @@
 {
   "expo": {
-    "name": "99personal",
+    "name": "99 Personal",
     "slug": "99personal",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/ChatGPT_Image_9_de_jul._de_2026,_21_23_46-Photoroom.png",
-    "scheme": "99personal",
+    "scheme": "personal99",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": false,
+    "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.personal99"
+      "bundleIdentifier": "com.personal99",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "com.personal99"
@@ -19,7 +22,7 @@
       "bundler": "metro",
       "output": "single",
       "favicon": "./assets/images/ChatGPT_Image_9_de_jul._de_2026,_21_23_46-Photoroom.png",
-      "title": "99personal"
+      "title": "99 Personal"
     },
     "plugins": [
       "expo-router",
@@ -31,9 +34,11 @@
       "typedRoutes": true
     },
     "extra": {
+      "router": {},
       "eas": {
-        "projectId": ""
+        "projectId": "8e7f072a-ce8d-401a-87c3-47f07236dbfc"
       }
-    }
+    },
+    "owner": "gustavo.miguel"
   }
 }
