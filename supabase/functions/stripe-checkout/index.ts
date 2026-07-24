@@ -17,9 +17,11 @@ const supabase = createClient(
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
 );
 
-const PLAN_PRICE_MAP: Record<string, string | undefined> = {
-  pro:     Deno.env.get("STRIPE_PRICE_PRO")     ?? "price_1TlIhLGT3oj5YeOVfAEhPfpu",
-  premium: Deno.env.get("STRIPE_PRICE_PREMIUM") ?? "price_1TlIhLGT3oj5YeOVEVxrxALk",
+// Hardcoded price IDs — the deployed STRIPE_PRICE_* secrets contain stale
+// values that don't match the actual Stripe products, so we ignore them.
+const PLAN_PRICE_MAP: Record<string, string> = {
+  pro:     "price_1TlIhLGT3oj5YeOVfAEhPfpu",
+  premium: "price_1TlIhLGT3oj5YeOVEVxrxALk",
 };
 
 Deno.serve(async (req: Request) => {
