@@ -55,6 +55,8 @@ export default function PricingScreen() {
         return;
       }
 
+      const origin = typeof window !== 'undefined' ? window.location.origin : (process.env.EXPO_PUBLIC_WEB_URL ?? '');
+
       const response = await fetch(
         `${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/stripe-checkout`,
         {
@@ -66,8 +68,8 @@ export default function PricingScreen() {
           body: JSON.stringify({
             action: 'checkout',
             planId: product.id,
-            successUrl: `${process.env.EXPO_PUBLIC_APP_URL || 'http://localhost:8081'}/success`,
-            cancelUrl: `${process.env.EXPO_PUBLIC_APP_URL || 'http://localhost:8081'}/pricing`,
+            successUrl: `${origin}/success`,
+            cancelUrl: `${origin}/pricing`,
           }),
         }
       );

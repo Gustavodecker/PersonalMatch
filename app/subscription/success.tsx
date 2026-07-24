@@ -53,7 +53,7 @@ export default function SubscriptionSuccessScreen() {
 
         <TouchableOpacity
           style={styles.button}
-          onPress={() => router.replace('/(tabs)')}
+          onPress={() => router.replace('/')}
           activeOpacity={0.85}
         >
           <Text style={styles.buttonText}>Ir para o início</Text>

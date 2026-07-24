@@ -54,6 +54,19 @@ Deno.serve(async (req: Request) => {
 
       let customerId = profile.stripe_customer_id;
 
+      // Validate the stored customer ID — it may have been deleted in Stripe
+      if (customerId) {
+        try {
+          await stripe.customers.retrieve(customerId);
+        } catch {
+          customerId = null;
+          await supabase
+            .from("profiles")
+            .update({ stripe_customer_id: null })
+            .eq("id", user.id);
+        }
+      }
+
       if (!customerId) {
         const customer = await stripe.customers.create({
           email: profile.email,
@@ -139,11 +152,21 @@ Deno.serve(async (req: Request) => {
 
     // ── CREATE PORTAL SESSION ────────────────────────────────────────────────
     if (action === "portal") {
-      if (!profile.stripe_customer_id) {
-        return json({ error: "No active subscription" }, 400);
+      let customerId = profile.stripe_customer_id;
+      if (!customerId) {
+        return json({ error: "Você ainda não tem uma assinatura ativa." }, 400);
+      }
+      try {
+        await stripe.customers.retrieve(customerId);
+      } catch {
+        await supabase
+          .from("profiles")
+          .update({ stripe_customer_id: null })
+          .eq("id", user.id);
+        return json({ error: "Cliente não encontrado no Stripe. Tente assinar novamente." }, 400);
       }
       const portalSession = await stripe.billingPortal.sessions.create({
-        customer: profile.stripe_customer_id,
+        customer: customerId,
         return_url: cancelUrl,
       });
       return json({ url: portalSession.url });

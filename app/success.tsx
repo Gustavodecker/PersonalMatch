@@ -52,7 +52,7 @@ export default function SuccessScreen() {
 
         <TouchableOpacity
           style={styles.button}
-          onPress={() => router.replace('/(tabs)')}
+          onPress={() => router.replace('/')}
           activeOpacity={0.8}
         >
           <Text style={styles.buttonText}>Ir para o início</Text>
