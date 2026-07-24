@@ -18,8 +18,8 @@ const supabase = createClient(
 );
 
 const PLAN_PRICE_MAP: Record<string, string | undefined> = {
-  pro:     Deno.env.get("STRIPE_PRICE_PRO"),
-  premium: Deno.env.get("STRIPE_PRICE_PREMIUM"),
+  pro:     Deno.env.get("STRIPE_PRICE_PRO")     ?? "price_1TlIhLGT3oj5YeOVfAEhPfpu",
+  premium: Deno.env.get("STRIPE_PRICE_PREMIUM") ?? "price_1TlIhLGT3oj5YeOVEVxrxALk",
 };
 
 Deno.serve(async (req: Request) => {
@@ -148,6 +148,34 @@ Deno.serve(async (req: Request) => {
 
       const session = await stripe.checkout.sessions.create(sessionParams);
       return json({ url: session.url });
+    }
+
+    // ── START FREE TRIAL (no Stripe involved) ────────────────────────────────
+    if (action === "start_trial") {
+      const trialDays = 15;
+      const trialEnd = new Date(Date.now() + trialDays * 86400000).toISOString();
+
+      await supabase
+        .from("trainers")
+        .update({
+          subscription_plan: "free_trial",
+          subscription_status: "trialing",
+          trial_ends_at: trialEnd,
+        })
+        .eq("id", user.id);
+
+      await supabase
+        .from("subscriptions")
+        .upsert({
+          trainer_id: user.id,
+          plan: "free_trial",
+          status: "trialing",
+          current_period_start: new Date().toISOString(),
+          current_period_end: trialEnd,
+          cancel_at_period_end: false,
+        }, { onConflict: "trainer_id" });
+
+      return json({ success: true, trial_ends_at: trialEnd });
     }
 
     // ── CREATE PORTAL SESSION ────────────────────────────────────────────────

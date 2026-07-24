@@ -131,6 +131,31 @@ export default function AssinaturaScreen() {
   const handleCheckout = async (plan: Plan) => {
     if (!isWeb) return;
     if (!session?.access_token) return;
+
+    // Free trial is activated directly, no Stripe checkout needed
+    if (plan.id === 'free_trial') {
+      setActionLoading(plan.id);
+      setError(null);
+      try {
+        const res = await fetch(`${SUPABASE_URL}/functions/v1/stripe-checkout`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
+          body: JSON.stringify({ action: 'start_trial' }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          await loadSubscription();
+        } else {
+          setError(data.error ?? 'Erro ao ativar teste grátis.');
+        }
+      } catch (e: any) {
+        setError(e.message);
+      } finally {
+        setActionLoading(null);
+      }
+      return;
+    }
+
     setActionLoading(plan.id);
     setError(null);
     try {
