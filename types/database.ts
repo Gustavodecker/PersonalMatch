@@ -94,6 +94,7 @@ export type TrainerAvailability = {
   modality: 'online' | 'in_person' | 'both';
   notes: string | null;
   is_active: boolean;
+  class_type_id: string | null;
   created_at: string;
   updated_at: string | null;
 };
@@ -106,6 +107,7 @@ export type TrainerScheduleBlock = {
   end_time: string | null;
   is_full_day: boolean;
   reason: string | null;
+  class_type_id: string | null;
   created_at: string;
 };
 

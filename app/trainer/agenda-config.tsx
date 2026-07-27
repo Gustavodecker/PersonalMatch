@@ -3,13 +3,14 @@ import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   Switch, TextInput, Modal, Platform, RefreshControl,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { Colors, Spacing, FontSizes, BorderRadii, Shadows } from '@/constants/theme';
-import { TrainerAvailability, TrainerScheduleBlock } from '@/types/database';
-import { ArrowLeft, Clock, Plus, Trash2, Check, X, Calendar, AlertCircle } from 'lucide-react-native';
+import { TrainerAvailability, TrainerScheduleBlock, TrainerClassType } from '@/types/database';
+import { ArrowLeft, Clock, Plus, Trash2, Check, X, Calendar, AlertCircle, Dumbbell } from 'lucide-react-native';
+import DatePickerModal from '@/components/DatePickerModal';
 
 const IS_WEB = Platform.OS === 'web';
 
@@ -36,12 +37,17 @@ const defaultDayConfig = (): DayConfig => ({
   existingId: null,
 });
 
+type WeekSchedule = DayConfig[];
+
+const emptyWeek = (): WeekSchedule => Array.from({ length: 7 }, defaultDayConfig);
+
 type BlockForm = {
   block_date: string;
   is_full_day: boolean;
   start_time: string;
   end_time: string;
   reason: string;
+  class_type_id: string | null;
 };
 
 const emptyBlockForm = (): BlockForm => ({
@@ -50,6 +56,7 @@ const emptyBlockForm = (): BlockForm => ({
   start_time: '08:00',
   end_time: '18:00',
   reason: '',
+  class_type_id: null,
 });
 
 function TimeInput({ value, onChange }: { value: string; onChange: (v: string) => void }) {
@@ -77,33 +84,12 @@ function TimeInput({ value, onChange }: { value: string; onChange: (v: string) =
   );
 }
 
-function DateInput({ value, onChange }: { value: string; onChange: (v: string) => void }) {
-  if (IS_WEB) {
-    return (
-      <input
-        type="date"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        style={{
-          flex: 1, padding: '8px 12px', borderRadius: 10,
-          border: `1.5px solid ${Colors.neutral[200]}`, fontSize: 14,
-          fontWeight: 600, color: Colors.neutral[900],
-          backgroundColor: Colors.neutral[50], outline: 'none', minWidth: 0,
-        } as any}
-      />
-    );
-  }
-  return (
-    <TextInput
-      style={s.timeInput} value={value} onChangeText={onChange}
-      placeholder="AAAA-MM-DD" placeholderTextColor={Colors.neutral[400]}
-    />
-  );
-}
-
 export default function AgendaConfigScreen() {
   const { profile } = useAuth();
-  const [days, setDays] = useState<DayConfig[]>(Array.from({ length: 7 }, defaultDayConfig));
+  const insets = useSafeAreaInsets();
+  const [classTypes, setClassTypes] = useState<TrainerClassType[]>([]);
+  const [activeTab, setActiveTab] = useState<string>('general');
+  const [schedules, setSchedules] = useState<Record<string, WeekSchedule>>({ general: emptyWeek() });
   const [blocks, setBlocks] = useState<TrainerScheduleBlock[]>([]);
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -115,20 +101,29 @@ export default function AgendaConfigScreen() {
   const [blockError, setBlockError] = useState<string | null>(null);
   const [deletingBlock, setDeletingBlock] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [datePickerVisible, setDatePickerVisible] = useState(false);
 
   const loadData = useCallback(async () => {
     if (!profile) return;
     const today = new Date().toISOString().split('T')[0];
-    const [availRes, blocksRes] = await Promise.all([
+    const [availRes, blocksRes, classRes] = await Promise.all([
       supabase.from('trainer_availability').select('*').eq('trainer_id', profile.id),
       supabase.from('trainer_schedule_blocks').select('*').eq('trainer_id', profile.id)
         .gte('block_date', today).order('block_date'),
+      supabase.from('trainer_class_types').select('*').eq('trainer_id', profile.id).eq('is_active', true).order('created_at'),
     ]);
 
-    const next = Array.from({ length: 7 }, defaultDayConfig);
+    const ctList = (classRes.data ?? []) as TrainerClassType[];
+    setClassTypes(ctList);
+
+    const newSchedules: Record<string, WeekSchedule> = { general: emptyWeek() };
+    for (const ct of ctList) newSchedules[ct.id] = emptyWeek();
+
     if (availRes.data) {
       for (const row of availRes.data as TrainerAvailability[]) {
-        next[row.day_of_week] = {
+        const key = row.class_type_id ?? 'general';
+        if (!newSchedules[key]) newSchedules[key] = emptyWeek();
+        newSchedules[key][row.day_of_week] = {
           is_active: row.is_active,
           start_time: row.start_time.slice(0, 5),
           end_time: row.end_time.slice(0, 5),
@@ -138,7 +133,7 @@ export default function AgendaConfigScreen() {
         };
       }
     }
-    setDays(next);
+    setSchedules(newSchedules);
     if (blocksRes.data) setBlocks(blocksRes.data as TrainerScheduleBlock[]);
     setLoading(false);
     setRefreshing(false);
@@ -147,18 +142,40 @@ export default function AgendaConfigScreen() {
   useEffect(() => { loadData(); }, [loadData]);
   const onRefresh = () => { setRefreshing(true); loadData(); };
 
+  const currentSchedule = schedules[activeTab] ?? emptyWeek();
+
   const updateDay = (dow: number, patch: Partial<DayConfig>) => {
-    setDays((prev) => { const next = [...prev]; next[dow] = { ...next[dow], ...patch }; return next; });
+    setSchedules((prev) => {
+      const week = [...(prev[activeTab] ?? emptyWeek())];
+      week[dow] = { ...week[dow], ...patch };
+      return { ...prev, [activeTab]: week };
+    });
   };
 
   const applyWeekdays = () => {
-    const mon = days[1];
-    setDays((prev) => {
-      const next = [...prev];
-      for (let dow = 2; dow <= 5; dow++) next[dow] = { ...mon, existingId: prev[dow].existingId };
-      return next;
+    setSchedules((prev) => {
+      const week = [...(prev[activeTab] ?? emptyWeek())];
+      const mon = week[1];
+      const next = week.map((d, dow) =>
+        dow >= 2 && dow <= 5 ? { ...mon, existingId: d.existingId } : d
+      );
+      return { ...prev, [activeTab]: next };
     });
   };
+
+  const buildRow = (d: DayConfig, dow: number, classTypeId: string | null) => ({
+    trainer_id: profile!.id,
+    day_of_week: dow,
+    is_active: d.is_active,
+    start_time: d.start_time || '08:00',
+    end_time: d.end_time || '18:00',
+    session_duration: d.session_duration,
+    buffer_minutes: d.buffer_minutes,
+    modality: 'both',
+    notes: null,
+    class_type_id: classTypeId,
+    updated_at: new Date().toISOString(),
+  });
 
   const saveAvailability = async () => {
     if (!profile) return;
@@ -166,31 +183,18 @@ export default function AgendaConfigScreen() {
     setSaveSuccess(false);
     setSaveError(null);
 
-    const now = new Date().toISOString();
+    const classTypeId = activeTab === 'general' ? null : activeTab;
+    const week = schedules[activeTab] ?? emptyWeek();
 
-    const buildRow = (d: DayConfig, dow: number) => ({
-      trainer_id: profile.id,
-      day_of_week: dow,
-      is_active: d.is_active,
-      start_time: d.start_time || '08:00',
-      end_time: d.end_time || '18:00',
-      session_duration: d.session_duration,
-      buffer_minutes: d.buffer_minutes,
-      modality: 'both',
-      notes: null,
-      updated_at: now,
-    });
-
-    // Split into new rows (INSERT) vs existing rows (UPDATE via upsert with id)
-    const toInsert = days
+    const toInsert = week
       .map((d, dow) => ({ d, dow }))
       .filter(({ d }) => !d.existingId)
-      .map(({ d, dow }) => buildRow(d, dow));
+      .map(({ d, dow }) => buildRow(d, dow, classTypeId));
 
-    const toUpdate = days
+    const toUpdate = week
       .map((d, dow) => ({ d, dow }))
       .filter(({ d }) => !!d.existingId)
-      .map(({ d, dow }) => ({ id: d.existingId as string, ...buildRow(d, dow) }));
+      .map(({ d, dow }) => ({ id: d.existingId as string, ...buildRow(d, dow, classTypeId) }));
 
     let newRows: { id: string; day_of_week: number }[] = [];
 
@@ -211,12 +215,11 @@ export default function AgendaConfigScreen() {
       if (error) { setSaveError(error.message); setSaving(false); return; }
     }
 
-    // Persist returned IDs for newly inserted rows
     if (newRows.length > 0) {
-      setDays((prev) => {
-        const next = [...prev];
-        for (const row of newRows) next[row.day_of_week] = { ...next[row.day_of_week], existingId: row.id };
-        return next;
+      setSchedules((prev) => {
+        const w = [...(prev[activeTab] ?? emptyWeek())];
+        for (const row of newRows) w[row.day_of_week] = { ...w[row.day_of_week], existingId: row.id };
+        return { ...prev, [activeTab]: w };
       });
     }
 
@@ -237,6 +240,7 @@ export default function AgendaConfigScreen() {
       start_time: blockForm.is_full_day ? null : blockForm.start_time,
       end_time: blockForm.is_full_day ? null : blockForm.end_time,
       reason: blockForm.reason.trim() || null,
+      class_type_id: blockForm.class_type_id,
     }).select().single();
     if (error) { setBlockError(error.message); setSavingBlock(false); return; }
     setBlocks((prev) => [...prev, data as TrainerScheduleBlock].sort((a, b) => a.block_date.localeCompare(b.block_date)));
@@ -254,6 +258,15 @@ export default function AgendaConfigScreen() {
   const fmtBlockDate = (iso: string) =>
     new Date(iso + 'T12:00:00').toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' });
 
+  const fmtDisplayDate = (iso: string) => {
+    if (!iso) return 'Selecionar data';
+    const [y, m, d] = iso.split('-').map(Number);
+    return `${d.toString().padStart(2, '0')}/${m.toString().padStart(2, '0')}/${y}`;
+  };
+
+  const tabName = (key: string) => key === 'general' ? 'Geral' : (classTypes.find((c) => c.id === key)?.name ?? 'Aula');
+  const tabDuration = (key: string) => key === 'general' ? null : classTypes.find((c) => c.id === key)?.duration_minutes ?? null;
+
   return (
     <SafeAreaView style={s.safe} edges={['top']}>
       {/* Header */}
@@ -263,7 +276,7 @@ export default function AgendaConfigScreen() {
         </TouchableOpacity>
         <View style={s.headerText}>
           <Text style={s.title}>Configurar agenda</Text>
-          <Text style={s.subtitle}>Horários e bloqueios</Text>
+          <Text style={s.subtitle}>Horários por aula e bloqueios</Text>
         </View>
         <TouchableOpacity
           style={[s.saveBtn, saving && s.saveBtnDisabled]}
@@ -279,7 +292,7 @@ export default function AgendaConfigScreen() {
       <ScrollView
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-        contentContainerStyle={s.scroll}
+        contentContainerStyle={[s.scroll, { paddingBottom: Math.max(insets.bottom, 24) }]}
       >
         {saveError ? (
           <View style={s.errorBanner}>
@@ -287,9 +300,42 @@ export default function AgendaConfigScreen() {
             <Text style={s.errorBannerText}>{saveError}</Text>
           </View>
         ) : null}
+
+        {/* ── Class type tabs ── */}
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={s.tabScroll} contentContainerStyle={s.tabScrollContent}>
+          <TouchableOpacity
+            style={[s.classTab, activeTab === 'general' && s.classTabActive]}
+            onPress={() => setActiveTab('general')}
+          >
+            <Dumbbell size={14} color={activeTab === 'general' ? Colors.white : Colors.neutral[600]} />
+            <Text style={[s.classTabText, activeTab === 'general' && s.classTabTextActive]}>Geral</Text>
+          </TouchableOpacity>
+          {classTypes.map((ct) => (
+            <TouchableOpacity
+              key={ct.id}
+              style={[s.classTab, activeTab === ct.id && s.classTabActive]}
+              onPress={() => setActiveTab(ct.id)}
+            >
+              <Text style={[s.classTabText, activeTab === ct.id && s.classTabTextActive]}>{ct.name}</Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+
+        {activeTab !== 'general' && (
+          <View style={s.classInfoBanner}>
+            <Clock size={13} color={Colors.primary[600]} />
+            <Text style={s.classInfoText}>
+              Configurando horários de <Text style={s.classInfoName}>{tabName(activeTab)}</Text>
+              {tabDuration(activeTab) ? ` · duração padrão: ${tabDuration(activeTab)} min` : ''}
+            </Text>
+          </View>
+        )}
+
         {/* ── Weekdays ── */}
         <View style={s.sectionHeader}>
-          <Text style={s.sectionTitle}>Horários de atendimento</Text>
+          <Text style={s.sectionTitle}>
+            {activeTab === 'general' ? 'Horários gerais' : `Horários — ${tabName(activeTab)}`}
+          </Text>
           <TouchableOpacity style={s.applyBtn} onPress={applyWeekdays}>
             <Text style={s.applyBtnText}>Aplicar Seg–Sex</Text>
           </TouchableOpacity>
@@ -299,7 +345,10 @@ export default function AgendaConfigScreen() {
           <View style={s.loadingBox}><Text style={s.loadingText}>Carregando…</Text></View>
         ) : (
           [1, 2, 3, 4, 5, 6, 0].map((dow) => {
-            const d = days[dow];
+            const d = currentSchedule[dow];
+            const effectiveDuration = activeTab !== 'general' && d.session_duration === 60
+              ? tabDuration(activeTab) ?? d.session_duration
+              : d.session_duration;
             return (
               <View key={dow} style={[s.dayCard, d.is_active && s.dayCardActive]}>
                 <View style={s.dayHeader}>
@@ -335,10 +384,10 @@ export default function AgendaConfigScreen() {
                       {SESSION_DURATIONS.map((min) => (
                         <TouchableOpacity
                           key={min}
-                          style={[s.chip, d.session_duration === min && s.chipActive]}
+                          style={[s.chip, effectiveDuration === min && s.chipActive]}
                           onPress={() => updateDay(dow, { session_duration: min })}
                         >
-                          <Text style={[s.chipText, d.session_duration === min && s.chipTextActive]}>{min} min</Text>
+                          <Text style={[s.chipText, effectiveDuration === min && s.chipTextActive]}>{min} min</Text>
                         </TouchableOpacity>
                       ))}
                     </View>
@@ -361,7 +410,7 @@ export default function AgendaConfigScreen() {
                     <View style={s.preview}>
                       <Clock size={12} color={Colors.primary[600]} />
                       <Text style={s.previewText}>
-                        {d.start_time} – {d.end_time} · {d.session_duration} min
+                        {d.start_time} – {d.end_time} · {effectiveDuration} min
                         {d.buffer_minutes > 0 ? ` + ${d.buffer_minutes} min intervalo` : ''}
                       </Text>
                     </View>
@@ -398,6 +447,13 @@ export default function AgendaConfigScreen() {
                   <Text style={s.blockTime}>
                     {block.is_full_day ? 'Dia inteiro' : `${block.start_time?.slice(0, 5)} – ${block.end_time?.slice(0, 5)}`}
                   </Text>
+                  {block.class_type_id ? (
+                    <View style={s.blockClassTag}>
+                      <Text style={s.blockClassTagText}>
+                        {classTypes.find((c) => c.id === block.class_type_id)?.name ?? 'Aula específica'}
+                      </Text>
+                    </View>
+                  ) : null}
                   {block.reason ? <Text style={s.blockReason}>{block.reason}</Text> : null}
                 </View>
                 <TouchableOpacity
@@ -411,57 +467,82 @@ export default function AgendaConfigScreen() {
             ))}
           </View>
         )}
-
-        <View style={{ height: 60 }} />
       </ScrollView>
 
       {/* Block modal */}
-      <Modal visible={blockModal} transparent animationType="slide">
+      <Modal visible={blockModal} transparent animationType="slide" onRequestClose={() => setBlockModal(false)}>
         <View style={s.modalBg}>
-          <View style={s.modalCard}>
+          <View style={[s.modalCard, { paddingBottom: Math.max(insets.bottom, Spacing.lg) }]}>
             <View style={s.modalHeader}>
               <Text style={s.modalTitle}>Novo bloqueio</Text>
               <TouchableOpacity onPress={() => setBlockModal(false)}><X size={22} color={Colors.neutral[600]} /></TouchableOpacity>
             </View>
 
-            <Text style={s.fieldLabel}>Data</Text>
-            <DateInput value={blockForm.block_date} onChange={(v) => setBlockForm({ ...blockForm, block_date: v })} />
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <Text style={s.fieldLabel}>Aula (opcional)</Text>
+              <Text style={s.fieldHint}>Deixe em branco para bloquear todos os horários do dia</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={s.blockClassScroll} contentContainerStyle={s.blockClassScrollContent}>
+                <TouchableOpacity
+                  style={[s.blockClassChip, !blockForm.class_type_id && s.blockClassChipActive]}
+                  onPress={() => setBlockForm({ ...blockForm, class_type_id: null })}
+                >
+                  <Text style={[s.blockClassChipText, !blockForm.class_type_id && s.blockClassChipTextActive]}>Todas as aulas</Text>
+                </TouchableOpacity>
+                {classTypes.map((ct) => (
+                  <TouchableOpacity
+                    key={ct.id}
+                    style={[s.blockClassChip, blockForm.class_type_id === ct.id && s.blockClassChipActive]}
+                    onPress={() => setBlockForm({ ...blockForm, class_type_id: ct.id })}
+                  >
+                    <Text style={[s.blockClassChipText, blockForm.class_type_id === ct.id && s.blockClassChipTextActive]}>{ct.name}</Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
 
-            <View style={s.fullDayRow}>
-              <Text style={s.fieldLabel}>Dia inteiro</Text>
-              <Switch
-                value={blockForm.is_full_day}
-                onValueChange={(v) => setBlockForm({ ...blockForm, is_full_day: v })}
-                trackColor={{ false: Colors.neutral[200], true: Colors.primary[200] }}
-                thumbColor={blockForm.is_full_day ? Colors.primary[600] : Colors.neutral[400]}
-              />
-            </View>
+              <Text style={s.fieldLabel}>Data</Text>
+              <TouchableOpacity style={s.dateField} onPress={() => setDatePickerVisible(true)}>
+                <Calendar size={16} color={Colors.neutral[500]} />
+                <Text style={[s.dateFieldText, !blockForm.block_date && s.dateFieldPlaceholder]}>
+                  {fmtDisplayDate(blockForm.block_date)}
+                </Text>
+              </TouchableOpacity>
 
-            {!blockForm.is_full_day && (
-              <View style={s.timeRow}>
-                <View style={s.timeField}>
-                  <Text style={s.fieldLabel}>Início</Text>
-                  <TimeInput value={blockForm.start_time} onChange={(v) => setBlockForm({ ...blockForm, start_time: v })} />
-                </View>
-                <View style={s.timeSep}><Text style={s.timeSepText}>até</Text></View>
-                <View style={s.timeField}>
-                  <Text style={s.fieldLabel}>Fim</Text>
-                  <TimeInput value={blockForm.end_time} onChange={(v) => setBlockForm({ ...blockForm, end_time: v })} />
-                </View>
+              <View style={s.fullDayRow}>
+                <Text style={s.fieldLabel}>Dia inteiro</Text>
+                <Switch
+                  value={blockForm.is_full_day}
+                  onValueChange={(v) => setBlockForm({ ...blockForm, is_full_day: v })}
+                  trackColor={{ false: Colors.neutral[200], true: Colors.primary[200] }}
+                  thumbColor={blockForm.is_full_day ? Colors.primary[600] : Colors.neutral[400]}
+                />
               </View>
-            )}
 
-            <Text style={s.fieldLabel}>Motivo (opcional)</Text>
-            <TextInput
-              style={s.reasonInput}
-              value={blockForm.reason}
-              onChangeText={(v) => setBlockForm({ ...blockForm, reason: v })}
-              placeholder="Ex: Compromisso pessoal, viagem…"
-              placeholderTextColor={Colors.neutral[400]}
-              multiline
-            />
+              {!blockForm.is_full_day && (
+                <View style={s.timeRow}>
+                  <View style={s.timeField}>
+                    <Text style={s.fieldLabel}>Início</Text>
+                    <TimeInput value={blockForm.start_time} onChange={(v) => setBlockForm({ ...blockForm, start_time: v })} />
+                  </View>
+                  <View style={s.timeSep}><Text style={s.timeSepText}>até</Text></View>
+                  <View style={s.timeField}>
+                    <Text style={s.fieldLabel}>Fim</Text>
+                    <TimeInput value={blockForm.end_time} onChange={(v) => setBlockForm({ ...blockForm, end_time: v })} />
+                  </View>
+                </View>
+              )}
 
-            {blockError ? <Text style={s.errorText}>{blockError}</Text> : null}
+              <Text style={s.fieldLabel}>Motivo (opcional)</Text>
+              <TextInput
+                style={s.reasonInput}
+                value={blockForm.reason}
+                onChangeText={(v) => setBlockForm({ ...blockForm, reason: v })}
+                placeholder="Ex: Compromisso pessoal, viagem…"
+                placeholderTextColor={Colors.neutral[400]}
+                multiline
+              />
+
+              {blockError ? <Text style={s.errorText}>{blockError}</Text> : null}
+            </ScrollView>
 
             <TouchableOpacity
               style={[s.modalSaveBtn, savingBlock && s.saveBtnDisabled]}
@@ -474,6 +555,15 @@ export default function AgendaConfigScreen() {
           </View>
         </View>
       </Modal>
+
+      <DatePickerModal
+        visible={datePickerVisible}
+        value={blockForm.block_date}
+        onClose={() => setDatePickerVisible(false)}
+        onConfirm={(date) => setBlockForm((prev) => ({ ...prev, block_date: date }))}
+        title="Data do bloqueio"
+        minDate={new Date().toISOString().split('T')[0]}
+      />
     </SafeAreaView>
   );
 }
@@ -501,6 +591,10 @@ const s = StyleSheet.create({
   saveBtnText: { fontSize: FontSizes.sm, fontWeight: '700', color: Colors.white },
 
   scroll: { paddingHorizontal: Spacing.lg, paddingTop: Spacing.sm },
+
+  loadingBox: { alignItems: 'center', padding: Spacing.xl, backgroundColor: Colors.white, borderRadius: BorderRadii.xl, marginBottom: Spacing.md },
+  loadingText: { fontSize: FontSizes.md, color: Colors.neutral[400] },
+
   errorBanner: {
     flexDirection: 'row', alignItems: 'center', gap: 8,
     backgroundColor: Colors.error[50], borderRadius: BorderRadii.lg,
@@ -508,8 +602,25 @@ const s = StyleSheet.create({
     paddingHorizontal: Spacing.md, paddingVertical: 10, marginBottom: Spacing.sm,
   },
   errorBannerText: { flex: 1, fontSize: FontSizes.sm, color: Colors.error[700], fontWeight: '600' },
-  loadingBox: { paddingVertical: Spacing.xl, alignItems: 'center' },
-  loadingText: { fontSize: FontSizes.md, color: Colors.neutral[400] },
+
+  tabScroll: { flexGrow: 0, marginBottom: Spacing.sm },
+  tabScrollContent: { gap: 8, paddingRight: Spacing.lg },
+  classTab: {
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    paddingHorizontal: 16, paddingVertical: 9, borderRadius: BorderRadii.full,
+    backgroundColor: Colors.white, borderWidth: 1.5, borderColor: Colors.neutral[200],
+  },
+  classTabActive: { backgroundColor: Colors.primary[600], borderColor: Colors.primary[600] },
+  classTabText: { fontSize: FontSizes.sm, fontWeight: '700', color: Colors.neutral[600] },
+  classTabTextActive: { color: Colors.white },
+
+  classInfoBanner: {
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    backgroundColor: Colors.primary[50], borderRadius: BorderRadii.md,
+    paddingHorizontal: 12, paddingVertical: 8, marginBottom: Spacing.sm,
+  },
+  classInfoText: { fontSize: FontSizes.xs, color: Colors.primary[700], fontWeight: '600', flex: 1 },
+  classInfoName: { fontWeight: '800' },
 
   sectionHeader: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
@@ -559,6 +670,7 @@ const s = StyleSheet.create({
     fontSize: FontSizes.xs, fontWeight: '700', color: Colors.neutral[600],
     textTransform: 'uppercase', letterSpacing: 0.4, marginTop: 4,
   },
+  fieldHint: { fontSize: FontSizes.xs, color: Colors.neutral[400], marginBottom: 6 },
   chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   chip: {
     paddingHorizontal: 12, paddingVertical: 6, borderRadius: BorderRadii.full,
@@ -599,18 +711,43 @@ const s = StyleSheet.create({
   blockInfo: { flex: 1, gap: 2 },
   blockDate: { fontSize: FontSizes.sm, fontWeight: '700', color: Colors.neutral[900] },
   blockTime: { fontSize: FontSizes.xs, color: Colors.neutral[600], fontWeight: '600' },
+  blockClassTag: {
+    alignSelf: 'flex-start', backgroundColor: Colors.primary[50], borderRadius: 6,
+    paddingHorizontal: 8, paddingVertical: 2, marginTop: 2,
+  },
+  blockClassTagText: { fontSize: 10, fontWeight: '700', color: Colors.primary[700] },
   blockReason: { fontSize: FontSizes.xs, color: Colors.neutral[500] },
   blockDelBtn: {
     width: 32, height: 32, borderRadius: 8,
     backgroundColor: Colors.error[50], alignItems: 'center', justifyContent: 'center',
   },
+
   modalBg: { flex: 1, backgroundColor: 'rgba(0,0,0,0.55)', justifyContent: 'flex-end' },
   modalCard: {
     backgroundColor: Colors.white, borderTopLeftRadius: 24, borderTopRightRadius: 24,
-    padding: Spacing.xl, gap: Spacing.sm, maxHeight: '85%',
+    padding: Spacing.xl, gap: Spacing.sm, maxHeight: '88%',
   },
   modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 },
   modalTitle: { fontSize: FontSizes.xl, fontWeight: '700', color: Colors.neutral[900] },
+
+  blockClassScroll: { flexGrow: 0, marginBottom: Spacing.sm },
+  blockClassScrollContent: { gap: 6, paddingRight: Spacing.lg },
+  blockClassChip: {
+    paddingHorizontal: 12, paddingVertical: 7, borderRadius: BorderRadii.full,
+    backgroundColor: Colors.white, borderWidth: 1.5, borderColor: Colors.neutral[200],
+  },
+  blockClassChipActive: { backgroundColor: Colors.primary[50], borderColor: Colors.primary[400] },
+  blockClassChipText: { fontSize: FontSizes.xs, fontWeight: '600', color: Colors.neutral[600] },
+  blockClassChipTextActive: { color: Colors.primary[700] },
+
+  dateField: {
+    flexDirection: 'row', alignItems: 'center', gap: 10,
+    backgroundColor: Colors.neutral[50], borderWidth: 1.5, borderColor: Colors.neutral[200],
+    borderRadius: 10, paddingHorizontal: 14, paddingVertical: 12,
+  },
+  dateFieldText: { fontSize: FontSizes.md, fontWeight: '600', color: Colors.neutral[900] },
+  dateFieldPlaceholder: { color: Colors.neutral[400], fontWeight: '500' },
+
   fullDayRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   reasonInput: {
     backgroundColor: Colors.neutral[50], borderWidth: 1.5, borderColor: Colors.neutral[200],
