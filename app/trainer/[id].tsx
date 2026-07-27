@@ -4,7 +4,7 @@ import {
   TextInput, Modal, Linking, Platform, Dimensions,
 } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
@@ -58,6 +58,7 @@ interface ServiceOption {
 export default function TrainerDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { user, profile } = useAuth();
+  const insets = useSafeAreaInsets();
 
   const [trainer, setTrainer]       = useState<TrainerWithProfile | null>(null);
   const [reviews, setReviews]       = useState<Review[]>([]);
@@ -858,7 +859,7 @@ export default function TrainerDetailScreen() {
 
       {/* Sticky CTA bar — mobile only */}
       {!IS_DESKTOP && (
-        <View style={s.stickyBar}>
+        <View style={[s.stickyBar, { paddingBottom: Math.max(insets.bottom, 12) }]}>
           {trainer.whatsapp && (
             <TouchableOpacity style={s.waBtn} onPress={openWhatsApp}>
               <Phone size={16} color={Colors.white} />
@@ -1432,7 +1433,7 @@ const s = StyleSheet.create({
   stickyBar: {
     position: 'absolute', bottom: 0, left: 0, right: 0,
     backgroundColor: Colors.white, flexDirection: 'row', alignItems: 'center', gap: 8,
-    paddingHorizontal: Spacing.md, paddingVertical: 12, paddingBottom: 24,
+    paddingHorizontal: Spacing.md, paddingVertical: 12,
     borderTopWidth: 1, borderTopColor: Colors.neutral[100], ...Shadows.lg,
   },
   waBtn: {
