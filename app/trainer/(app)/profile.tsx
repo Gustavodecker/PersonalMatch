@@ -11,7 +11,7 @@ import { Colors, Spacing, FontSizes, BorderRadii, Shadows } from '@/constants/th
 import { TrainerClassType } from '@/types/database';
 import {
   ArrowLeft, Plus, Trash2, Check, X, BookOpen, Clock,
-  Edit3, ChevronRight, Dumbbell, AlertCircle,
+  Edit, ChevronRight, Dumbbell, AlertCircle,
 } from 'lucide-react-native';
 
 const IS_WEB = Platform.OS === 'web';
@@ -118,7 +118,7 @@ export default function TrainerProfileScreen() {
       >
         {/* Edit profile link */}
         <TouchableOpacity style={s.editCard} onPress={() => router.push('/trainer/onboarding')} activeOpacity={0.7}>
-          <View style={s.editIcon}><Edit3 size={18} color={Colors.primary[600]} /></View>
+          <View style={s.editIcon}><Edit size={18} color={Colors.primary[600]} /></View>
           <View style={s.editInfo}>
             <Text style={s.editTitle}>Editar perfil público</Text>
             <Text style={s.editDesc}>Foto, bio, preços, especialidades, contato</Text>
@@ -165,7 +165,7 @@ export default function TrainerProfileScreen() {
                 </View>
                 <View style={s.classActions}>
                   <TouchableOpacity style={s.classEditBtn} onPress={() => openEdit(ct)}>
-                    <Edit3 size={14} color={Colors.neutral[500]} />
+                    <Edit size={14} color={Colors.neutral[500]} />
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={s.classDelBtn}
