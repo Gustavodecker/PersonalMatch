@@ -40,7 +40,7 @@ export default function TrainerAppLayout() {
   }, [profile]);
 
   if (loading || trialState === 'loading') return <LoadingScreen />;
-  if (!user) return <Redirect href="/(auth)/login" />;
+  if (!user) return <Redirect href={{ pathname: '/(auth)/login', params: { redirect: '/trainer/(app)/assinatura' } }} />;
   if (profile && profile.role !== 'trainer' && profile.role !== 'admin') return <Redirect href="/" />;
 
   const handleSignOut = async () => {

@@ -3,7 +3,7 @@ import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   KeyboardAvoidingView, Platform, Image,
 } from 'react-native';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { Redirect } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '@/contexts/AuthContext';
@@ -13,6 +13,7 @@ import { Colors, Spacing, FontSizes, BorderRadii } from '@/constants/theme';
 
 export default function LoginScreen() {
   const { signIn, user, profile } = useAuth();
+  const params = useLocalSearchParams<{ redirect?: string }>();
   const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading]   = useState(false);
@@ -26,6 +27,8 @@ export default function LoginScreen() {
     setLoading(false);
     if (err) {
       setError('E-mail ou senha incorretos.');
+    } else if (params.redirect) {
+      router.replace(params.redirect as any);
     } else {
       router.replace('/');
     }

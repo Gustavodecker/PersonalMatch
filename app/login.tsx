@@ -12,12 +12,13 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react-native';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { getDashboardRoute } from '@/lib/role-routes';
 
 export default function LoginScreen() {
   const { signIn, user, profile, loading } = useAuth();
+  const params = useLocalSearchParams<{ redirect?: string }>();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -27,7 +28,11 @@ export default function LoginScreen() {
 
   useEffect(() => {
     if (user && profile) {
-      router.replace(getDashboardRoute(profile.role) as any);
+      if (params.redirect) {
+        router.replace(params.redirect as any);
+      } else {
+        router.replace(getDashboardRoute(profile.role) as any);
+      }
     }
   }, [user, profile]);
 
