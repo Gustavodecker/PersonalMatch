@@ -91,6 +91,10 @@ export default function TrainerAppLayout() {
             tabBarIcon: ({ color, size }) => <CreditCard size={size} color={color} />,
           }}
         />
+        {/* Detail screens — hidden from tab bar, accessible via router.push */}
+        <Tabs.Screen name="avaliacoes" options={{ href: null }} />
+        <Tabs.Screen name="visualizacoes" options={{ href: null }} />
+        <Tabs.Screen name="leads" options={{ href: null }} />
       </Tabs>
 
       {/* Overlay shown whenever expired and NOT on the assinatura tab */}

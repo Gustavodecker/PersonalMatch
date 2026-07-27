@@ -112,7 +112,7 @@ export default function TrainerDashboard() {
       supabase.from('profile_views').select('id', { count: 'exact', head: true }).eq('trainer_id', profile.id),
       supabase.from('appointments').select('*, student:profiles!appointments_student_id_fkey(*)').eq('trainer_id', profile.id).gte('appointment_date', new Date().toISOString().split('T')[0]).in('status', ['requested', 'confirmed']).order('appointment_date').order('start_time').limit(5),
       supabase.from('subscriptions').select('plan, status, current_period_end').eq('trainer_id', profile.id).order('created_at', { ascending: false }).limit(1).maybeSingle(),
-      supabase.from('reviews').select('*, student:profiles!reviews_student_id_fkey(*)').eq('trainer_id', profile.id).eq('status', 'approved').order('created_at', { ascending: false }).limit(5),
+      supabase.from('reviews').select('*, student:profiles!reviews_student_id_fkey(*)').eq('trainer_id', profile.id).eq('status', 'approved').order('created_at', { ascending: false }),
       supabase.from('appointments').select('id', { count: 'exact', head: true }).eq('trainer_id', profile.id).eq('status', 'requested'),
       supabase.from('trainer_specialties').select('id', { count: 'exact', head: true }).eq('trainer_id', profile.id),
       supabase.from('trainer_photos').select('id', { count: 'exact', head: true }).eq('trainer_id', profile.id),
@@ -148,14 +148,20 @@ export default function TrainerDashboard() {
     setPendingApts(pendingAptsRes.count ?? 0);
     setAvailabilitySlots(availRes.data?.length ?? 0);
 
+    const allReviews = (reviewsRes.data ?? []) as Review[];
+    const reviewCount = allReviews.length;
+    const avgRating = reviewCount > 0
+      ? allReviews.reduce((sum, r) => sum + r.rating, 0) / reviewCount
+      : 0;
+
     setStats({
-      rating:      t?.rating ?? 0,
-      reviewCount: t?.review_count ?? 0,
+      rating:      avgRating,
+      reviewCount,
       viewCount:   viewsRes.count ?? 0,
       leadCount:   allLeads.length,
     });
 
-    if (reviewsRes.data) setReviews(reviewsRes.data as Review[]);
+    setReviews(allReviews);
     if (aptRes.data) setAppointments(aptRes.data as Appointment[]);
     setLoading(false);
     setRefreshing(false);
