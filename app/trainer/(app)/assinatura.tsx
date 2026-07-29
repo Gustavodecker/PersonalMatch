@@ -113,17 +113,22 @@ export default function AssinaturaScreen() {
   };
 
   const loadSubscription = useCallback(async () => {
-    if (!user) return;
-    const { data } = await supabase
-      .from('subscriptions')
-      .select('plan, status, current_period_end, cancel_at_period_end, stripe_subscription_id')
-      .eq('trainer_id', user.id)
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    setSubscription(data ?? null);
-    setLoading(false);
-    setRefreshing(false);
+    if (!user) { setLoading(false); setRefreshing(false); return; }
+    try {
+      const { data } = await supabase
+        .from('subscriptions')
+        .select('plan, status, current_period_end, cancel_at_period_end, stripe_subscription_id')
+        .eq('trainer_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      setSubscription(data ?? null);
+    } catch {
+      setSubscription(null);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
   }, [user]);
 
   useEffect(() => { loadSubscription(); }, [loadSubscription]);

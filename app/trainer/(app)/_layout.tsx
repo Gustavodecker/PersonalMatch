@@ -20,13 +20,14 @@ export default function TrainerAppLayout() {
   const showExpiredOverlay = trialState === 'expired' && !pathname.endsWith('/assinatura');
 
   useEffect(() => {
-    if (!profile || profile.role !== 'trainer') return;
-    supabase
-      .from('trainers')
-      .select('subscription_status, subscription_plan, trial_ends_at')
-      .eq('id', profile.id)
-      .maybeSingle()
-      .then(({ data }) => {
+    if (!profile || profile.role !== 'trainer') { setTrialState('ok'); return; }
+    (async () => {
+      try {
+        const { data } = await supabase
+          .from('trainers')
+          .select('subscription_status, subscription_plan, trial_ends_at')
+          .eq('id', profile.id)
+          .maybeSingle();
         if (!data) { setTrialState('ok'); return; }
         if (data.subscription_status === 'active') { setTrialState('ok'); return; }
         const trialEnd = data.trial_ends_at ? new Date(data.trial_ends_at) : null;
@@ -36,7 +37,10 @@ export default function TrainerAppLayout() {
         if (days <= 0) setTrialState('expired');
         else if (days <= 3) { setTrialState('warning'); setDaysLeft(days); }
         else setTrialState('ok');
-      });
+      } catch {
+        setTrialState('ok');
+      }
+    })();
   }, [profile]);
 
   if (loading || trialState === 'loading') return <LoadingScreen />;
