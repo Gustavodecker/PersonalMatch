@@ -1,8 +1,10 @@
 import { useEffect, useState, useCallback } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  ActivityIndicator, Platform, RefreshControl, TextInput, Linking,
+  ActivityIndicator, Platform, RefreshControl, TextInput,
 } from 'react-native';
+import * as WebBrowser from 'expo-web-browser';
+import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
@@ -11,10 +13,8 @@ import { PLANS, getPlanById, type PlanId, type Plan } from '@/src/stripe-config'
 import {
   CheckCircle, Crown, Zap, Star, ArrowRight,
   RefreshCw, XCircle, AlertCircle, BadgeCheck, Info,
-  Tag, Globe, ExternalLink,
+  Tag,
 } from 'lucide-react-native';
-
-const WEB_APP_URL = (process.env.EXPO_PUBLIC_WEB_URL ?? process.env.EXPO_PUBLIC_SUPABASE_URL?.replace('supabase.co', 'vercel.app') ?? 'https://99personal.com.br');
 
 type Subscription = {
   plan: PlanId;
@@ -129,7 +129,6 @@ export default function AssinaturaScreen() {
   useEffect(() => { loadSubscription(); }, [loadSubscription]);
 
   const handleCheckout = async (plan: Plan) => {
-    if (!isWeb) return;
     if (!session?.access_token) return;
 
     // Free trial is activated directly, no Stripe checkout needed
@@ -159,7 +158,12 @@ export default function AssinaturaScreen() {
     setActionLoading(plan.id);
     setError(null);
     try {
-      const origin = window.location.origin;
+      const successUrl = isWeb
+        ? `${window.location.origin}/trainer/assinatura-sucesso`
+        : 'personal99://trainer/assinatura-sucesso';
+      const cancelUrl = isWeb
+        ? `${window.location.origin}/trainer/(app)/assinatura`
+        : 'personal99://trainer/assinatura';
       const res = await fetch(`${SUPABASE_URL}/functions/v1/stripe-checkout`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
@@ -168,13 +172,24 @@ export default function AssinaturaScreen() {
           planId: plan.id,
           trainerId: user?.id,
           voucherCode: voucherData ? voucherCode.trim().toUpperCase() : undefined,
-          successUrl: `${origin}/trainer/assinatura-sucesso`,
-          cancelUrl:  `${origin}/trainer/assinatura`,
+          successUrl,
+          cancelUrl,
         }),
       });
       const data = await res.json();
-      if (data.url) window.location.href = data.url;
-      else setError(data.error ?? 'Erro ao iniciar checkout.');
+      if (data.url) {
+        if (isWeb) {
+          window.location.href = data.url;
+        } else {
+          const result = await WebBrowser.openAuthSessionAsync(data.url, 'personal99://');
+          if (result.type === 'success' && result.url?.includes('assinatura-sucesso')) {
+            await loadSubscription();
+            router.push('/trainer/assinatura-sucesso');
+          }
+        }
+      } else {
+        setError(data.error ?? 'Erro ao iniciar checkout.');
+      }
     } catch (e: any) {
       setError(e.message);
     } finally {
@@ -183,20 +198,28 @@ export default function AssinaturaScreen() {
   };
 
   const handlePortal = async () => {
-    if (!isWeb) return;
     if (!session?.access_token) return;
     setActionLoading('portal');
     setError(null);
     try {
-      const origin = window.location.origin;
+      const cancelUrl = isWeb
+        ? `${window.location.origin}/trainer/(app)/assinatura`
+        : 'personal99://trainer/assinatura';
       const res = await fetch(`${SUPABASE_URL}/functions/v1/stripe-checkout`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
-        body: JSON.stringify({ action: 'portal', cancelUrl: `${origin}/trainer/assinatura` }),
+        body: JSON.stringify({ action: 'portal', cancelUrl }),
       });
       const data = await res.json();
-      if (data.url) window.location.href = data.url;
-      else setError(data.error ?? 'Erro ao abrir portal.');
+      if (data.url) {
+        if (isWeb) {
+          window.location.href = data.url;
+        } else {
+          await WebBrowser.openAuthSessionAsync(data.url, 'personal99://');
+        }
+      } else {
+        setError(data.error ?? 'Erro ao abrir portal.');
+      }
     } catch (e: any) {
       setError(e.message);
     } finally {
@@ -273,29 +296,75 @@ export default function AssinaturaScreen() {
             )}
           </View>
 
-          {/* CTA para assinar/gerenciar no site */}
-          <TouchableOpacity
-            style={s.mobileCta}
-            onPress={() => Linking.openURL(`${WEB_APP_URL}/trainer/assinatura`)}
-            activeOpacity={0.85}
-          >
-            <View style={s.mobileCtaLeft}>
-              <Globe size={22} color={Colors.primary[600]} />
-              <View style={{ flex: 1 }}>
-                <Text style={s.mobileCtaTitle}>
-                  {currentPlanId === 'free' || currentPlanId === 'free_trial'
-                    ? 'Fazer upgrade do plano'
-                    : 'Gerenciar assinatura'}
-                </Text>
-                <Text style={s.mobileCtaSub}>
-                  {currentPlanId === 'free' || currentPlanId === 'free_trial'
-                    ? 'Assine um plano Pro ou Premium no site'
-                    : 'Para alterar ou cancelar, acesse o site'}
-                </Text>
-              </View>
+          {error && (
+            <View style={s.errorBanner}>
+              <XCircle size={16} color={Colors.error[600]} />
+              <Text style={s.errorText}>{error}</Text>
             </View>
-            <ExternalLink size={18} color={Colors.primary[600]} />
-          </TouchableOpacity>
+          )}
+
+          {isPaid && (
+            <TouchableOpacity
+              style={s.mobileManageBtn}
+              onPress={handlePortal}
+              disabled={actionLoading === 'portal'}
+              activeOpacity={0.85}
+            >
+              {actionLoading === 'portal'
+                ? <ActivityIndicator size="small" color={Colors.white} />
+                : <>
+                    <RefreshCw size={16} color={Colors.white} />
+                    <Text style={s.mobileManageBtnText}>Gerenciar faturamento</Text>
+                  </>}
+            </TouchableOpacity>
+          )}
+
+          <View style={s.voucherSection}>
+            <Text style={s.voucherTitle}>Voucher de desconto</Text>
+            {voucherData ? (
+              <View style={s.voucherApplied}>
+                <Tag size={16} color={Colors.secondary[600]} />
+                <View style={{ flex: 1 }}>
+                  <Text style={s.voucherAppliedCode}>{voucherCode.trim().toUpperCase()}</Text>
+                  <Text style={s.voucherAppliedDesc}>
+                    {voucherData.type === 'percentage'
+                      ? `${voucherData.discount_value}% de desconto aplicado`
+                      : `R$ ${Number(voucherData.discount_value).toFixed(2)} de desconto aplicado`}
+                    {voucherData.description ? ` · ${voucherData.description}` : ''}
+                  </Text>
+                </View>
+                <TouchableOpacity onPress={clearVoucher} style={s.voucherRemove}>
+                  <XCircle size={18} color={Colors.error[500]} />
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <View style={s.voucherRow}>
+                <TextInput
+                  style={s.voucherInput}
+                  value={voucherCode}
+                  onChangeText={(t) => { setVoucherCode(t.toUpperCase()); setVoucherError(null); }}
+                  placeholder="Ex: PROMO20"
+                  placeholderTextColor={Colors.neutral[400]}
+                  autoCapitalize="characters"
+                />
+                <TouchableOpacity
+                  style={[s.voucherApplyBtn, (!voucherCode.trim() || voucherLoading) && s.voucherApplyBtnDisabled]}
+                  onPress={applyVoucher}
+                  disabled={!voucherCode.trim() || voucherLoading}
+                >
+                  {voucherLoading
+                    ? <ActivityIndicator size="small" color={Colors.white} />
+                    : <Text style={s.voucherApplyBtnText}>Aplicar</Text>}
+                </TouchableOpacity>
+              </View>
+            )}
+            {voucherError && (
+              <View style={s.voucherErrRow}>
+                <AlertCircle size={13} color={Colors.error[600]} />
+                <Text style={s.voucherErrText}>{voucherError}</Text>
+              </View>
+            )}
+          </View>
 
           {/* Plans overview (read-only) */}
           <Text style={s.plansTitle}>Planos disponíveis</Text>
@@ -337,11 +406,18 @@ export default function AssinaturaScreen() {
                   {!isCurrent && plan.id !== 'free' && (
                     <TouchableOpacity
                       style={[s.mobilePlanBtn, plan.highlight && { backgroundColor: Colors.primary[600] }]}
-                      onPress={() => Linking.openURL(`${WEB_APP_URL}/trainer/assinatura`)}
+                      onPress={() => handleCheckout(plan)}
+                      disabled={!!actionLoading}
                       activeOpacity={0.85}
                     >
-                      <ExternalLink size={14} color={Colors.white} />
-                      <Text style={s.mobilePlanBtnText}>Assinar no site</Text>
+                      {actionLoading === plan.id
+                        ? <ActivityIndicator size="small" color={Colors.white} />
+                        : <>
+                            <Text style={s.mobilePlanBtnText}>
+                              {plan.id === 'free_trial' ? 'Ativar teste grátis' : 'Assinar agora'}
+                            </Text>
+                            <ArrowRight size={14} color={Colors.white} />
+                          </>}
                     </TouchableOpacity>
                   )}
                 </View>
@@ -564,15 +640,13 @@ const s = StyleSheet.create({
   mobileRowLabel: { fontSize: FontSizes.sm, color: Colors.neutral[500], fontWeight: '500' },
   mobileRowValue: { fontSize: FontSizes.sm, fontWeight: '700' },
 
-  mobileCta: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+  mobileManageBtn: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
     marginHorizontal: Spacing.lg, marginBottom: Spacing.md,
-    backgroundColor: Colors.primary[600], borderRadius: 16,
-    padding: Spacing.md,
+    backgroundColor: Colors.neutral[800], borderRadius: 14,
+    paddingVertical: 14,
   },
-  mobileCtaLeft: { flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 },
-  mobileCtaTitle: { fontSize: FontSizes.md, fontWeight: '800', color: Colors.white },
-  mobileCtaSub: { fontSize: FontSizes.xs, color: 'rgba(255,255,255,0.75)', marginTop: 2 },
+  mobileManageBtnText: { fontSize: FontSizes.md, fontWeight: '700', color: Colors.white },
   mobilePlanBtn: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
     backgroundColor: Colors.neutral[800], borderRadius: 10,
