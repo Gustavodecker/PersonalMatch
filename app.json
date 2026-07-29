@@ -20,7 +20,7 @@
     },
     "web": {
       "bundler": "metro",
-      "output": "single",
+      "output": "static",
       "favicon": "./assets/images/ChatGPT_Image_9_de_jul._de_2026,_21_23_46-Photoroom.png",
       "title": "99 Personal"
     },

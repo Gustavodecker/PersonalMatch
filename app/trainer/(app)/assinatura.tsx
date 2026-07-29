@@ -162,7 +162,7 @@ export default function AssinaturaScreen() {
         ? `${window.location.origin}/trainer/assinatura-sucesso`
         : 'personal99://trainer/assinatura-sucesso';
       const cancelUrl = isWeb
-        ? `${window.location.origin}/trainer/(app)/assinatura`
+        ? `${window.location.origin}/trainer/assinatura`
         : 'personal99://trainer/assinatura';
       const res = await fetch(`${SUPABASE_URL}/functions/v1/stripe-checkout`, {
         method: 'POST',
@@ -203,7 +203,7 @@ export default function AssinaturaScreen() {
     setError(null);
     try {
       const cancelUrl = isWeb
-        ? `${window.location.origin}/trainer/(app)/assinatura`
+        ? `${window.location.origin}/trainer/assinatura`
         : 'personal99://trainer/assinatura';
       const res = await fetch(`${SUPABASE_URL}/functions/v1/stripe-checkout`, {
         method: 'POST',

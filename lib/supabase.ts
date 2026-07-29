@@ -23,13 +23,14 @@ const nativeStorage = {
 };
 
 const webStorage = {
-  getItem: (key: string) => Promise.resolve(localStorage.getItem(key)),
+  getItem: (key: string) =>
+    Promise.resolve(typeof localStorage !== 'undefined' ? localStorage.getItem(key) : null),
   setItem: (key: string, value: string) => {
-    localStorage.setItem(key, value);
+    if (typeof localStorage !== 'undefined') localStorage.setItem(key, value);
     return Promise.resolve();
   },
   removeItem: (key: string) => {
-    localStorage.removeItem(key);
+    if (typeof localStorage !== 'undefined') localStorage.removeItem(key);
     return Promise.resolve();
   },
 };
