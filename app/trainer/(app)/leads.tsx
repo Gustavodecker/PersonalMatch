@@ -116,21 +116,23 @@ export default function LeadsScreen() {
         <View style={{ width: 40 }} />
       </View>
 
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.tabRow}>
-        {TABS.map((t) => {
-          const count = counts[t.key];
-          return (
-            <TouchableOpacity
-              key={t.key}
-              style={[s.tabChip, tab === t.key && s.tabChipActive]}
-              onPress={() => setTab(t.key)}
-            >
-              <Text style={[s.tabChipText, tab === t.key && s.tabChipTextActive]}>{t.label}</Text>
-              {count > 0 && <View style={s.tabDot}><Text style={s.tabDotText}>{count}</Text></View>}
-            </TouchableOpacity>
-          );
-        })}
-      </ScrollView>
+      <View style={s.tabRowWrap}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.tabRow}>
+          {TABS.map((t) => {
+            const count = counts[t.key];
+            return (
+              <TouchableOpacity
+                key={t.key}
+                style={[s.tabChip, tab === t.key && s.tabChipActive]}
+                onPress={() => setTab(t.key)}
+              >
+                <Text style={[s.tabChipText, tab === t.key && s.tabChipTextActive]}>{t.label}</Text>
+                {count > 0 && <View style={s.tabDot}><Text style={s.tabDotText}>{count}</Text></View>}
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
+      </View>
 
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -311,10 +313,14 @@ const s = StyleSheet.create({
   headerTitle: { fontSize: FontSizes.lg, fontWeight: '700', color: Colors.neutral[900] },
   headerSub: { fontSize: FontSizes.xs, color: Colors.neutral[500], marginTop: 1 },
 
-  tabRow: { paddingHorizontal: Spacing.lg, paddingBottom: Spacing.sm, gap: 8, flexDirection: 'row' },
+  tabRowWrap: {
+    height: 48, justifyContent: 'center',
+    borderBottomWidth: 1, borderBottomColor: Colors.neutral[100],
+  },
+  tabRow: { paddingHorizontal: Spacing.lg, gap: 8, flexDirection: 'row', alignItems: 'center' },
   tabChip: {
     flexDirection: 'row', alignItems: 'center', gap: 5,
-    paddingHorizontal: 14, paddingVertical: 7, borderRadius: BorderRadii.full,
+    paddingHorizontal: 14, height: 34, borderRadius: BorderRadii.full,
     borderWidth: 1.5, borderColor: Colors.neutral[200], backgroundColor: Colors.white,
   },
   tabChipActive: { backgroundColor: Colors.primary[600], borderColor: Colors.primary[600] },

@@ -96,17 +96,19 @@ export default function ProfileStatsScreen() {
       </View>
 
       {/* Period selector */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.periodRow}>
-        {PERIODS.map((p) => (
-          <TouchableOpacity
-            key={p.key}
-            style={[s.periodChip, period === p.key && s.periodChipActive]}
-            onPress={() => { setLoading(true); setPeriod(p.key); }}
-          >
-            <Text style={[s.periodChipText, period === p.key && s.periodChipTextActive]}>{p.label}</Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+      <View style={s.periodRowWrap}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.periodRow}>
+          {PERIODS.map((p) => (
+            <TouchableOpacity
+              key={p.key}
+              style={[s.periodChip, period === p.key && s.periodChipActive]}
+              onPress={() => { setLoading(true); setPeriod(p.key); }}
+            >
+              <Text style={[s.periodChipText, period === p.key && s.periodChipTextActive]}>{p.label}</Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
 
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -202,10 +204,15 @@ const s = StyleSheet.create({
   headerTitle: { fontSize: FontSizes.lg, fontWeight: '700', color: Colors.neutral[900] },
   headerSub: { fontSize: FontSizes.xs, color: Colors.neutral[500], marginTop: 1 },
 
-  periodRow: { paddingHorizontal: Spacing.lg, paddingBottom: Spacing.sm, gap: 8, flexDirection: 'row' },
+  periodRowWrap: {
+    height: 48, justifyContent: 'center',
+    borderBottomWidth: 1, borderBottomColor: Colors.neutral[100],
+  },
+  periodRow: { paddingHorizontal: Spacing.lg, gap: 8, flexDirection: 'row', alignItems: 'center' },
   periodChip: {
-    paddingHorizontal: 14, paddingVertical: 7, borderRadius: BorderRadii.full,
+    paddingHorizontal: 14, height: 34, borderRadius: BorderRadii.full,
     borderWidth: 1.5, borderColor: Colors.neutral[200], backgroundColor: Colors.white,
+    alignItems: 'center', justifyContent: 'center',
   },
   periodChipActive: { backgroundColor: Colors.primary[600], borderColor: Colors.primary[600] },
   periodChipText: { fontSize: FontSizes.sm, fontWeight: '600', color: Colors.neutral[600] },
