@@ -202,6 +202,28 @@ Deno.serve(async (req: Request) => {
       return json({ url: portalSession.url });
     }
 
+    // ── CANCEL SUBSCRIPTION ──────────────────────────────────────────────────
+    if (action === "cancel_subscription") {
+      const { data: sub } = await supabase
+        .from("subscriptions")
+        .select("stripe_subscription_id, status")
+        .eq("trainer_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (!sub?.stripe_subscription_id) {
+        return json({ error: "Nenhuma assinatura ativa encontrada." }, 400);
+      }
+
+      try {
+        await stripe.subscriptions.cancel(sub.stripe_subscription_id);
+        return json({ success: true });
+      } catch (err: any) {
+        return json({ error: err.message }, 500);
+      }
+    }
+
     return json({ error: "Unknown action" }, 400);
   } catch (err: any) {
     console.error("stripe-checkout error:", err);

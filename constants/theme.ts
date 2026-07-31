@@ -53,6 +53,7 @@ export const Colors = {
   error: {
     50:  '#FFF1F2',
     100: '#FFE4E6',
+    200: '#FECDD3',
     500: '#F43F5E',
     600: '#E11D48',
     700: '#BE123C',

@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  ActivityIndicator, Platform, RefreshControl, TextInput,
+  ActivityIndicator, Platform, RefreshControl, TextInput, Alert,
 } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
 import { router } from 'expo-router';
@@ -232,6 +232,40 @@ export default function AssinaturaScreen() {
     }
   };
 
+  const handleCancelSubscription = async () => {
+    if (!session?.access_token) return;
+    const confirmMsg = 'Deseja cancelar sua assinatura? Você continuará com acesso até o final do período já pago, mas não será cobrado novamente.';
+    const doCancel = async () => {
+      setActionLoading('cancel');
+      setError(null);
+      try {
+        const res = await fetch(`${SUPABASE_URL}/functions/v1/stripe-checkout`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
+          body: JSON.stringify({ action: 'cancel_subscription' }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          await loadSubscription();
+        } else {
+          setError(data.error ?? 'Erro ao cancelar assinatura.');
+        }
+      } catch (e: any) {
+        setError(e.message);
+      } finally {
+        setActionLoading(null);
+      }
+    };
+    if (isWeb) {
+      if (window.confirm(confirmMsg)) doCancel();
+    } else {
+      Alert.alert('Cancelar assinatura', confirmMsg, [
+        { text: 'Não, manter', style: 'cancel' },
+        { text: 'Sim, cancelar', style: 'destructive', onPress: doCancel },
+      ]);
+    }
+  };
+
   if (loading) {
     return (
       <SafeAreaView style={s.safe}>
@@ -320,6 +354,22 @@ export default function AssinaturaScreen() {
                 : <>
                     <RefreshCw size={16} color={Colors.white} />
                     <Text style={s.mobileManageBtnText}>Gerenciar faturamento</Text>
+                  </>}
+            </TouchableOpacity>
+          )}
+
+          {isPaid && !subscription?.cancel_at_period_end && (
+            <TouchableOpacity
+              style={[s.mobileManageBtn, { backgroundColor: Colors.error[600], marginTop: 10 }]}
+              onPress={handleCancelSubscription}
+              disabled={actionLoading === 'cancel'}
+              activeOpacity={0.85}
+            >
+              {actionLoading === 'cancel'
+                ? <ActivityIndicator size="small" color={Colors.white} />
+                : <>
+                    <XCircle size={16} color={Colors.white} />
+                    <Text style={s.mobileManageBtnText}>Cancelar assinatura</Text>
                   </>}
             </TouchableOpacity>
           )}
@@ -485,6 +535,19 @@ export default function AssinaturaScreen() {
               {actionLoading === 'portal'
                 ? <ActivityIndicator size="small" color={planColors.icon} />
                 : <Text style={[s.manageBtnText, { color: planColors.icon }]}>Gerenciar faturamento</Text>
+              }
+            </TouchableOpacity>
+          )}
+
+          {isPaid && !subscription?.cancel_at_period_end && (
+            <TouchableOpacity
+              style={[s.manageBtn, { borderColor: Colors.error[200], marginTop: 10 }]}
+              onPress={handleCancelSubscription}
+              disabled={actionLoading === 'cancel'}
+            >
+              {actionLoading === 'cancel'
+                ? <ActivityIndicator size="small" color={Colors.error[600]} />
+                : <Text style={[s.manageBtnText, { color: Colors.error[600] }]}>Cancelar assinatura</Text>
               }
             </TouchableOpacity>
           )}

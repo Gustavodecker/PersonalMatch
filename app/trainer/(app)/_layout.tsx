@@ -99,6 +99,7 @@ export default function TrainerAppLayout() {
         <Tabs.Screen name="avaliacoes" options={{ href: null }} />
         <Tabs.Screen name="visualizacoes" options={{ href: null }} />
         <Tabs.Screen name="leads" options={{ href: null }} />
+        <Tabs.Screen name="configuracoes" options={{ href: null }} />
       </Tabs>
 
       {/* Overlay shown whenever expired and NOT on the assinatura tab */}

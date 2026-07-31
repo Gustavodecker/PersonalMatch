@@ -11,7 +11,7 @@ import { Colors, Spacing, FontSizes, BorderRadii, Shadows } from '@/constants/th
 import { TrainerClassType } from '@/types/database';
 import {
   ArrowLeft, Plus, Trash2, Check, X, BookOpen, Clock,
-  Edit, ChevronRight, Dumbbell, AlertCircle, LogOut,
+  Edit, ChevronRight, Dumbbell, AlertCircle, Shield,
 } from 'lucide-react-native';
 
 const IS_WEB = Platform.OS === 'web';
@@ -26,7 +26,7 @@ type ClassForm = {
 const emptyForm = (): ClassForm => ({ id: null, name: '', description: '', duration_minutes: '60' });
 
 export default function TrainerProfileScreen() {
-  const { profile, signOut } = useAuth();
+  const { profile } = useAuth();
   const insets = useSafeAreaInsets();
   const [classTypes, setClassTypes] = useState<TrainerClassType[]>([]);
   const [loading, setLoading] = useState(true);
@@ -190,23 +190,14 @@ export default function TrainerProfileScreen() {
           <ChevronRight size={18} color={Colors.neutral[400]} />
         </TouchableOpacity>
 
-        {/* Logout */}
-        <TouchableOpacity
-          style={s.logoutBtn}
-          onPress={async () => {
-            if (IS_WEB) {
-              if (window.confirm('Deseja sair da sua conta?')) { await signOut(); router.replace('/'); }
-            } else {
-              Alert.alert('Sair da conta', 'Deseja sair da sua conta?', [
-                { text: 'Cancelar', style: 'cancel' },
-                { text: 'Sair', style: 'destructive', onPress: async () => { await signOut(); router.replace('/'); } },
-              ]);
-            }
-          }}
-          activeOpacity={0.7}
-        >
-          <LogOut size={18} color={Colors.error[600]} />
-          <Text style={s.logoutText}>Sair da conta</Text>
+        {/* Privacy & security */}
+        <TouchableOpacity style={s.agendaLink} onPress={() => router.push('/trainer/(app)/configuracoes')} activeOpacity={0.7}>
+          <View style={s.agendaLinkIcon}><Shield size={18} color={Colors.neutral[600]} /></View>
+          <View style={s.agendaLinkInfo}>
+            <Text style={s.agendaLinkTitle}>Privacidade e segurança</Text>
+            <Text style={s.agendaLinkDesc}>Excluir conta, termos, política de privacidade</Text>
+          </View>
+          <ChevronRight size={18} color={Colors.neutral[400]} />
         </TouchableOpacity>
       </ScrollView>
 
@@ -400,10 +391,4 @@ const s = StyleSheet.create({
   modalSaveBtnDisabled: { opacity: 0.5 },
   modalSaveBtnText: { fontSize: FontSizes.md, fontWeight: '700', color: Colors.white },
 
-  logoutBtn: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
-    backgroundColor: Colors.error[50], borderRadius: BorderRadii.lg,
-    paddingVertical: 14, marginTop: Spacing.lg, borderWidth: 1, borderColor: Colors.error[100],
-  },
-  logoutText: { fontSize: FontSizes.md, fontWeight: '700', color: Colors.error[600] },
 });

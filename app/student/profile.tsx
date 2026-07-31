@@ -7,15 +7,10 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/Button';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Colors, Spacing, FontSizes, BorderRadii } from '@/constants/theme';
-import { Mail, MapPin, LogOut, ChevronRight } from 'lucide-react-native';
+import { Mail, MapPin, ChevronRight, Shield } from 'lucide-react-native';
 
 export default function StudentProfile() {
-  const { profile, signOut } = useAuth();
-
-  const handleSignOut = async () => {
-    await signOut();
-    router.replace('/');
-  };
+  const { profile } = useAuth();
 
   if (!profile) return null;
 
@@ -60,7 +55,7 @@ export default function StudentProfile() {
         </View>
 
         <View style={styles.section}>
-          <Button variant="outline" onPress={handleSignOut}>Sair da conta</Button>
+          <Button variant="outline" onPress={() => router.push('/student/configuracoes')}>Privacidade e segurança</Button>
         </View>
 
         <View style={{ height: Spacing.xxl }} />
