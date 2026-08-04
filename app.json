@@ -12,7 +12,8 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.personal99",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSPhotoLibraryUsageDescription": "O 99 Personal acessa suas fotos para permitir que você escolha uma imagem para o seu perfil."
       }
     },
     "android": {

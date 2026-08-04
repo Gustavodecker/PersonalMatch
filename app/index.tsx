@@ -2587,7 +2587,7 @@ const PublicHome: React.FC = () => {
 
           <View style={s.footerBottom}>
             <Text style={s.footerCopy}>
-              © 2026 Personal. Todos os direitos
+              © 2026 99 Personal. Todos os direitos
               reservados.
             </Text>
           </View>
