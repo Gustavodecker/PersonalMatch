@@ -119,12 +119,12 @@ async function upsertSubscription(trainerId: string, sub: Stripe.Subscription) {
     cancel_at_period_end: sub.cancel_at_period_end,
   }, { onConflict: "stripe_subscription_id" });
 
-  const isPremium = plan === "premium";
-  const photoLimit = plan === "free" ? 3 : plan === "pro" ? 8 : 20;
+  const isPaid = plan === "pro" || plan === "premium";
+  const photoLimit = plan === "free" ? 3 : plan === "pro" ? 10 : 999;
 
   await supabase.from("trainers").update({
     subscription_plan: plan,
-    is_featured: isPremium,
+    is_featured: isPaid,
     photo_limit: photoLimit,
   }).eq("id", trainerId);
 }

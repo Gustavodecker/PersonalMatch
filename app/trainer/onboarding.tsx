@@ -223,6 +223,13 @@ export default function TrainerOnboarding() {
 
   const uploadGalleryPhoto = async () => {
     if (!profile) return;
+    // Enforce photo limit based on subscription plan
+    const { data: trainerData } = await supabase.from('trainers').select('photo_limit').eq('id', profile.id).single();
+    const limit = trainerData?.photo_limit ?? 3;
+    if (galleryPhotos.length >= limit) {
+      setError(`Você atingiu o limite de ${limit} fotos do seu plano. Faça upgrade para adicionar mais.`);
+      return;
+    }
     setUploadingGallery(true); setError(null);
     try {
       const picked = await pickImage([4, 3]);

@@ -154,15 +154,15 @@ Deno.serve(async (req: Request) => {
 
     // ── START FREE TRIAL (no Stripe involved) ────────────────────────────────
     if (action === "start_trial") {
-      const trialDays = 15;
+      const trialDays = 7;
       const trialEnd = new Date(Date.now() + trialDays * 86400000).toISOString();
 
       await supabase
         .from("trainers")
         .update({
-          subscription_plan: "free_trial",
-          subscription_status: "trialing",
-          trial_ends_at: trialEnd,
+          subscription_plan: "pro",
+          is_featured: true,
+          photo_limit: 10,
         })
         .eq("id", user.id);
 
@@ -170,11 +170,11 @@ Deno.serve(async (req: Request) => {
         .from("subscriptions")
         .upsert({
           trainer_id: user.id,
-          plan: "free_trial",
+          plan: "pro",
           status: "trialing",
           current_period_start: new Date().toISOString(),
           current_period_end: trialEnd,
-          cancel_at_period_end: false,
+          cancel_at_period_end: true,
         }, { onConflict: "trainer_id" });
 
       return json({ success: true, trial_ends_at: trialEnd });
