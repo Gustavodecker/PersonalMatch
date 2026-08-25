@@ -1,5 +1,5 @@
-import { createContext, useContext, useEffect, useState, useRef, ReactNode } from 'react';
-import { Session, User } from '@supabase/supabase-js';
+import { createContext, useContext, useEffect, useState, useRef, ReactNode, useCallback } from 'react';
+import { Session, User, Provider } from '@supabase/supabase-js';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { Profile } from '@/types/database';
 
@@ -10,6 +10,7 @@ type AuthContextType = {
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: string | null }>;
   signUp: (email: string, password: string, fullName: string, role: 'student' | 'trainer') => Promise<{ error: string | null }>;
+  signInWithProvider: (provider: Provider) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
 };
@@ -130,6 +131,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error: null };
   };
 
+  const signInWithProvider = useCallback(async (provider: Provider) => {
+    const redirectTo = typeof window !== 'undefined'
+      ? `${window.location.origin}/`
+      : 'personal99://auth/callback';
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: { redirectTo },
+    });
+    if (error) {
+      console.error('OAuth signIn failed', error);
+      return { error: 'Não foi possível entrar com essa conta. Tente novamente.' };
+    }
+    return { error: null };
+  }, []);
+
   const signOut = async () => {
     await supabase.auth.signOut();
     if (mountedRef.current) {
@@ -144,7 +160,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, profile, loading, signIn, signUp, signOut, refreshProfile }}>
+    <AuthContext.Provider value={{ user, session, profile, loading, signIn, signUp, signInWithProvider, signOut, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   );

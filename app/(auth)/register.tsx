@@ -8,6 +8,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '@/contexts/AuthContext';
 import { Input } from '@/components/Input';
 import { Button } from '@/components/Button';
+import { SocialLoginButtons } from '@/components/SocialLoginButtons';
 import { Colors, Spacing, FontSizes, BorderRadii } from '@/constants/theme';
 import { ArrowLeft } from 'lucide-react-native';
 
@@ -84,6 +85,8 @@ export default function RegisterScreen() {
             <Input label="Senha" value={password} onChangeText={setPassword} secureTextEntry placeholder="Mínimo 6 caracteres" />
 
             <Button onPress={handleRegister} loading={loading} size="lg">Criar conta</Button>
+
+            <SocialLoginButtons />
 
             <TouchableOpacity style={styles.link} onPress={() => router.push('/(auth)/login')}>
               <Text style={styles.linkText}>

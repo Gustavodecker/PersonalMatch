@@ -45,7 +45,7 @@ export const supabase = createClient(
       storage,
       autoRefreshToken: isSupabaseConfigured,
       persistSession: isSupabaseConfigured,
-      detectSessionInUrl: false,
+      detectSessionInUrl: Platform.OS === 'web',
     },
   }
 );
