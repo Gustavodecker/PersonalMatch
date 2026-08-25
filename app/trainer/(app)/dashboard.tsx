@@ -181,11 +181,17 @@ export default function TrainerDashboard() {
     { label: 'Perfil incompleto', count: completionPct < 100 ? 100 - completionPct : 0, icon: AlertTriangle, color: '#EA580C', bg: 'rgba(234,88,12,0.08)', route: '/trainer/onboarding' },
   ].filter((a) => a.count > 0);
 
+  const isPremium = subscriptionPlan === 'premium';
   const shortcuts = [
     { label: 'Editar perfil',   icon: Edit,         route: '/trainer/onboarding' },
     { label: 'Disponibilidade', icon: CalendarClock, route: '/trainer/(app)/availability' },
     { label: 'Compartilhar',    icon: Share2,       action: 'share' as const },
     { label: 'Perfil público',  icon: Eye,          route: `/trainer/${profile?.id}` },
+    ...(isPremium ? [
+      { label: 'Promoções',       icon: Percent,      route: '/trainer/(app)/promocoes' },
+      { label: 'Conversão',       icon: TrendingUp,   route: '/trainer/(app)/conversao' },
+      { label: 'Config. Premium', icon: Crown,        route: '/trainer/(app)/premium-settings' },
+    ] : []),
   ];
 
   const fmtAptDate = (dateStr: string) => {

@@ -872,6 +872,7 @@ const PublicHome: React.FC = () => {
 
   const [searchQuery, setSearchQuery] =
     useState('');
+  const [promoTrainerIds, setPromoTrainerIds] = useState<Set<string>>(new Set());
 
   const scrollRef =
     useRef<ScrollView>(null);
@@ -925,6 +926,14 @@ const PublicHome: React.FC = () => {
               .filter(Boolean) ?? [],
         }))
       );
+      // Fetch trainer IDs with active promotions
+      const { data: promoData } = await supabase
+        .from('trainer_promotions')
+        .select('trainer_id')
+        .eq('is_active', true);
+      if (promoData) {
+        setPromoTrainerIds(new Set(promoData.map((p: any) => p.trainer_id)));
+      }
     } catch {
       // silent
     } finally {
@@ -1668,6 +1677,7 @@ const PublicHome: React.FC = () => {
                 >
                   <TrainerCard
                     trainer={t}
+                    hasPromotion={promoTrainerIds.has(t.id)}
                     onPress={() => {
                       if (!t.id) {
                         Alert.alert(

@@ -99,6 +99,8 @@ export default function TrainerDetailScreen() {
 
   const [galleryExpanded, setGalleryExpanded] = useState(false);
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
+  const [promotions, setPromotions] = useState<{ id: string; title: string; description: string | null; discount_label: string | null }[]>([]);
+  const [autoReplyMsg, setAutoReplyMsg] = useState<string | null>(null);
 
   useEffect(() => { if (id) loadTrainer(); }, [id]);
 
@@ -132,6 +134,14 @@ export default function TrainerDetailScreen() {
       };
       setTrainer(t);
       await supabase.from('profile_views').insert({ trainer_id: id, viewer_id: profile?.id ?? null });
+
+      // Load Premium features
+      const [promosRes, trainerMetaRes] = await Promise.all([
+        supabase.from('trainer_promotions').select('id, title, description, discount_label').eq('trainer_id', id).eq('is_active', true).order('created_at', { ascending: false }).limit(5),
+        supabase.from('trainers').select('auto_reply_message').eq('id', id).maybeSingle(),
+      ]);
+      setPromotions((promosRes.data ?? []) as any);
+      setAutoReplyMsg(trainerMetaRes.data?.auto_reply_message ?? null);
 
       if (profile?.role === 'student') {
         const { data: fav } = await supabase
@@ -463,7 +473,9 @@ export default function TrainerDetailScreen() {
       {sent ? (
         <View style={s.successBox}>
           <CheckCircle size={16} color={Colors.secondary[600]} />
-          <Text style={s.successText}>Mensagem enviada! O personal entrará em contato em breve.</Text>
+          <Text style={s.successText}>
+            {autoReplyMsg || 'Mensagem enviada! O personal entrará em contato em breve.'}
+          </Text>
         </View>
       ) : (
         <TouchableOpacity
@@ -642,6 +654,31 @@ export default function TrainerDetailScreen() {
 
           {/* Main content column */}
           <View style={IS_DESKTOP ? s.mainCol : undefined}>
+
+            {/* Promotions — Premium feature */}
+            {promotions.length > 0 && (
+              <View style={s.section}>
+                <Text style={s.sectionTitle}>Ofertas Especiais</Text>
+                <View style={{ gap: 8 }}>
+                  {promotions.map((promo) => (
+                    <View key={promo.id} style={s.promoCard}>
+                      <View style={s.promoHeader}>
+                        <View style={s.promoIconWrap}>
+                          <Zap size={14} color={Colors.warning[700]} fill={Colors.warning[500]} />
+                        </View>
+                        <Text style={s.promoTitle}>{promo.title}</Text>
+                        {promo.discount_label && (
+                          <View style={s.promoDiscountBadge}>
+                            <Text style={s.promoDiscountText}>{promo.discount_label}</Text>
+                          </View>
+                        )}
+                      </View>
+                      {promo.description && <Text style={s.promoDesc}>{promo.description}</Text>}
+                    </View>
+                  ))}
+                </View>
+              </View>
+            )}
 
             {/* Bio */}
             {p.bio ? (
@@ -1370,6 +1407,24 @@ const s = StyleSheet.create({
     borderRadius: 24, padding: Spacing.lg,
   },
   trustGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 14 },
+
+  // Promotion cards
+  promoCard: {
+    backgroundColor: Colors.warning[50], borderRadius: 14, padding: 14,
+    borderWidth: 1, borderColor: Colors.warning[100],
+  },
+  promoHeader: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  promoIconWrap: {
+    width: 28, height: 28, borderRadius: 8, backgroundColor: Colors.warning[100],
+    alignItems: 'center', justifyContent: 'center',
+  },
+  promoTitle: { flex: 1, fontSize: FontSizes.md, fontWeight: '700', color: Colors.neutral[900] },
+  promoDiscountBadge: {
+    backgroundColor: Colors.secondary[500], paddingHorizontal: 8, paddingVertical: 3,
+    borderRadius: 999,
+  },
+  promoDiscountText: { fontSize: 11, fontWeight: '800', color: Colors.white },
+  promoDesc: { fontSize: FontSizes.sm, color: Colors.neutral[600], marginTop: 6, lineHeight: 18 },
   trustCard: {
     width: '47%', gap: 6,
     backgroundColor: 'rgba(255,255,255,0.06)',

@@ -133,6 +133,7 @@ export default function StudentSearch() {
   const [showFilters, setShowFilters] = useState(false);
   const [loading, setLoading]         = useState(true);
   const [focused, setFocused]         = useState(false);
+  const [promoTrainerIds, setPromoTrainerIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     supabase.from('specialties').select('*').order('name').then(({ data }) => {
@@ -163,6 +164,15 @@ export default function StudentSearch() {
       })));
     }
     setLoading(false);
+
+    // Fetch trainer IDs that have active promotions
+    const { data: promoData } = await supabase
+      .from('trainer_promotions')
+      .select('trainer_id')
+      .eq('is_active', true);
+    if (promoData) {
+      setPromoTrainerIds(new Set(promoData.map((p: any) => p.trainer_id)));
+    }
   };
 
   const compute = useCallback((trainers: TrainerWithProfile[], q: string, f: Filters) => {
@@ -362,7 +372,7 @@ export default function StudentSearch() {
             <ResultsList
               loading={loading} results={results} isFiltering={isFiltering}
               featured={featured} regular={regular} locationLabel={locationLabel}
-              openWhatsApp={openWhatsApp}
+              openWhatsApp={openWhatsApp} promoTrainerIds={promoTrainerIds}
             />
             <View style={{ height: Spacing.xxl }} />
           </ScrollView>
@@ -373,7 +383,7 @@ export default function StudentSearch() {
           <ResultsList
             loading={loading} results={results} isFiltering={isFiltering}
             featured={featured} regular={regular} locationLabel={locationLabel}
-            openWhatsApp={openWhatsApp}
+            openWhatsApp={openWhatsApp} promoTrainerIds={promoTrainerIds}
           />
           <View style={{ height: Spacing.xxl }} />
         </ScrollView>
@@ -425,7 +435,7 @@ function CountBar({ label, hasFilters, onClear }: { label: string; hasFilters: b
 }
 
 function ResultsList({
-  loading, results, isFiltering, featured, regular, locationLabel, openWhatsApp,
+  loading, results, isFiltering, featured, regular, locationLabel, openWhatsApp, promoTrainerIds,
 }: {
   loading: boolean;
   results: TrainerWithProfile[];
@@ -434,6 +444,7 @@ function ResultsList({
   regular: TrainerWithProfile[];
   locationLabel: string;
   openWhatsApp: (w: string) => void;
+  promoTrainerIds: Set<string>;
 }) {
   if (loading) return (
     <View style={s.emptyState}>
@@ -469,16 +480,16 @@ function ResultsList({
               <Text style={s.sectionTitle}>Em destaque</Text>
             </View>
           </View>
-          {featured.map((t) => <TrainerSearchCard key={t.id} trainer={t} onWhatsApp={openWhatsApp} />)}
+          {featured.map((t) => <TrainerSearchCard key={t.id} trainer={t} onWhatsApp={openWhatsApp} hasPromotion={promoTrainerIds.has(t.id)} />)}
         </View>
       )}
 
       {isFiltering && results.map((t) => (
-        <TrainerSearchCard key={t.id} trainer={t} onWhatsApp={openWhatsApp} />
+        <TrainerSearchCard key={t.id} trainer={t} onWhatsApp={openWhatsApp} hasPromotion={promoTrainerIds.has(t.id)} />
       ))}
 
       {!isFiltering && featured.length === 0 && results.map((t) => (
-        <TrainerSearchCard key={t.id} trainer={t} onWhatsApp={openWhatsApp} />
+        <TrainerSearchCard key={t.id} trainer={t} onWhatsApp={openWhatsApp} hasPromotion={promoTrainerIds.has(t.id)} />
       ))}
 
       {!isFiltering && featured.length > 0 && regular.length > 0 && (
@@ -486,7 +497,7 @@ function ResultsList({
           <View style={s.sectionHeader}>
             <Text style={s.sectionTitle}>Todos os personais</Text>
           </View>
-          {regular.map((t) => <TrainerSearchCard key={t.id} trainer={t} onWhatsApp={openWhatsApp} />)}
+          {regular.map((t) => <TrainerSearchCard key={t.id} trainer={t} onWhatsApp={openWhatsApp} hasPromotion={promoTrainerIds.has(t.id)} />)}
         </View>
       )}
     </>
@@ -494,8 +505,8 @@ function ResultsList({
 }
 
 function TrainerSearchCard({
-  trainer: t, onWhatsApp,
-}: { trainer: TrainerWithProfile; onWhatsApp: (w: string) => void }) {
+  trainer: t, onWhatsApp, hasPromotion,
+}: { trainer: TrainerWithProfile; onWhatsApp: (w: string) => void; hasPromotion?: boolean }) {
   const cover  = t.cover_photo_url ?? COVER_PH;
   const avatar = t.profile.avatar_url ?? AVATAR_PH;
 
@@ -533,6 +544,11 @@ function TrainerSearchCard({
             <View style={s.verBadge}>
               <BadgeCheck size={9} color={Colors.primary[700]} />
               <Text style={s.verText}>Verificado</Text>
+            </View>
+          )}
+          {hasPromotion && (
+            <View style={s.promoBadge}>
+              <Text style={s.promoText}>Oferta</Text>
             </View>
           )}
         </View>
@@ -704,6 +720,11 @@ const s = StyleSheet.create({
     backgroundColor: 'rgba(224,231,255,0.97)', paddingHorizontal: 9, paddingVertical: 4, borderRadius: 999,
   },
   verText: { fontSize: 10, fontWeight: '700', color: Colors.primary[700] },
+  promoBadge: {
+    backgroundColor: 'rgba(220,252,231,0.97)', paddingHorizontal: 9, paddingVertical: 4,
+    borderRadius: 999,
+  },
+  promoText: { fontSize: 10, fontWeight: '700', color: '#15803D' },
   ratingPill: {
     position: 'absolute', top: 12, right: 12,
     flexDirection: 'row', alignItems: 'center', gap: 3,

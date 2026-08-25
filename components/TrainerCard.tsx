@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { Colors, FontSizes, BorderRadii } from '@/constants/theme';
-import { Star, MapPin, BadgeCheck, Zap, Monitor, Users } from 'lucide-react-native';
+import { Star, MapPin, BadgeCheck, Zap, Monitor, Users, Tag } from 'lucide-react-native';
 import { TrainerWithProfile } from '@/types/database';
 
 const COVER_PLACEHOLDER = 'https://images.pexels.com/photos/841130/pexels-photo-841130.jpeg?auto=compress&cs=tinysrgb&w=600&h=300&fit=crop';
@@ -9,9 +9,11 @@ const AVATAR_PLACEHOLDER = 'https://images.pexels.com/photos/6551133/pexels-phot
 export function TrainerCard({
   trainer,
   onPress,
+  hasPromotion,
 }: {
   trainer: TrainerWithProfile;
   onPress?: () => void;
+  hasPromotion?: boolean;
 }) {
   const { profile, specialties } = trainer;
   const coverUrl = trainer.cover_photo_url ?? COVER_PLACEHOLDER;
@@ -38,6 +40,12 @@ export function TrainerCard({
             <View style={styles.verifiedBadge}>
               <BadgeCheck size={9} color={Colors.primary[700]} />
               <Text style={styles.verifiedText}>Verificado</Text>
+            </View>
+          )}
+          {hasPromotion && (
+            <View style={styles.promoBadge}>
+              <Tag size={9} color="#15803D" />
+              <Text style={styles.promoText}>Oferta</Text>
             </View>
           )}
         </View>
@@ -137,6 +145,12 @@ const styles = StyleSheet.create({
     borderRadius: 999,
   },
   verifiedText: { fontSize: 10, fontWeight: '700', color: Colors.primary[700] },
+  promoBadge: {
+    flexDirection: 'row', alignItems: 'center', gap: 3,
+    backgroundColor: 'rgba(220,252,231,0.97)', paddingHorizontal: 9, paddingVertical: 4,
+    borderRadius: 999,
+  },
+  promoText: { fontSize: 10, fontWeight: '700', color: '#15803D' },
   ratingBubble: {
     position: 'absolute', bottom: 10, right: 10,
     flexDirection: 'row', alignItems: 'center', gap: 3,
