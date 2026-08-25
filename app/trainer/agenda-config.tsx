@@ -203,7 +203,12 @@ export default function AgendaConfigScreen() {
         .from('trainer_availability')
         .insert(toInsert)
         .select('id, day_of_week');
-      if (error) { setSaveError(error.message); setSaving(false); return; }
+      if (error) {
+        console.error('agenda save failed', error);
+        setSaveError('Não foi possível salvar a agenda. Tente novamente.');
+        setSaving(false);
+        return;
+      }
       newRows = data ?? [];
     }
 
@@ -212,7 +217,12 @@ export default function AgendaConfigScreen() {
         .from('trainer_availability')
         .upsert(toUpdate)
         .select('id, day_of_week');
-      if (error) { setSaveError(error.message); setSaving(false); return; }
+      if (error) {
+        console.error('agenda save failed', error);
+        setSaveError('Não foi possível salvar a agenda. Tente novamente.');
+        setSaving(false);
+        return;
+      }
     }
 
     if (newRows.length > 0) {
@@ -242,7 +252,12 @@ export default function AgendaConfigScreen() {
       reason: blockForm.reason.trim() || null,
       class_type_id: blockForm.class_type_id,
     }).select().single();
-    if (error) { setBlockError(error.message); setSavingBlock(false); return; }
+    if (error) {
+      console.error('agenda block save failed', error);
+      setBlockError('Não foi possível salvar o bloqueio. Tente novamente.');
+      setSavingBlock(false);
+      return;
+    }
     setBlocks((prev) => [...prev, data as TrainerScheduleBlock].sort((a, b) => a.block_date.localeCompare(b.block_date)));
     setBlockModal(false);
     setSavingBlock(false);

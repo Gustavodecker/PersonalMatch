@@ -217,7 +217,7 @@ export default function TrainerOnboarding() {
       else                   await supabase.from('trainers').update({ cover_photo_url: publicUrl }).eq('id', profile.id);
       setUri(publicUrl);
     } catch (e: any) {
-      setError(e.message ?? 'Erro ao fazer upload da foto');
+      setError('Erro ao fazer upload da foto. Tente novamente.');
     } finally { setUploading(false); }
   };
 
@@ -248,7 +248,7 @@ export default function TrainerOnboarding() {
       if (dbErr) throw dbErr;
       if (row) setGalleryPhotos((prev) => [...prev, row as { id: string; url: string }]);
     } catch (e: any) {
-      setError(e.message ?? 'Erro ao enviar foto');
+      setError('Erro ao enviar a foto. Tente novamente.');
     } finally { setUploadingGallery(false); }
   };
 
@@ -268,7 +268,11 @@ export default function TrainerOnboarding() {
       is_active: true,
     }).select('*').single();
     setSavingClass(false);
-    if (err) { setError(err.message); return; }
+    if (err) {
+      console.error('trainer onboarding step failed', err);
+      setError('Não foi possível salvar seus dados. Tente novamente.');
+      return;
+    }
     if (data) setClassTypes((prev) => [...prev, data as TrainerClassType]);
     setShowClassModal(false);
     setNewClassName(''); setNewClassDesc(''); setNewClassDuration('60');
@@ -298,7 +302,6 @@ export default function TrainerOnboarding() {
 
     const inPersonRateVal = parseFloat(inPersonRate) || null;
     const { error: err } = await supabase.from('trainers').update({
-      status: 'active',
       cref: cref.trim() || null,
       experience_years: parseInt(experience) || 0,
       monthly_rate: parseFloat(monthlyRate) || null,
@@ -318,7 +321,20 @@ export default function TrainerOnboarding() {
       instagram: instagram.trim() || null,
     }).eq('id', profile.id);
 
-    if (err) { setError(err.message); setSaving(false); return; }
+    if (err) {
+      console.error('trainer onboarding save failed', err);
+      setError('Não foi possível salvar seus dados. Tente novamente.');
+      setSaving(false);
+      return;
+    }
+
+    const { error: activateErr } = await supabase.rpc('trainer_activate_own_profile');
+    if (activateErr) {
+      console.error('trainer activation failed', activateErr);
+      setError('Não foi possível ativar seu perfil. Tente novamente.');
+      setSaving(false);
+      return;
+    }
 
     await supabase.from('profiles').update({
       bio: bio.trim() || null,

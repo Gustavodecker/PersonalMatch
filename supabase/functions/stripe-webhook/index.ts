@@ -35,7 +35,7 @@ Deno.serve(async (req: Request) => {
     event = stripe.webhooks.constructEvent(body, sig ?? "", webhookSecret ?? "");
   } catch (err: any) {
     console.error("Webhook signature error:", err.message);
-    return new Response(`Webhook Error: ${err.message}`, { status: 400, headers: corsHeaders });
+    return new Response("Invalid signature", { status: 400, headers: corsHeaders });
   }
 
   try {
@@ -96,7 +96,7 @@ Deno.serve(async (req: Request) => {
     }
   } catch (err: any) {
     console.error("Webhook handler error:", err);
-    return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: corsHeaders });
+    return new Response(JSON.stringify({ error: "Webhook processing failed" }), { status: 500, headers: corsHeaders });
   }
 
   return new Response(JSON.stringify({ received: true }), {

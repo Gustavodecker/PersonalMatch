@@ -94,7 +94,7 @@ Deno.serve(async (req: Request) => {
     return json({ success: true });
   } catch (err: any) {
     console.error("delete-account error:", err);
-    return json({ error: err.message }, 500);
+    return json({ error: "Não foi possível concluir a exclusão da conta. Tente novamente." }, 500);
   }
 });
 

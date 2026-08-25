@@ -57,7 +57,11 @@ export default function AdminUsers() {
   const toggleBlock = async () => {
     if (!confirmBlock) return;
     setActionLoading(true);
-    await supabase.from('profiles').update({ is_blocked: !confirmBlock.is_blocked }).eq('id', confirmBlock.id);
+    const { error } = await supabase.rpc('admin_set_user_blocked', {
+      p_user: confirmBlock.id,
+      p_blocked: !confirmBlock.is_blocked,
+    });
+    if (error) console.error('admin_set_user_blocked failed', error);
     setActionLoading(false);
     setConfirmBlock(null);
     fetchUsers();
@@ -66,14 +70,16 @@ export default function AdminUsers() {
   const deleteUser = async () => {
     if (!confirmDelete) return;
     setActionLoading(true);
-    await supabase.from('profiles').delete().eq('id', confirmDelete.id);
+    const { error } = await supabase.rpc('admin_delete_user', { p_user: confirmDelete.id });
+    if (error) console.error('admin_delete_user failed', error);
     setActionLoading(false);
     setConfirmDelete(null);
     fetchUsers();
   };
 
   const changeRole = async (user: Profile, newRole: 'student' | 'trainer' | 'admin') => {
-    await supabase.from('profiles').update({ role: newRole }).eq('id', user.id);
+    const { error } = await supabase.rpc('admin_set_user_role', { p_user: user.id, p_role: newRole });
+    if (error) console.error('admin_set_user_role failed', error);
     setRoleModal(null);
     fetchUsers();
   };

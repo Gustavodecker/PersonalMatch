@@ -6,6 +6,6 @@ export default function AdminLayout() {
   const { user, profile, loading } = useAuth();
   if (loading) return <LoadingScreen />;
   if (!user) return <Redirect href="/(auth)/login" />;
-  if (profile && profile.role !== 'admin') return <Redirect href="/" />;
+  if (profile?.role !== 'admin') return <Redirect href="/" />;
   return <Stack screenOptions={{ headerShown: false }} />;
 }

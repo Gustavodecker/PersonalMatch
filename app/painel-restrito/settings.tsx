@@ -101,7 +101,11 @@ export default function AdminSettings() {
       updated_at:         new Date().toISOString(),
     }).eq('id', 1);
     setSaving(false);
-    if (err) { setError(err.message); return; }
+    if (err) {
+      console.error('settings save failed', err);
+      setError('Não foi possível salvar as configurações. Tente novamente.');
+      return;
+    }
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);
   };

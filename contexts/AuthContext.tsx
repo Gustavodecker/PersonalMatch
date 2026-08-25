@@ -103,7 +103,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signUp = async (email: string, password: string, fullName: string, role: 'student' | 'trainer') => {
     const { data, error } = await supabase.auth.signUp({ email, password });
-    if (error) return { error: error.message };
+    if (error) {
+      console.error('signUp failed', error);
+      return {
+        error:
+          'Não foi possível criar a conta com esses dados. Verifique o e-mail e a senha e tente novamente.',
+      };
+    }
     if (data.user) {
       const { error: profileError } = await supabase.from('profiles').insert({
         id: data.user.id,
@@ -111,19 +117,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         email,
         role,
       });
-      if (profileError) return { error: profileError.message };
+      if (profileError) {
+        console.error('profile creation failed', profileError);
+        return { error: 'Não foi possível concluir o cadastro. Tente novamente.' };
+      }
       if (role === 'trainer') {
-        const now = new Date();
-        const trialEndsAt = new Date(now);
-        trialEndsAt.setDate(trialEndsAt.getDate() + 15);
-        await supabase.from('trainers').insert({
-          id: data.user.id,
-          status: 'active',
-          subscription_plan: 'free_trial',
-          subscription_status: 'trialing',
-          trial_started_at: now.toISOString(),
-          trial_ends_at: trialEndsAt.toISOString(),
-        });
+        await supabase.from('trainers').insert({ id: data.user.id });
       } else {
         await supabase.from('students').insert({ id: data.user.id });
       }

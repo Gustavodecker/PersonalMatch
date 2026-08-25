@@ -40,9 +40,9 @@ export default function PlanosScreen() {
           window.location.href = url;
         }
       } catch (e: any) {
-        setError(e.message ?? 'Erro ao iniciar pagamento. Tente novamente.');
+        setError('Erro ao iniciar pagamento. Tente novamente.');
         if (Platform.OS !== 'web') {
-          Alert.alert('Erro', e.message ?? 'Erro ao iniciar pagamento.');
+          Alert.alert('Erro', 'Erro ao iniciar pagamento. Tente novamente.');
         }
       } finally {
         setLoadingId(null);

@@ -43,7 +43,12 @@ export default function StudentOnboarding() {
       .from('students')
       .update({ goals, fitness_level: level, preferred_modality: modality })
       .eq('id', profile.id);
-    if (err) { setError(err.message); setSaving(false); return; }
+    if (err) {
+      console.error('student onboarding save failed', err);
+      setError('Não foi possível salvar seus dados. Tente novamente.');
+      setSaving(false);
+      return;
+    }
     await refreshProfile();
     router.replace('/student/dashboard');
   };

@@ -73,11 +73,21 @@ export default function TrainerProfileScreen() {
     };
     if (form.id) {
       const { error: err } = await supabase.from('trainer_class_types').update(payload).eq('id', form.id);
-      if (err) { setError(err.message); setSaving(false); return; }
+      if (err) {
+        console.error('class type save failed', err);
+        setError('Não foi possível salvar a aula. Tente novamente.');
+        setSaving(false);
+        return;
+      }
       setClassTypes((prev) => prev.map((c) => c.id === form.id ? { ...c, ...payload } : c));
     } else {
       const { data, error: err } = await supabase.from('trainer_class_types').insert(payload).select('*').single();
-      if (err) { setError(err.message); setSaving(false); return; }
+      if (err) {
+        console.error('class type save failed', err);
+        setError('Não foi possível salvar a aula. Tente novamente.');
+        setSaving(false);
+        return;
+      }
       if (data) setClassTypes((prev) => [...prev, data as TrainerClassType]);
     }
     setSaving(false);

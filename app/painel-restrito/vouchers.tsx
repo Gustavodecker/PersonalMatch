@@ -124,7 +124,11 @@ export default function AdminVouchers() {
     }
 
     setSaving(false);
-    if (error) { setFormError(error.message); return; }
+    if (error) {
+      console.error('voucher save failed', error);
+      setFormError('Não foi possível salvar o voucher. Verifique os dados e tente novamente.');
+      return;
+    }
     setModalOpen(false);
     fetchVouchers();
   };

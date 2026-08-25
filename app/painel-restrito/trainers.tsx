@@ -81,22 +81,22 @@ export default function AdminTrainers() {
     setActionLoading(true);
     switch (type) {
       case 'approve':
-        await supabase.from('trainers').update({ status: 'active', approved_at: new Date().toISOString(), approved_by: profile?.id }).eq('id', trainer.id);
+        await supabase.rpc('admin_set_trainer_status', { p_trainer: trainer.id, p_status: 'active' });
         break;
       case 'reject':
-        await supabase.from('trainers').update({ status: 'rejected' }).eq('id', trainer.id);
+        await supabase.rpc('admin_set_trainer_status', { p_trainer: trainer.id, p_status: 'rejected' });
         break;
       case 'block':
-        await supabase.from('trainers').update({ status: 'blocked' }).eq('id', trainer.id);
+        await supabase.rpc('admin_set_trainer_status', { p_trainer: trainer.id, p_status: 'blocked' });
         break;
       case 'unblock':
-        await supabase.from('trainers').update({ status: 'active' }).eq('id', trainer.id);
+        await supabase.rpc('admin_set_trainer_status', { p_trainer: trainer.id, p_status: 'active' });
         break;
       case 'feature':
-        await supabase.from('trainers').update({ is_featured: !trainer.is_featured }).eq('id', trainer.id);
+        await supabase.rpc('admin_set_trainer_featured', { p_trainer: trainer.id, p_featured: !trainer.is_featured });
         break;
       case 'verify':
-        await supabase.from('trainers').update({ is_verified: true }).eq('id', trainer.id);
+        await supabase.rpc('admin_set_trainer_verified', { p_trainer: trainer.id, p_verified: true });
         break;
       case 'delete':
         await supabase.from('trainers').delete().eq('id', trainer.id);

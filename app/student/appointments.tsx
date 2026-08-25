@@ -146,11 +146,11 @@ export default function StudentAppointments() {
       trainer_id: reviewModal.trainer_id,
       rating: reviewRating,
       comment: reviewComment.trim() || null,
-      status: 'pending',
     });
     setReviewSaving(false);
     if (error) {
-      setReviewError(error.message ?? 'Erro ao enviar avaliacao. Tente novamente.');
+      console.error('review submit failed', error);
+      setReviewError('Não foi possível enviar a avaliação. Tente novamente.');
       return;
     }
     setReviewedIds((prev) => new Set([...prev, reviewModal.trainer_id]));

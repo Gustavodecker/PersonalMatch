@@ -78,31 +78,23 @@ export default function AssinaturaScreen() {
     setVoucherLoading(true);
     setVoucherError(null);
     setVoucherData(null);
-    const today = new Date().toISOString();
-    const { data, error } = await supabase
-      .from('vouchers')
-      .select('id, type, discount_value, description, applicable_for, max_uses, use_count, expiry_date')
-      .eq('code', code)
-      .eq('is_active', true)
-      .or(`applicable_for.eq.trainer,applicable_for.eq.both`)
-      .maybeSingle();
+    const { data, error } = await supabase.rpc('lookup_voucher', { p_code: code });
 
-    if (error || !data) {
+    if (error) console.error('lookup_voucher failed', error);
+
+    const found = Array.isArray(data) ? data[0] : data;
+
+    if (error || !found) {
       setVoucherError('Voucher não encontrado ou inválido.');
       setVoucherLoading(false);
       return;
     }
-    if (data.expiry_date && data.expiry_date < today) {
-      setVoucherError('Este voucher expirou.');
-      setVoucherLoading(false);
-      return;
-    }
-    if (data.max_uses != null && data.use_count >= data.max_uses) {
-      setVoucherError('Este voucher atingiu o limite de usos.');
-      setVoucherLoading(false);
-      return;
-    }
-    setVoucherData(data);
+    setVoucherData({
+      id: code,
+      type: found.voucher_type,
+      discount_value: Number(found.discount_value),
+      description: found.description ?? null,
+    });
     setVoucherLoading(false);
   };
 
@@ -153,7 +145,7 @@ export default function AssinaturaScreen() {
           setError(data.error ?? 'Erro ao ativar teste grátis.');
         }
       } catch (e: any) {
-        setError(e.message);
+        setError('Não foi possível concluir a operação. Tente novamente.');
       } finally {
         setActionLoading(null);
       }
@@ -196,7 +188,7 @@ export default function AssinaturaScreen() {
         setError(data.error ?? 'Erro ao iniciar checkout.');
       }
     } catch (e: any) {
-      setError(e.message);
+      setError('Não foi possível concluir a operação. Tente novamente.');
     } finally {
       setActionLoading(null);
     }
@@ -226,7 +218,7 @@ export default function AssinaturaScreen() {
         setError(data.error ?? 'Erro ao abrir portal.');
       }
     } catch (e: any) {
-      setError(e.message);
+      setError('Não foi possível concluir a operação. Tente novamente.');
     } finally {
       setActionLoading(null);
     }
@@ -251,7 +243,7 @@ export default function AssinaturaScreen() {
           setError(data.error ?? 'Erro ao cancelar assinatura.');
         }
       } catch (e: any) {
-        setError(e.message);
+        setError('Não foi possível concluir a operação. Tente novamente.');
       } finally {
         setActionLoading(null);
       }

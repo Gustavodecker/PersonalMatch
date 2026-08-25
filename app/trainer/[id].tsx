@@ -133,7 +133,7 @@ export default function TrainerDetailScreen() {
         specialties: trainerRes.data.specialties?.map((ts: any) => ts.specialty).filter(Boolean) ?? [],
       };
       setTrainer(t);
-      await supabase.from('profile_views').insert({ trainer_id: id, viewer_id: profile?.id ?? null });
+      await supabase.rpc('record_profile_view', { p_trainer: id });
 
       // Load Premium features
       const [promosRes, trainerMetaRes] = await Promise.all([
@@ -218,7 +218,11 @@ export default function TrainerDetailScreen() {
       class_type_name: selectedCT?.name ?? null,
     });
     setBooking(false);
-    if (error) { setBookError(error.message); return; }
+    if (error) {
+      console.error('booking failed', error);
+      setBookError('Não foi possível concluir o agendamento. Tente novamente.');
+      return;
+    }
     setBooked(true);
     setBookModal(false);
   };

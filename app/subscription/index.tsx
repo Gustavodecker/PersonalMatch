@@ -29,7 +29,8 @@ export default function SubscriptionScreen() {
         window.location.href = url;
       }
     } catch (err: any) {
-      Alert.alert('Erro', err.message || 'Não foi possível iniciar o pagamento.');
+      console.error('checkout failed', err);
+      Alert.alert('Erro', 'Não foi possível iniciar o pagamento. Tente novamente.');
       setLoadingId(null);
     }
   };
