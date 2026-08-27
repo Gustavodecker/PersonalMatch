@@ -3,7 +3,7 @@ import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   TextInput, Modal, Image, Linking, Platform, Dimensions,
 } from 'react-native';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { supabase } from '@/lib/supabase';
@@ -137,6 +137,7 @@ function applyLocationFilter(
 }
 
 export default function PublicSearch() {
+  const params = useLocalSearchParams<{ specialty?: string }>();
   const [query, setQuery]             = useState('');
   const [specialties, setSpecialties] = useState<Specialty[]>([]);
   const [all, setAll]                 = useState<TrainerWithProfile[]>([]);
@@ -147,10 +148,22 @@ export default function PublicSearch() {
   const [showFilters, setShowFilters] = useState(false);
   const [loading, setLoading]         = useState(true);
   const [focused, setFocused]         = useState(false);
+  const [initialSpecialtyApplied, setInitialSpecialtyApplied] = useState(false);
 
   useEffect(() => {
     supabase.from('specialties').select('*').order('name').then(({ data }) => {
-      if (data) setSpecialties(data);
+      if (data) {
+        setSpecialties(data);
+        if (params.specialty && !initialSpecialtyApplied) {
+          const match = data.find((sp) => normalizedIncludes(sp.name, normalizeText(params.specialty!)));
+          if (match) {
+            const updated = { ...DEFAULT_FILTERS, specialties: [match.id] };
+            setFilters(updated);
+            setPending(updated);
+          }
+          setInitialSpecialtyApplied(true);
+        }
+      }
     });
     fetchTrainers();
   }, []);

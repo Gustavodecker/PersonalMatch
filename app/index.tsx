@@ -1575,9 +1575,8 @@ const PublicHome: React.FC = () => {
                 key={cat.id}
                 style={s.catCard}
                 onPress={() =>
-                  router.push('/search')
+                  router.push(`/search?specialty=${encodeURIComponent(cat.label)}`)
                 }
-                activeOpacity={0.88}
               >
                 <Image
                   source={{ uri: cat.photo }}
