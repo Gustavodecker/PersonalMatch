@@ -2779,8 +2779,8 @@ justifyContent: 'center',
 },
 
 logoMark: {
-width: IS_DESKTOP ? 200 : 140,
-height: IS_DESKTOP ? 56 : 44,
+width: IS_DESKTOP ? 280 : 190,
+height: IS_DESKTOP ? 72 : 56,
 },
 
 
