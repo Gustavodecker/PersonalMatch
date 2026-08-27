@@ -31,14 +31,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const fetchProfile = async (userId: string) => {
+  const fetchProfile = async (userId: string, userEmail?: string, fullName?: string) => {
     try {
       const { data } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
         .maybeSingle();
-      if (mountedRef.current) setProfile(data);
+      if (data) {
+        if (mountedRef.current) setProfile(data);
+        return;
+      }
+      if (userEmail) {
+        const { data: created } = await supabase
+          .from('profiles')
+          .insert({ id: userId, email: userEmail, full_name: fullName || '', role: 'student' })
+          .select()
+          .single();
+        if (created) {
+          await supabase.from('students').insert({ id: userId });
+        }
+        if (mountedRef.current) setProfile(created);
+      } else {
+        if (mountedRef.current) setProfile(null);
+      }
     } catch {
       if (mountedRef.current) setProfile(null);
     }
@@ -60,7 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(s?.user ?? null);
         if (s?.user) {
           try {
-            await fetchProfile(s.user.id);
+            await fetchProfile(s.user.id, s.user.email, s.user.user_metadata?.full_name || s.user.user_metadata?.name);
           } catch {
             if (mountedRef.current) setProfile(null);
           }
@@ -82,7 +98,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(s?.user ?? null);
       if (s?.user) {
         (async () => {
-          try { await fetchProfile(s.user.id); }
+          try { await fetchProfile(s.user.id, s.user.email, s.user.user_metadata?.full_name || s.user.user_metadata?.name); }
           catch { if (mountedRef.current) setProfile(null); }
         })();
       } else {
