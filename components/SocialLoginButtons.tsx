@@ -6,8 +6,6 @@ import { Colors, Spacing, FontSizes, BorderRadii } from '@/constants/theme';
 
 const providers: { id: Provider; label: string; color: string; bgColor: string; icon: string }[] = [
   { id: 'google', label: 'Google', color: '#1f1f1f', bgColor: '#ffffff', icon: 'G' },
-  { id: 'facebook', label: 'Facebook', color: '#ffffff', bgColor: '#1877F2', icon: 'f' },
-  { id: 'apple', label: 'Apple', color: '#ffffff', bgColor: '#000000', icon: '\uF8FF' },
 ];
 
 export function SocialLoginButtons() {
