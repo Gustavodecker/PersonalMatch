@@ -2764,29 +2764,23 @@ const s = StyleSheet.create({
 headerInner: {
 flexDirection: 'row',
 alignItems: 'center',
-justifyContent: 'flex-end',
-paddingLeft: 0,
+justifyContent: 'space-between',
+paddingLeft: IS_DESKTOP ? 12 : 8,
 paddingRight: IS_DESKTOP ? 28 : 16,
 paddingVertical: IS_DESKTOP ? 6 : 6,
-minHeight: IS_DESKTOP ? 110 : 82,
+minHeight: IS_DESKTOP ? 70 : 56,
 width: '100%',
-position: 'relative',
 },
 
 logo: {
-position: 'absolute',
-left: IS_DESKTOP ? -35 : -12,
-top: 0,
-bottom: 0,
-height: '100%',
+flexShrink: 1,
 alignItems: 'flex-start',
 justifyContent: 'center',
 },
 
 logoMark: {
-width: IS_DESKTOP ? 880 : 620,
-height: IS_DESKTOP ? 200 : 82,
-marginLeft: IS_DESKTOP ? -18 : -6,
+width: IS_DESKTOP ? 200 : 140,
+height: IS_DESKTOP ? 56 : 44,
 },
 
 
