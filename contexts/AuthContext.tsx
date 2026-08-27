@@ -70,6 +70,47 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     (async () => {
       try {
+        // Handle PKCE OAuth callback: exchange code for session if present in URL
+        if (typeof window !== 'undefined') {
+          const params = new URLSearchParams(window.location.search);
+          const code = params.get('code');
+          if (code) {
+            const { data: { session: oauthSession }, error: oauthError } = await supabase.auth.exchangeCodeForSession(code);
+            window.history.replaceState({}, '', window.location.pathname);
+            if (!mountedRef.current) return;
+            if (oauthSession && !oauthError) {
+              setSession(oauthSession);
+              setUser(oauthSession.user);
+              await fetchProfile(oauthSession.user.id, oauthSession.user.email, oauthSession.user.user_metadata?.full_name || oauthSession.user.user_metadata?.name);
+              setLoading(false);
+              return;
+            }
+          }
+
+          // Handle implicit OAuth callback: tokens in hash fragment
+          const hash = window.location.hash;
+          if (hash && hash.includes('access_token')) {
+            const hashParams = new URLSearchParams(hash.substring(1));
+            const accessToken = hashParams.get('access_token');
+            const refreshToken = hashParams.get('refresh_token');
+            if (accessToken && refreshToken) {
+              const { data: { session: hashSession } } = await supabase.auth.setSession({
+                access_token: accessToken,
+                refresh_token: refreshToken,
+              });
+              window.history.replaceState({}, '', window.location.pathname);
+              if (!mountedRef.current) return;
+              if (hashSession) {
+                setSession(hashSession);
+                setUser(hashSession.user);
+                await fetchProfile(hashSession.user.id, hashSession.user.email, hashSession.user.user_metadata?.full_name || hashSession.user.user_metadata?.name);
+                setLoading(false);
+                return;
+              }
+            }
+          }
+        }
+
         const { data: { session: s } } = await supabase.auth.getSession();
         if (!mountedRef.current) return;
         setSession(s);
@@ -149,11 +190,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signInWithProvider = useCallback(async (provider: Provider) => {
     const redirectTo = typeof window !== 'undefined'
-      ? `${window.location.origin}/`
+      ? window.location.origin
       : 'personal99://auth/callback';
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
-      options: { redirectTo },
+      options: {
+        redirectTo,
+        queryParams: { prompt: 'select_account' },
+      },
     });
     if (error) {
       console.error('OAuth signIn failed', error);
