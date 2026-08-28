@@ -18,13 +18,13 @@ import {
 } from 'lucide-react-native';
 import {
   initRevenueCat,
-  getOfferings,
+  getOfferingPackages,
   purchasePackage,
   restorePurchases,
   getCustomerInfo,
   getActiveEntitlement,
+  type OfferingPackages,
 } from '@/src/lib/revenuecat';
-import type { PurchasesPackage } from 'react-native-purchases';
 
 type Subscription = {
   plan: PlanId;
@@ -117,7 +117,7 @@ export default function AssinaturaScreen() {
   };
 
   // RevenueCat state (mobile only)
-  const [rcPackages, setRcPackages] = useState<PurchasesPackage[]>([]);
+  const [rcOfferings, setRcOfferings] = useState<OfferingPackages>({ proMonthly: null, premiumMonthly: null, all: [] });
   const [rcLoading, setRcLoading] = useState(false);
 
   const loadSubscription = useCallback(async () => {
@@ -152,8 +152,8 @@ export default function AssinaturaScreen() {
     (async () => {
       try {
         await initRevenueCat(user.id);
-        const pkgs = await getOfferings();
-        setRcPackages(pkgs);
+        const pkgs = await getOfferingPackages();
+        setRcOfferings(pkgs);
       } catch (e) {
         console.warn('RevenueCat init failed:', e);
       }
@@ -184,26 +184,26 @@ export default function AssinaturaScreen() {
       return;
     }
 
-    // Map plan to RevenueCat package identifier
-    const rcIdentifier = plan.id === 'premium' ? 'premium' : 'pro';
-    const pkg = rcPackages.find(
-      (p) => p.identifier.toLowerCase().includes(rcIdentifier)
-    );
+    // Map plan to RevenueCat package
+    const pkg = plan.id === 'premium' ? rcOfferings.premiumMonthly : rcOfferings.proMonthly;
     if (!pkg) {
-      setError('Produto não disponível. Tente novamente mais tarde.');
+      setError('Produto nao disponivel. Tente novamente mais tarde.');
       return;
     }
 
     setActionLoading(plan.id);
     setError(null);
     try {
-      const info = await purchasePackage(pkg);
-      if (info) {
+      const result = await purchasePackage(pkg);
+      if (result.cancelled) {
+        // User cancelled - no error
+      } else if (result.error) {
+        setError(result.error);
+      } else if (result.success) {
         await loadSubscription();
       }
     } catch (e: any) {
-      if (e.userCancelled) { /* user cancelled, no error */ }
-      else { setError('Não foi possível completar a compra.'); }
+      setError('Nao foi possivel completar a compra.');
     } finally {
       setActionLoading(null);
     }
@@ -375,6 +375,16 @@ export default function AssinaturaScreen() {
     : null;
   const isPaid = currentPlanId !== 'free';
   const isTrialing = subscription?.status === 'trialing';
+
+  const getMobilePriceLabel = (plan: Plan): string => {
+    if (plan.id === 'pro' && rcOfferings.proMonthly) {
+      return `${rcOfferings.proMonthly.product.priceString}/mes`;
+    }
+    if (plan.id === 'premium' && rcOfferings.premiumMonthly) {
+      return `${rcOfferings.premiumMonthly.product.priceString}/mes`;
+    }
+    return plan.priceLabel;
+  };
 
   // ── MOBILE ──────────────────────────────────────────────────────────────────
   if (!isWeb) {
@@ -560,7 +570,9 @@ export default function AssinaturaScreen() {
                     </View>
                     <View style={{ flex: 1 }}>
                       <Text style={s.planName}>{plan.name}</Text>
-                      <Text style={[s.planPrice, plan.highlight && { color: Colors.primary[700] }]}>{plan.priceLabel}</Text>
+                      <Text style={[s.planPrice, plan.highlight && { color: Colors.primary[700] }]}>
+                        {getMobilePriceLabel(plan)}
+                      </Text>
                     </View>
                     {isCurrent && (
                       <View style={[s.currentBadge, { paddingHorizontal: 8, paddingVertical: 4 }]}>

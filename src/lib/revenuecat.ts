@@ -3,6 +3,7 @@ import Purchases, {
   PurchasesPackage,
   CustomerInfo,
   LOG_LEVEL,
+  PURCHASES_ERROR_CODE,
 } from 'react-native-purchases';
 
 const RC_IOS_KEY = process.env.EXPO_PUBLIC_REVENUECAT_IOS_KEY ?? '';
@@ -24,28 +25,65 @@ export async function initRevenueCat(appUserId: string) {
 export async function loginRevenueCat(appUserId: string) {
   if (Platform.OS === 'web') return;
   if (!initialized) await initRevenueCat(appUserId);
-  await Purchases.logIn(appUserId);
+  else await Purchases.logIn(appUserId);
 }
 
 export async function logoutRevenueCat() {
   if (Platform.OS === 'web' || !initialized) return;
-  await Purchases.logOut();
+  try {
+    await Purchases.logOut();
+  } catch {
+    // Ignore logout errors (e.g. already anonymous)
+  }
+  initialized = false;
 }
 
-export async function getOfferings(): Promise<PurchasesPackage[]> {
-  if (Platform.OS === 'web') return [];
+export interface OfferingPackages {
+  proMonthly: PurchasesPackage | null;
+  premiumMonthly: PurchasesPackage | null;
+  all: PurchasesPackage[];
+}
+
+export async function getOfferingPackages(): Promise<OfferingPackages> {
+  if (Platform.OS === 'web') return { proMonthly: null, premiumMonthly: null, all: [] };
+
   const offerings = await Purchases.getOfferings();
   const current = offerings.current;
-  if (!current) return [];
-  return current.availablePackages;
+  if (!current) return { proMonthly: null, premiumMonthly: null, all: [] };
+
+  const all = current.availablePackages;
+  const proMonthly = all.find((p) => p.identifier === 'pro_monthly') ?? null;
+  const premiumMonthly = all.find((p) => p.identifier === 'premium_monthly') ?? null;
+
+  return { proMonthly, premiumMonthly, all };
 }
 
-export async function purchasePackage(
-  pkg: PurchasesPackage
-): Promise<CustomerInfo | null> {
-  if (Platform.OS === 'web') return null;
-  const { customerInfo } = await Purchases.purchasePackage(pkg);
-  return customerInfo;
+export interface PurchaseResult {
+  success: boolean;
+  customerInfo: CustomerInfo | null;
+  cancelled: boolean;
+  error: string | null;
+}
+
+export async function purchasePackage(pkg: PurchasesPackage): Promise<PurchaseResult> {
+  if (Platform.OS === 'web') return { success: false, customerInfo: null, cancelled: false, error: 'Not supported on web' };
+
+  try {
+    const { customerInfo } = await Purchases.purchasePackage(pkg);
+    return { success: true, customerInfo, cancelled: false, error: null };
+  } catch (e: any) {
+    if (e.userCancelled) {
+      return { success: false, customerInfo: null, cancelled: true, error: null };
+    }
+    if (e.code === PURCHASES_ERROR_CODE.PRODUCT_ALREADY_PURCHASED_ERROR) {
+      const info = await Purchases.getCustomerInfo();
+      return { success: true, customerInfo: info, cancelled: false, error: null };
+    }
+    if (e.code === PURCHASES_ERROR_CODE.PAYMENT_PENDING_ERROR) {
+      return { success: false, customerInfo: null, cancelled: false, error: 'Pagamento pendente. Aguarde a confirmação.' };
+    }
+    return { success: false, customerInfo: null, cancelled: false, error: e.message ?? 'Erro ao processar compra.' };
+  }
 }
 
 export async function restorePurchases(): Promise<CustomerInfo | null> {

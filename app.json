@@ -11,13 +11,15 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.personal99",
+      "buildNumber": "2",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "NSPhotoLibraryUsageDescription": "O 99 Personal acessa suas fotos para permitir que você escolha uma imagem para o seu perfil."
       }
     },
     "android": {
-      "package": "com.personal99"
+      "package": "com.personal99",
+      "versionCode": 3
     },
     "web": {
       "bundler": "metro",
@@ -29,7 +31,15 @@
       "expo-router",
       "expo-font",
       "expo-web-browser",
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "react-native-purchases",
+        {
+          "ios": {
+            "usesStoreKit2": true
+          }
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

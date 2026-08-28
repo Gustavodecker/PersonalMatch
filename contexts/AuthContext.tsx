@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState, useRef, ReactNode, useC
 import { Session, User, Provider } from '@supabase/supabase-js';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { Profile } from '@/types/database';
+import { logoutRevenueCat } from '@/src/lib/revenuecat';
 
 type AuthContextType = {
   user: User | null;
@@ -207,6 +208,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signOut = async () => {
+    await logoutRevenueCat();
     await supabase.auth.signOut();
     if (mountedRef.current) {
       setProfile(null);
