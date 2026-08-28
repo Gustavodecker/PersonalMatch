@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   ActivityIndicator, Platform, RefreshControl, TextInput, Alert,
+  Linking,
 } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
 import { router } from 'expo-router';
@@ -13,12 +14,23 @@ import { PLANS, getPlanById, type PlanId, type Plan } from '@/src/stripe-config'
 import {
   CheckCircle, Crown, Zap, Star, ArrowRight,
   RefreshCw, XCircle, AlertCircle, BadgeCheck, Info,
-  Tag,
+  Tag, RotateCcw,
 } from 'lucide-react-native';
+import {
+  initRevenueCat,
+  getOfferings,
+  purchasePackage,
+  restorePurchases,
+  getCustomerInfo,
+  getActiveEntitlement,
+} from '@/src/lib/revenuecat';
+import type { PurchasesPackage } from 'react-native-purchases';
 
 type Subscription = {
   plan: PlanId;
   status: string;
+  active: boolean;
+  provider: 'stripe' | 'apple' | 'google' | null;
   current_period_end: string | null;
   cancel_at_period_end: boolean;
   stripe_subscription_id: string | null;
@@ -104,17 +116,28 @@ export default function AssinaturaScreen() {
     setVoucherError(null);
   };
 
+  // RevenueCat state (mobile only)
+  const [rcPackages, setRcPackages] = useState<PurchasesPackage[]>([]);
+  const [rcLoading, setRcLoading] = useState(false);
+
   const loadSubscription = useCallback(async () => {
     if (!user) { setLoading(false); setRefreshing(false); return; }
     try {
-      const { data } = await supabase
-        .from('subscriptions')
-        .select('plan, status, current_period_end, cancel_at_period_end, stripe_subscription_id')
-        .eq('trainer_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      setSubscription(data ?? null);
+      const { data } = await supabase.rpc('get_effective_plan', { p_user_id: user.id });
+      const planData = data ? (typeof data === 'string' ? JSON.parse(data) : data) : null;
+      if (planData && planData.plan !== 'free') {
+        setSubscription({
+          plan: planData.plan as PlanId,
+          status: planData.active ? 'active' : 'canceled',
+          active: planData.active,
+          provider: planData.provider,
+          current_period_end: planData.expires_at,
+          cancel_at_period_end: false,
+          stripe_subscription_id: null,
+        });
+      } else {
+        setSubscription(null);
+      }
     } catch {
       setSubscription(null);
     } finally {
@@ -123,12 +146,91 @@ export default function AssinaturaScreen() {
     }
   }, [user]);
 
+  // Initialize RevenueCat on mobile
+  useEffect(() => {
+    if (isWeb || !user) return;
+    (async () => {
+      try {
+        await initRevenueCat(user.id);
+        const pkgs = await getOfferings();
+        setRcPackages(pkgs);
+      } catch (e) {
+        console.warn('RevenueCat init failed:', e);
+      }
+    })();
+  }, [user]);
+
   useEffect(() => { loadSubscription(); }, [loadSubscription]);
 
+  // ── Purchase via RevenueCat (mobile) ─────────────────────────────────────
+  const handleMobilePurchase = async (plan: Plan) => {
+    if (!user) return;
+
+    // Free trial goes through our backend
+    if (plan.id === 'free_trial') {
+      setActionLoading(plan.id);
+      setError(null);
+      try {
+        const res = await fetch(`${SUPABASE_URL}/functions/v1/stripe-checkout`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token}` },
+          body: JSON.stringify({ action: 'start_trial' }),
+        });
+        const data = await res.json();
+        if (data.success) { await loadSubscription(); }
+        else { setError(data.error ?? 'Erro ao ativar teste grátis.'); }
+      } catch { setError('Não foi possível concluir a operação.'); }
+      finally { setActionLoading(null); }
+      return;
+    }
+
+    // Map plan to RevenueCat package identifier
+    const rcIdentifier = plan.id === 'premium' ? 'premium' : 'pro';
+    const pkg = rcPackages.find(
+      (p) => p.identifier.toLowerCase().includes(rcIdentifier)
+    );
+    if (!pkg) {
+      setError('Produto não disponível. Tente novamente mais tarde.');
+      return;
+    }
+
+    setActionLoading(plan.id);
+    setError(null);
+    try {
+      const info = await purchasePackage(pkg);
+      if (info) {
+        await loadSubscription();
+      }
+    } catch (e: any) {
+      if (e.userCancelled) { /* user cancelled, no error */ }
+      else { setError('Não foi possível completar a compra.'); }
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleRestore = async () => {
+    setRcLoading(true);
+    setError(null);
+    try {
+      const info = await restorePurchases();
+      const ent = getActiveEntitlement(info);
+      if (ent !== 'free') {
+        await loadSubscription();
+      } else {
+        setError('Nenhuma assinatura encontrada para restaurar.');
+      }
+    } catch {
+      setError('Não foi possível restaurar compras.');
+    } finally {
+      setRcLoading(false);
+    }
+  };
+
+  // ── Purchase via Stripe (web) ─────────────────────────────────────────────
   const handleCheckout = async (plan: Plan) => {
     if (!session?.access_token) return;
 
-    // Free trial is activated directly, no Stripe checkout needed
     if (plan.id === 'free_trial') {
       setActionLoading(plan.id);
       setError(null);
@@ -139,28 +241,18 @@ export default function AssinaturaScreen() {
           body: JSON.stringify({ action: 'start_trial' }),
         });
         const data = await res.json();
-        if (data.success) {
-          await loadSubscription();
-        } else {
-          setError(data.error ?? 'Erro ao ativar teste grátis.');
-        }
-      } catch (e: any) {
-        setError('Não foi possível concluir a operação. Tente novamente.');
-      } finally {
-        setActionLoading(null);
-      }
+        if (data.success) { await loadSubscription(); }
+        else { setError(data.error ?? 'Erro ao ativar teste grátis.'); }
+      } catch { setError('Não foi possível concluir a operação.'); }
+      finally { setActionLoading(null); }
       return;
     }
 
     setActionLoading(plan.id);
     setError(null);
     try {
-      const successUrl = isWeb
-        ? `${window.location.origin}/trainer/assinatura-sucesso`
-        : 'personal99://trainer/assinatura-sucesso';
-      const cancelUrl = isWeb
-        ? `${window.location.origin}/trainer/assinatura`
-        : 'personal99://trainer/assinatura';
+      const successUrl = `${window.location.origin}/trainer/assinatura-sucesso`;
+      const cancelUrl = `${window.location.origin}/trainer/assinatura`;
       const res = await fetch(`${SUPABASE_URL}/functions/v1/stripe-checkout`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
@@ -175,26 +267,28 @@ export default function AssinaturaScreen() {
       });
       const data = await res.json();
       if (data.url) {
-        if (isWeb) {
-          window.location.href = data.url;
-        } else {
-          const result = await WebBrowser.openAuthSessionAsync(data.url, 'personal99://');
-          if (result.type === 'success' && result.url?.includes('assinatura-sucesso')) {
-            await loadSubscription();
-            router.push('/trainer/assinatura-sucesso');
-          }
-        }
+        window.location.href = data.url;
       } else {
         setError(data.error ?? 'Erro ao iniciar checkout.');
       }
-    } catch (e: any) {
-      setError('Não foi possível concluir a operação. Tente novamente.');
-    } finally {
-      setActionLoading(null);
-    }
+    } catch { setError('Não foi possível concluir a operação.'); }
+    finally { setActionLoading(null); }
   };
 
-  const handlePortal = async () => {
+  const handleManageSubscription = async () => {
+    if (!subscription) return;
+    const provider = subscription.provider;
+
+    if (provider === 'apple') {
+      Linking.openURL('https://apps.apple.com/account/subscriptions');
+      return;
+    }
+    if (provider === 'google') {
+      Linking.openURL('https://play.google.com/store/account/subscriptions');
+      return;
+    }
+
+    // Stripe portal (web)
     if (!session?.access_token) return;
     setActionLoading('portal');
     setError(null);
@@ -217,14 +311,28 @@ export default function AssinaturaScreen() {
       } else {
         setError(data.error ?? 'Erro ao abrir portal.');
       }
-    } catch (e: any) {
-      setError('Não foi possível concluir a operação. Tente novamente.');
+    } catch {
+      setError('Não foi possível concluir a operação.');
     } finally {
       setActionLoading(null);
     }
   };
 
   const handleCancelSubscription = async () => {
+    if (!subscription) return;
+    const provider = subscription.provider;
+
+    // For Apple/Google, redirect to their management screens
+    if (provider === 'apple') {
+      Linking.openURL('https://apps.apple.com/account/subscriptions');
+      return;
+    }
+    if (provider === 'google') {
+      Linking.openURL('https://play.google.com/store/account/subscriptions');
+      return;
+    }
+
+    // Stripe cancellation
     if (!session?.access_token) return;
     const confirmMsg = 'Deseja cancelar sua assinatura? Você continuará com acesso até o final do período já pago, mas não será cobrado novamente.';
     const doCancel = async () => {
@@ -237,16 +345,10 @@ export default function AssinaturaScreen() {
           body: JSON.stringify({ action: 'cancel_subscription' }),
         });
         const data = await res.json();
-        if (data.success) {
-          await loadSubscription();
-        } else {
-          setError(data.error ?? 'Erro ao cancelar assinatura.');
-        }
-      } catch (e: any) {
-        setError('Não foi possível concluir a operação. Tente novamente.');
-      } finally {
-        setActionLoading(null);
-      }
+        if (data.success) { await loadSubscription(); }
+        else { setError(data.error ?? 'Erro ao cancelar assinatura.'); }
+      } catch { setError('Não foi possível concluir a operação.'); }
+      finally { setActionLoading(null); }
     };
     if (isWeb) {
       if (window.confirm(confirmMsg)) doCancel();
@@ -337,7 +439,7 @@ export default function AssinaturaScreen() {
           {isPaid && (
             <TouchableOpacity
               style={s.mobileManageBtn}
-              onPress={handlePortal}
+              onPress={handleManageSubscription}
               disabled={actionLoading === 'portal'}
               activeOpacity={0.85}
             >
@@ -345,7 +447,23 @@ export default function AssinaturaScreen() {
                 ? <ActivityIndicator size="small" color={Colors.white} />
                 : <>
                     <RefreshCw size={16} color={Colors.white} />
-                    <Text style={s.mobileManageBtnText}>Gerenciar faturamento</Text>
+                    <Text style={s.mobileManageBtnText}>Gerenciar assinatura</Text>
+                  </>}
+            </TouchableOpacity>
+          )}
+
+          {!isPaid && !isWeb && (
+            <TouchableOpacity
+              style={[s.mobileManageBtn, { backgroundColor: Colors.neutral[600] }]}
+              onPress={handleRestore}
+              disabled={rcLoading}
+              activeOpacity={0.85}
+            >
+              {rcLoading
+                ? <ActivityIndicator size="small" color={Colors.white} />
+                : <>
+                    <RotateCcw size={16} color={Colors.white} />
+                    <Text style={s.mobileManageBtnText}>Restaurar compras</Text>
                   </>}
             </TouchableOpacity>
           )}
@@ -366,7 +484,7 @@ export default function AssinaturaScreen() {
             </TouchableOpacity>
           )}
 
-          <View style={s.voucherSection}>
+          {isWeb && <View style={s.voucherSection}>
             <Text style={s.voucherTitle}>Voucher de desconto</Text>
             {voucherData ? (
               <View style={s.voucherApplied}>
@@ -411,7 +529,16 @@ export default function AssinaturaScreen() {
                 <Text style={s.voucherErrText}>{voucherError}</Text>
               </View>
             )}
-          </View>
+          </View>}
+
+          {isPaid && subscription?.provider && subscription.provider !== 'stripe' && (
+            <View style={[s.errorBanner, { backgroundColor: Colors.primary[50], borderColor: Colors.primary[100] }]}>
+              <Info size={16} color={Colors.primary[600]} />
+              <Text style={[s.errorText, { color: Colors.primary[700] }]}>
+                Voce ja possui uma assinatura ativa. Os beneficios do seu plano estao disponiveis nesta conta.
+              </Text>
+            </View>
+          )}
 
           {/* Plans overview (read-only) */}
           <Text style={s.plansTitle}>Planos disponíveis</Text>
@@ -453,7 +580,7 @@ export default function AssinaturaScreen() {
                   {!isCurrent && plan.id !== 'free' && (
                     <TouchableOpacity
                       style={[s.mobilePlanBtn, plan.highlight && { backgroundColor: Colors.primary[600] }]}
-                      onPress={() => handleCheckout(plan)}
+                      onPress={() => handleMobilePurchase(plan)}
                       disabled={!!actionLoading}
                       activeOpacity={0.85}
                     >
@@ -523,10 +650,10 @@ export default function AssinaturaScreen() {
           )}
 
           {isPaid && (
-            <TouchableOpacity style={s.manageBtn} onPress={handlePortal} disabled={actionLoading === 'portal'}>
+            <TouchableOpacity style={s.manageBtn} onPress={handleManageSubscription} disabled={actionLoading === 'portal'}>
               {actionLoading === 'portal'
                 ? <ActivityIndicator size="small" color={planColors.icon} />
-                : <Text style={[s.manageBtnText, { color: planColors.icon }]}>Gerenciar faturamento</Text>
+                : <Text style={[s.manageBtnText, { color: planColors.icon }]}>Gerenciar assinatura</Text>
               }
             </TouchableOpacity>
           )}

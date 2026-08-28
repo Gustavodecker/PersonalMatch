@@ -69,12 +69,13 @@ Deno.serve(async (req: Request) => {
           trainer_id: trainerId,
           stripe_subscription_id: sub.id,
           stripe_customer_id: sub.customer as string,
+          provider: "stripe",
           plan: "free",
           status: "canceled",
           current_period_start: new Date(sub.current_period_start * 1000).toISOString(),
           current_period_end: new Date(sub.current_period_end * 1000).toISOString(),
           cancel_at_period_end: false,
-        }, { onConflict: "stripe_subscription_id" });
+        }, { onConflict: "trainer_id,provider" });
 
         await supabase.from("trainers").update({
           subscription_plan: "free",
@@ -112,12 +113,14 @@ async function upsertSubscription(trainerId: string, sub: Stripe.Subscription) {
     trainer_id: trainerId,
     stripe_subscription_id: sub.id,
     stripe_customer_id: sub.customer as string,
+    provider: "stripe",
+    provider_subscription_id: sub.id,
     plan,
     status: sub.status,
     current_period_start: new Date(sub.current_period_start * 1000).toISOString(),
     current_period_end: new Date(sub.current_period_end * 1000).toISOString(),
     cancel_at_period_end: sub.cancel_at_period_end,
-  }, { onConflict: "stripe_subscription_id" });
+  }, { onConflict: "trainer_id,provider" });
 
   const isPaid = plan === "pro" || plan === "premium";
   const photoLimit = plan === "free" ? 3 : plan === "pro" ? 10 : 999;

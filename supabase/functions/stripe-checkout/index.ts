@@ -233,12 +233,13 @@ Deno.serve(async (req: Request) => {
         .from("subscriptions")
         .upsert({
           trainer_id: user.id,
+          provider: "stripe",
           plan: "pro",
           status: "trialing",
           current_period_start: startedAt,
           current_period_end: trialEnd,
           cancel_at_period_end: true,
-        }, { onConflict: "trainer_id" });
+        }, { onConflict: "trainer_id,provider" });
 
       return json({ success: true, trial_ends_at: trialEnd });
     }

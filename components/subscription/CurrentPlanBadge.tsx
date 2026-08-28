@@ -33,7 +33,7 @@ export function CurrentPlanBadge({ compact = false }: CurrentPlanBadgeProps) {
       <Icon size={compact ? 12 : 14} color={isPremium ? '#B45309' : '#4C1D95'} />
       <Text style={[textStyle, compact && styles.compactText]}>
         {product.name}
-        {!compact && subscription?.subscription_status === 'trialing' ? ' (Trial)' : ''}
+        {!compact && subscription?.status === 'trialing' ? ' (Trial)' : ''}
       </Text>
     </View>
   );

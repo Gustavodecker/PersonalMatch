@@ -1,13 +1,15 @@
 import { useState, useEffect, useCallback } from 'react';
+import { Platform } from 'react-native';
 import { supabase } from '@/lib/supabase';
 import { STRIPE_PRODUCTS, type StripeProduct } from '../stripe-config';
 
 export interface SubscriptionInfo {
   plan: string;
   status: string;
+  active: boolean;
+  provider: 'stripe' | 'apple' | 'google' | null;
   currentPeriodEnd: string | null;
   cancelAtPeriodEnd: boolean;
-  subscription_status: string;
 }
 
 export function useSubscription(userId?: string) {
@@ -15,34 +17,42 @@ export function useSubscription(userId?: string) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetch = useCallback(async () => {
+  const fetchPlan = useCallback(async () => {
     if (!userId) {
       setLoading(false);
       return;
     }
 
     try {
-      const { data, error: dbErr } = await supabase
-        .from('subscriptions')
-        .select('plan, status, current_period_end, cancel_at_period_end')
-        .eq('trainer_id', userId)
-        .maybeSingle();
+      const { data, error: rpcErr } = await supabase.rpc('get_effective_plan', {
+        p_user_id: userId,
+      });
 
-      if (dbErr) throw dbErr;
+      if (rpcErr) throw rpcErr;
 
-      setSubscription(
-        data
-          ? {
-              plan: data.plan,
-              status: data.status,
-              currentPeriodEnd: data.current_period_end,
-              cancelAtPeriodEnd: data.cancel_at_period_end,
-              subscription_status: data.status,
-            }
-          : null
-      );
+      if (data) {
+        const planData = typeof data === 'string' ? JSON.parse(data) : data;
+        setSubscription({
+          plan: planData.plan ?? 'free',
+          status: planData.active ? 'active' : 'inactive',
+          active: planData.active ?? false,
+          provider: planData.provider ?? null,
+          currentPeriodEnd: planData.expires_at ?? null,
+          cancelAtPeriodEnd: false,
+        });
+      } else {
+        setSubscription({
+          plan: 'free',
+          status: 'inactive',
+          active: false,
+          provider: null,
+          currentPeriodEnd: null,
+          cancelAtPeriodEnd: false,
+        });
+      }
     } catch (err: any) {
       setError(err.message);
+      setSubscription(null);
     } finally {
       setLoading(false);
     }
@@ -50,33 +60,34 @@ export function useSubscription(userId?: string) {
 
   useEffect(() => {
     let mounted = true;
-
     async function run() {
-      if (!userId) {
-        setLoading(false);
-        return;
-      }
+      if (!userId) { setLoading(false); return; }
       try {
-        const { data, error: dbErr } = await supabase
-          .from('subscriptions')
-          .select('plan, status, current_period_end, cancel_at_period_end')
-          .eq('trainer_id', userId)
-          .maybeSingle();
+        const { data, error: rpcErr } = await supabase.rpc('get_effective_plan', {
+          p_user_id: userId,
+        });
+        if (rpcErr) throw rpcErr;
+        if (!mounted) return;
 
-        if (dbErr) throw dbErr;
-
-        if (mounted) {
-          setSubscription(
-            data
-              ? {
-                  plan: data.plan,
-                  status: data.status,
-                  currentPeriodEnd: data.current_period_end,
-                  cancelAtPeriodEnd: data.cancel_at_period_end,
-                  subscription_status: data.status,
-                }
-              : null
-          );
+        if (data) {
+          const planData = typeof data === 'string' ? JSON.parse(data) : data;
+          setSubscription({
+            plan: planData.plan ?? 'free',
+            status: planData.active ? 'active' : 'inactive',
+            active: planData.active ?? false,
+            provider: planData.provider ?? null,
+            currentPeriodEnd: planData.expires_at ?? null,
+            cancelAtPeriodEnd: false,
+          });
+        } else {
+          setSubscription({
+            plan: 'free',
+            status: 'inactive',
+            active: false,
+            provider: null,
+            currentPeriodEnd: null,
+            cancelAtPeriodEnd: false,
+          });
         }
       } catch (err: any) {
         if (mounted) setError(err.message);
@@ -84,15 +95,11 @@ export function useSubscription(userId?: string) {
         if (mounted) setLoading(false);
       }
     }
-
     run();
-
-    return () => {
-      mounted = false;
-    };
+    return () => { mounted = false; };
   }, [userId]);
 
-  const isActive = subscription?.status === 'active' || subscription?.status === 'trialing';
+  const isActive = subscription?.active ?? false;
   const planName = subscription?.plan ?? 'free';
 
   const product: StripeProduct | undefined = STRIPE_PRODUCTS.find(
@@ -101,8 +108,8 @@ export function useSubscription(userId?: string) {
 
   const refetch = useCallback(() => {
     setLoading(true);
-    fetch();
-  }, [fetch]);
+    fetchPlan();
+  }, [fetchPlan]);
 
   return { subscription, loading, error, isActive, planName, product, refetch };
 }
