@@ -32,14 +32,7 @@
       "expo-font",
       "expo-web-browser",
       "expo-secure-store",
-      [
-        "react-native-purchases",
-        {
-          "ios": {
-            "usesStoreKit2": true
-          }
-        }
-      ]
+      "./plugins/withBillingPermission"
     ],
     "experiments": {
       "typedRoutes": true
