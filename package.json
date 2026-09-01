@@ -24,7 +24,6 @@
     "expo-blur": "~15.0.8",
     "expo-camera": "~17.0.10",
     "expo-constants": "~18.0.9",
-    "expo-dev-client": "~6.0.21",
     "expo-font": "~14.0.8",
     "expo-haptics": "~15.0.8",
     "expo-image-picker": "~17.0.8",
@@ -53,6 +52,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
+    "expo-dev-client": "~6.0.21",
     "@types/react": "~19.1.10",
     "patch-package": "^8.0.1",
     "typescript": "~5.9.2"
