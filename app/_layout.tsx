@@ -11,7 +11,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useFrameworkReady } from '@/hooks/useFrameworkReady';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { isSupabaseConfigured } from '@/lib/supabase';
+import { isSupabaseConfigured, validateEnvironment } from '@/lib/supabase';
 import ConfigErrorScreen from '@/components/ConfigErrorScreen';
 
 SplashScreen.preventAutoHideAsync();
@@ -26,7 +26,10 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
-    if (fontsLoaded) SplashScreen.hideAsync();
+    if (fontsLoaded) {
+      validateEnvironment();
+      SplashScreen.hideAsync();
+    }
   }, [fontsLoaded]);
 
   if (!fontsLoaded) return null;
