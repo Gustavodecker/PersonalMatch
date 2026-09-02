@@ -31,8 +31,7 @@
       "expo-router",
       "expo-font",
       "expo-web-browser",
-      "expo-secure-store",
-      "./plugins/withBillingPermission"
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true
