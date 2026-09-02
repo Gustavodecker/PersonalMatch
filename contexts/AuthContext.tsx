@@ -1,8 +1,15 @@
 import { createContext, useContext, useEffect, useState, useRef, ReactNode, useCallback } from 'react';
+import { Platform } from 'react-native';
 import { Session, User, Provider } from '@supabase/supabase-js';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { Profile } from '@/types/database';
 import { logoutRevenueCat } from '@/src/lib/revenuecat';
+import * as WebBrowser from 'expo-web-browser';
+import { makeRedirectUri } from 'expo-auth-session';
+
+if (Platform.OS !== 'web') {
+  WebBrowser.maybeCompleteAuthSession();
+}
 
 type AuthContextType = {
   user: User | null;
@@ -71,7 +78,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     (async () => {
       try {
-        // Handle PKCE OAuth callback: exchange code for session if present in URL
         if (typeof window !== 'undefined') {
           const params = new URLSearchParams(window.location.search);
           const code = params.get('code');
@@ -88,7 +94,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             }
           }
 
-          // Handle implicit OAuth callback: tokens in hash fragment
           const hash = window.location.hash;
           if (hash && hash.includes('access_token')) {
             const hashParams = new URLSearchParams(hash.substring(1));
@@ -190,21 +195,80 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signInWithProvider = useCallback(async (provider: Provider) => {
-    const redirectTo = typeof window !== 'undefined'
-      ? window.location.origin
-      : 'personal99://auth/callback';
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider,
-      options: {
-        redirectTo,
-        queryParams: { prompt: 'select_account' },
-      },
-    });
-    if (error) {
-      console.error('OAuth signIn failed', error);
+    try {
+      if (Platform.OS === 'web') {
+        const redirectTo = window.location.origin;
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider,
+          options: {
+            redirectTo,
+            queryParams: { prompt: 'select_account' },
+          },
+        });
+        if (error) {
+          console.error('OAuth signIn failed', error);
+          return { error: 'Não foi possível entrar com essa conta. Tente novamente.' };
+        }
+        return { error: null };
+      }
+
+      const redirectUri = makeRedirectUri({ scheme: 'personal99', path: 'auth/callback' });
+
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: redirectUri,
+          queryParams: { prompt: 'select_account' },
+          skipBrowserRedirect: true,
+        },
+      });
+
+      if (error || !data.url) {
+        console.error('OAuth signIn failed', error);
+        return { error: 'Não foi possível entrar com essa conta. Tente novamente.' };
+      }
+
+      const result = await WebBrowser.openAuthSessionAsync(data.url, redirectUri);
+
+      if (result.type !== 'success' || !result.url) {
+        return { error: null };
+      }
+
+      const url = new URL(result.url);
+
+      const code = url.searchParams.get('code');
+      if (code) {
+        const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+        if (exchangeError) {
+          console.error('Code exchange failed', exchangeError);
+          return { error: 'Não foi possível completar o login. Tente novamente.' };
+        }
+        return { error: null };
+      }
+
+      const fragment = url.hash?.substring(1);
+      if (fragment) {
+        const params = new URLSearchParams(fragment);
+        const accessToken = params.get('access_token');
+        const refreshToken = params.get('refresh_token');
+        if (accessToken && refreshToken) {
+          const { error: sessionError } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken,
+          });
+          if (sessionError) {
+            console.error('Session set failed', sessionError);
+            return { error: 'Não foi possível completar o login. Tente novamente.' };
+          }
+          return { error: null };
+        }
+      }
+
+      return { error: 'Não foi possível completar o login. Tente novamente.' };
+    } catch (e) {
+      console.error('OAuth flow error', e);
       return { error: 'Não foi possível entrar com essa conta. Tente novamente.' };
     }
-    return { error: null };
   }, []);
 
   const signOut = async () => {
