@@ -58,6 +58,7 @@ export default function RootLayout() {
           <Stack.Screen name="trainer" />
           <Stack.Screen name="painel-restrito" />
           <Stack.Screen name="onboarding/student" />
+          <Stack.Screen name="auth/callback" />
           <Stack.Screen name="+not-found" />
         </Stack>
         <StatusBar style="dark" />
