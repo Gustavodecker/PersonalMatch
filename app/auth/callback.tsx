@@ -1,40 +1,30 @@
 import { useEffect } from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
-import { router, useLocalSearchParams } from 'expo-router';
+import { router } from 'expo-router';
 import * as Linking from 'expo-linking';
 import { supabase } from '@/lib/supabase';
 import { Colors } from '@/constants/theme';
 
 export default function AuthCallbackScreen() {
-  const params = useLocalSearchParams<{ code?: string }>();
-
   useEffect(() => {
     (async () => {
       try {
-        const code = params.code;
-
-        if (code) {
-          await supabase.auth.exchangeCodeForSession(code);
-          router.replace('/');
-          return;
-        }
-
         const url = await Linking.getInitialURL();
         if (url) {
           const parsed = new URL(url);
 
-          const urlCode = parsed.searchParams.get('code');
-          if (urlCode) {
-            await supabase.auth.exchangeCodeForSession(urlCode);
+          const code = parsed.searchParams.get('code');
+          if (code) {
+            await supabase.auth.exchangeCodeForSession(code);
             router.replace('/');
             return;
           }
 
           const fragment = parsed.hash?.substring(1);
           if (fragment) {
-            const hashParams = new URLSearchParams(fragment);
-            const accessToken = hashParams.get('access_token');
-            const refreshToken = hashParams.get('refresh_token');
+            const params = new URLSearchParams(fragment);
+            const accessToken = params.get('access_token');
+            const refreshToken = params.get('refresh_token');
             if (accessToken && refreshToken) {
               await supabase.auth.setSession({
                 access_token: accessToken,
@@ -45,11 +35,11 @@ export default function AuthCallbackScreen() {
             }
           }
         }
-
-        router.replace('/');
       } catch {
-        router.replace('/');
+        // Auth state handled by onAuthStateChange listener
       }
+
+      router.replace('/');
     })();
   }, []);
 
