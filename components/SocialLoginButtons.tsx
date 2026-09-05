@@ -4,11 +4,16 @@ import { Provider } from '@supabase/supabase-js';
 import { useAuth } from '@/contexts/AuthContext';
 import { Colors, Spacing, FontSizes, BorderRadii } from '@/constants/theme';
 
-const providers: { id: Provider; label: string; color: string; bgColor: string; icon: string }[] = [
-  { id: 'google', label: 'Google', color: '#1f1f1f', bgColor: '#ffffff', icon: 'G' },
+const allProviders: { id: Provider; label: string; color: string; bgColor: string; icon: string; platforms?: string[] }[] = [
+  { id: 'google', label: 'Google', color: '#1f1f1f', bgColor: '#ffffff', icon: 'G', platforms: ['android', 'web'] },
 ];
 
 export function SocialLoginButtons() {
+  const providers = allProviders.filter(
+    (p) => !p.platforms || p.platforms.includes(Platform.OS),
+  );
+
+  if (providers.length === 0) return null;
   const { signInWithProvider } = useAuth();
   const [loadingProvider, setLoadingProvider] = useState<Provider | null>(null);
   const [error, setError] = useState<string | null>(null);
