@@ -9,14 +9,15 @@ const allProviders: { id: Provider; label: string; color: string; bgColor: strin
 ];
 
 export function SocialLoginButtons() {
+  const { signInWithProvider } = useAuth();
+  const [loadingProvider, setLoadingProvider] = useState<Provider | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
   const providers = allProviders.filter(
     (p) => !p.platforms || p.platforms.includes(Platform.OS),
   );
 
   if (providers.length === 0) return null;
-  const { signInWithProvider } = useAuth();
-  const [loadingProvider, setLoadingProvider] = useState<Provider | null>(null);
-  const [error, setError] = useState<string | null>(null);
 
   const handlePress = async (provider: Provider) => {
     setError(null);
