@@ -7,6 +7,7 @@ import { useLocalSearchParams, router } from 'expo-router';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { supabase } from '@/lib/supabase';
+import { trackPageVisit } from '@/lib/trackVisit';
 import { useAuth } from '@/contexts/AuthContext';
 import { LoadingScreen } from '@/components/LoadingScreen';
 import { Button } from '@/components/Button';
@@ -102,7 +103,7 @@ export default function TrainerDetailScreen() {
   const [promotions, setPromotions] = useState<{ id: string; title: string; description: string | null; discount_label: string | null }[]>([]);
   const [autoReplyMsg, setAutoReplyMsg] = useState<string | null>(null);
 
-  useEffect(() => { if (id) loadTrainer(); }, [id]);
+  useEffect(() => { if (id) { loadTrainer(); trackPageVisit(`/trainer/${id}`); } }, [id]);
 
   const loadTrainer = async () => {
     const [trainerRes, reviewsRes, photosRes] = await Promise.all([

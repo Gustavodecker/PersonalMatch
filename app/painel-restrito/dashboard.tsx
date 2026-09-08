@@ -35,7 +35,7 @@ export default function AdminDashboard() {
       supabase.from('leads').select('id', { count: 'exact' }),
       supabase.from('reviews').select('id, status', { count: 'exact' }),
       supabase.from('vouchers').select('id, is_active', { count: 'exact' }),
-      supabase.from('profile_views').select('id', { count: 'exact', head: true }),
+      supabase.from('site_visits').select('id', { count: 'exact', head: true }),
     ]);
     const profiles  = profilesRes.data ?? [];
     const trainers  = trainersRes.data ?? [];
@@ -87,14 +87,22 @@ export default function AdminDashboard() {
       <View style={s.platformSection}>
         <Text style={s.sectionTitle}>Plataforma</Text>
         <View style={s.platformGrid}>
-          <View style={s.platformCard}>
+          <TouchableOpacity
+            style={s.platformCard}
+            onPress={() => router.push('/painel-restrito/visits' as any)}
+            activeOpacity={0.8}
+          >
             <View style={[s.platformIconWrap, { backgroundColor: Colors.primary[50] }]}>
               <Eye size={20} color={Colors.primary[500]} />
             </View>
             <Text style={s.platformValue}>{loading ? '—' : formatNumber(stats?.siteVisits ?? 0)}</Text>
             <Text style={s.platformLabel}>Visitas no site</Text>
-            <Text style={s.platformSub}>visualizações de perfil</Text>
-          </View>
+            <Text style={s.platformSub}>Toque para ver detalhes</Text>
+            <View style={s.platformBtnRow}>
+              <Text style={s.platformBtnText}>Ver acessos detalhados</Text>
+              <ChevronRight size={14} color={Colors.primary[600]} />
+            </View>
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -168,6 +176,11 @@ const s = StyleSheet.create({
   platformValue: { fontSize: 28, fontWeight: '800', color: Colors.neutral[900] },
   platformLabel: { fontSize: FontSizes.sm, fontWeight: '700', color: Colors.neutral[700] },
   platformSub: { fontSize: FontSizes.xs, color: Colors.neutral[400], fontWeight: '500' },
+  platformBtnRow: {
+    flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4,
+    paddingTop: 8, borderTopWidth: 1, borderTopColor: Colors.neutral[100],
+  },
+  platformBtnText: { fontSize: FontSizes.xs, fontWeight: '700', color: Colors.primary[600] },
 
 
   statsGrid: {

@@ -9,7 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Colors, FontSizes, Spacing, Shadows } from '@/constants/theme';
 import {
   LayoutDashboard, Users, Dumbbell, TrendingUp, Star,
-  Tag, Settings, LogOut, Menu, X, Shield,
+  Tag, Settings, LogOut, Menu, X, Shield, Eye,
 } from 'lucide-react-native';
 
 const DESKTOP_BREAKPOINT = 900;
@@ -21,6 +21,7 @@ const NAV_ITEMS = [
   { href: '/painel-restrito/leads',     label: 'Leads',       icon: TrendingUp },
   { href: '/painel-restrito/reviews',   label: 'Avaliações',  icon: Star },
   { href: '/painel-restrito/vouchers',  label: 'Vouchers',    icon: Tag },
+  { href: '/painel-restrito/visits',    label: 'Visitas',      icon: Eye },
   { href: '/painel-restrito/settings',  label: 'Configurações', icon: Settings },
 ];
 

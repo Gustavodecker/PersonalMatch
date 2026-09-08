@@ -20,6 +20,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Redirect, router } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
+import { trackPageVisit } from '@/lib/trackVisit';
 import { TrainerCard } from '@/components/TrainerCard';
 import { LoadingScreen } from '@/components/LoadingScreen';
 import {
@@ -898,6 +899,7 @@ const PublicHome: React.FC = () => {
 
   useEffect(() => {
     fetchFeaturedTrainers();
+    trackPageVisit('/');
   }, []);
 
   const fetchFeaturedTrainers = async () => {

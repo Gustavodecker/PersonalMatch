@@ -7,6 +7,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { supabase } from '@/lib/supabase';
+import { trackPageVisit } from '@/lib/trackVisit';
 import { Colors, Spacing, FontSizes, Shadows } from '@/constants/theme';
 import { TrainerWithProfile, Specialty, OBJECTIVES_OPTIONS } from '@/types/database';
 import { normalizeText, normalizedIncludes } from '@/lib/textUtils';
@@ -151,6 +152,7 @@ export default function PublicSearch() {
   const [initialSpecialtyApplied, setInitialSpecialtyApplied] = useState(false);
 
   useEffect(() => {
+    trackPageVisit('/search');
     supabase.from('specialties').select('*').order('name').then(({ data }) => {
       if (data) {
         setSpecialties(data);
