@@ -14,7 +14,7 @@ import { PLANS, getPlanById, type PlanId, type Plan } from '@/src/stripe-config'
 import {
   CheckCircle, Crown, Zap, Star, ArrowRight,
   RefreshCw, XCircle, AlertCircle, BadgeCheck, Info,
-  Tag, RotateCcw,
+  Tag, RotateCcw, ExternalLink,
 } from 'lucide-react-native';
 import {
   initRevenueCat,
@@ -462,21 +462,7 @@ export default function AssinaturaScreen() {
             </TouchableOpacity>
           )}
 
-          {!isPaid && !isWeb && (
-            <TouchableOpacity
-              style={[s.mobileManageBtn, { backgroundColor: Colors.neutral[600] }]}
-              onPress={handleRestore}
-              disabled={rcLoading}
-              activeOpacity={0.85}
-            >
-              {rcLoading
-                ? <ActivityIndicator size="small" color={Colors.white} />
-                : <>
-                    <RotateCcw size={16} color={Colors.white} />
-                    <Text style={s.mobileManageBtnText}>Restaurar compras</Text>
-                  </>}
-            </TouchableOpacity>
-          )}
+
 
           {isPaid && !subscription?.cancel_at_period_end && (
             <TouchableOpacity
@@ -493,6 +479,8 @@ export default function AssinaturaScreen() {
                   </>}
             </TouchableOpacity>
           )}
+
+
 
           {isWeb && <View style={s.voucherSection}>
             <Text style={s.voucherTitle}>Voucher de desconto</Text>
@@ -550,7 +538,6 @@ export default function AssinaturaScreen() {
             </View>
           )}
 
-          {/* Plans overview (read-only) */}
           <Text style={s.plansTitle}>Planos disponíveis</Text>
           <View style={s.mobilePlansWrap}>
             {PLANS.map((plan) => {
@@ -589,6 +576,18 @@ export default function AssinaturaScreen() {
                       </View>
                     ))}
                   </View>
+                  {!isCurrent && plan.id !== 'free' && plan.id !== 'free_trial' && (
+                    <View style={s.mobilePlanMeta}>
+                      <Text style={s.mobilePlanPeriod}>Assinatura mensal (1 mes) - renovada automaticamente</Text>
+                      <Text style={s.mobilePlanPriceNote}>
+                        {plan.id === 'pro' && rcOfferings.proMonthly
+                          ? `Preco: ${rcOfferings.proMonthly.product.priceString}/mes`
+                          : plan.id === 'premium' && rcOfferings.premiumMonthly
+                            ? `Preco: ${rcOfferings.premiumMonthly.product.priceString}/mes`
+                            : `Preco: ${plan.priceLabel}`}
+                      </Text>
+                    </View>
+                  )}
                   {!isCurrent && plan.id !== 'free' && (
                     <TouchableOpacity
                       style={[s.mobilePlanBtn, plan.highlight && { backgroundColor: Colors.primary[600] }]}
@@ -609,6 +608,37 @@ export default function AssinaturaScreen() {
                 </View>
               );
             })}
+          </View>
+
+          {/* Legal links & restore */}
+          <View style={s.legalSection}>
+            <TouchableOpacity
+              style={s.legalLink}
+              onPress={() => Linking.openURL('https://www.apple.com/legal/internet-services/itunes/dev/stdeula/').catch(() => {})}
+              activeOpacity={0.7}
+            >
+              <ExternalLink size={14} color={Colors.primary[600]} />
+              <Text style={s.legalLinkText}>Termos de Uso (EULA)</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={s.legalLink}
+              onPress={() => Linking.openURL('https://www.99personal.com.br/privacy').catch(() => {})}
+              activeOpacity={0.7}
+            >
+              <ExternalLink size={14} color={Colors.primary[600]} />
+              <Text style={s.legalLinkText}>Politica de Privacidade</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[s.legalLink, { marginTop: 4 }]}
+              onPress={handleRestore}
+              disabled={rcLoading}
+              activeOpacity={0.7}
+            >
+              <RotateCcw size={14} color={Colors.neutral[600]} />
+              <Text style={[s.legalLinkText, { color: Colors.neutral[600] }]}>
+                {rcLoading ? 'Restaurando...' : 'Restaurar compras'}
+              </Text>
+            </TouchableOpacity>
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -955,4 +985,19 @@ const s = StyleSheet.create({
   voucherRemove: { padding: 2 },
   voucherErrRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   voucherErrText: { fontSize: FontSizes.xs, color: Colors.error[600], fontWeight: '600', flex: 1 },
+
+  mobilePlanMeta: {
+    backgroundColor: Colors.neutral[50], borderRadius: 8, padding: 10,
+    borderWidth: 1, borderColor: Colors.neutral[200],
+  },
+  mobilePlanPeriod: { fontSize: FontSizes.xs, color: Colors.neutral[600], fontWeight: '600' },
+  mobilePlanPriceNote: { fontSize: FontSizes.sm, color: Colors.neutral[800], fontWeight: '700', marginTop: 2 },
+
+  legalSection: {
+    marginHorizontal: Spacing.lg, marginTop: Spacing.md, marginBottom: Spacing.lg,
+    paddingTop: Spacing.md, borderTopWidth: 1, borderTopColor: Colors.neutral[200],
+    gap: 10,
+  },
+  legalLink: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  legalLinkText: { fontSize: FontSizes.sm, color: Colors.primary[600], fontWeight: '600', textDecorationLine: 'underline' },
 });
