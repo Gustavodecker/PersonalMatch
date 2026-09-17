@@ -96,6 +96,7 @@ Deno.serve(async (req: Request) => {
       .from("trainers")
       .update({
         subscription_plan: plan,
+        subscription_status: isPaid ? "active" : status,
         is_featured: isPaid,
         photo_limit: photoLimit,
       })

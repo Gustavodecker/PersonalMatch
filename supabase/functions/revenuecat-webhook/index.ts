@@ -169,6 +169,7 @@ Deno.serve(async (req: Request) => {
 
       await supabase.from("trainers").update({
         subscription_plan: plan,
+        subscription_status: isPaid ? "active" : status,
         is_featured: isPaid,
         photo_limit: photoLimit,
       }).eq("id", appUserId);

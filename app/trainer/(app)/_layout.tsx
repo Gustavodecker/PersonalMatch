@@ -29,7 +29,10 @@ export default function TrainerAppLayout() {
           .eq('id', profile.id)
           .maybeSingle();
         if (!data) { setTrialState('ok'); return; }
-        if (data.subscription_status === 'active') { setTrialState('ok'); return; }
+
+        const hasPaidPlan = data.subscription_plan === 'pro' || data.subscription_plan === 'premium';
+        if (data.subscription_status === 'active' || hasPaidPlan) { setTrialState('ok'); return; }
+
         const trialEnd = data.trial_ends_at ? new Date(data.trial_ends_at) : null;
         if (!trialEnd) { setTrialState('ok'); return; }
         const msLeft = trialEnd.getTime() - Date.now();
