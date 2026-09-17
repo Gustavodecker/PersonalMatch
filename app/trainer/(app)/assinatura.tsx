@@ -146,19 +146,53 @@ export default function AssinaturaScreen() {
     }
   }, [user]);
 
-  // Initialize RevenueCat on mobile
+  // Initialize RevenueCat on mobile + auto-sync entitlements
   useEffect(() => {
-    if (isWeb || !user) return;
+    if (isWeb || !user || !session?.access_token) return;
     (async () => {
       try {
         await initRevenueCat(user.id);
         const pkgs = await getOfferingPackages();
         setRcOfferings(pkgs);
+
+        // Auto-sync: check if RevenueCat has an active entitlement and sync to DB
+        const info = await getCustomerInfo();
+        if (info) {
+          const ent = getActiveEntitlement(info);
+          if (ent !== 'free') {
+            const provider = Platform.OS === 'ios' ? 'apple' as const : 'google' as const;
+            const activeEnt = info.entitlements?.active?.[ent];
+            const expiresAt = activeEnt?.expirationDate || null;
+            const purchasedAt = activeEnt?.latestPurchaseDate || null;
+            const transactionId = activeEnt?.productIdentifier || null;
+            try {
+              await fetch(`${SUPABASE_URL}/functions/v1/sync-subscription`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Bearer ${session.access_token}`,
+                },
+                body: JSON.stringify({
+                  plan: ent,
+                  provider,
+                  status: 'active',
+                  transactionId,
+                  expiresAt,
+                  purchasedAt,
+                }),
+              });
+              // Reload subscription from DB after sync
+              loadSubscription();
+            } catch (e) {
+              console.warn('Auto-sync failed:', e);
+            }
+          }
+        }
       } catch (e) {
         console.warn('RevenueCat init failed:', e);
       }
     })();
-  }, [user]);
+  }, [user, session?.access_token]);
 
   useEffect(() => { loadSubscription(); }, [loadSubscription]);
 
