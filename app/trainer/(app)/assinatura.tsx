@@ -162,6 +162,37 @@ export default function AssinaturaScreen() {
 
   useEffect(() => { loadSubscription(); }, [loadSubscription]);
 
+  const syncSubscriptionToBackend = async (customerInfo: any, provider: 'apple' | 'google') => {
+    if (!session?.access_token || !customerInfo) return;
+    const ent = getActiveEntitlement(customerInfo);
+    if (ent === 'free') return;
+
+    const activeEnt = customerInfo.entitlements?.active?.[ent];
+    const expiresAt = activeEnt?.expirationDate || null;
+    const purchasedAt = activeEnt?.latestPurchaseDate || null;
+    const transactionId = activeEnt?.productIdentifier || null;
+
+    try {
+      await fetch(`${SUPABASE_URL}/functions/v1/sync-subscription`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          plan: ent,
+          provider,
+          status: 'active',
+          transactionId,
+          expiresAt,
+          purchasedAt,
+        }),
+      });
+    } catch (e) {
+      console.warn('sync-subscription failed:', e);
+    }
+  };
+
   // ── Purchase via RevenueCat (mobile) ─────────────────────────────────────
   const handleMobilePurchase = async (plan: Plan) => {
     if (!user) return;
@@ -200,6 +231,9 @@ export default function AssinaturaScreen() {
       } else if (result.error) {
         setError(result.error);
       } else if (result.success) {
+        const provider = Platform.OS === 'ios' ? 'apple' as const : 'google' as const;
+        const info = result.customerInfo ?? await getCustomerInfo();
+        await syncSubscriptionToBackend(info, provider);
         await loadSubscription();
       }
     } catch (e: any) {
@@ -216,6 +250,8 @@ export default function AssinaturaScreen() {
       const info = await restorePurchases();
       const ent = getActiveEntitlement(info);
       if (ent !== 'free') {
+        const provider = Platform.OS === 'ios' ? 'apple' as const : 'google' as const;
+        await syncSubscriptionToBackend(info, provider);
         await loadSubscription();
       } else {
         setError('Nenhuma assinatura encontrada para restaurar.');
