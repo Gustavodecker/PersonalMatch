@@ -96,13 +96,20 @@ export default function TrainerDashboard() {
     const t = trainerRes.data as any;
     if (t) {
       setTrainerStatus(t.status as TrainerStatus);
-      setSubscriptionPlan((t.subscription_plan ?? 'free') as PlanId);
       if (t.subscription_status !== 'active' && t.trial_ends_at) setTrialEnd(t.trial_ends_at);
       setCompletionPct(calcCompletion(t, specialtiesRes.count ?? 0, photosRes.count ?? 0));
     }
-    if (subRes.data) {
+
+    // Use get_effective_plan as single source of truth for the active plan
+    const { data: epData } = await supabase.rpc('get_effective_plan', { p_user_id: profile.id });
+    if (epData && epData.plan) {
+      setSubscriptionPlan(epData.plan as PlanId);
+      if (epData.active) setTrialEnd(null);
+    } else if (subRes.data) {
       if (subRes.data.plan) setSubscriptionPlan(subRes.data.plan as PlanId);
       if (subRes.data.status === 'trialing') setTrialEnd(subRes.data.current_period_end);
+    } else if (t) {
+      setSubscriptionPlan((t.subscription_plan ?? 'free') as PlanId);
     }
 
     const allLeads = (leadsRes.data ?? []) as Lead[];
