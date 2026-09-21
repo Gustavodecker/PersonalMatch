@@ -117,7 +117,7 @@ export default function TrainerAppLayout() {
             </View>
             <Text style={exp.title}>Período de teste encerrado</Text>
             <Text style={exp.desc}>
-              Seu período de teste gratuito de 15 dias expirou. Assine um plano para continuar recebendo alunos e aparecer nas buscas.
+              Seu período de teste gratuito de 30 dias expirou. Assine um plano para continuar recebendo alunos e aparecer nas buscas.
             </Text>
             <TouchableOpacity style={exp.btn} onPress={handleGoToSubscription}>
               <CreditCard size={18} color={Colors.white} />

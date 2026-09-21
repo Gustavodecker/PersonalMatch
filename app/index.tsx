@@ -210,9 +210,9 @@ const PLANS = [
     id: 'trial',
     name: 'Teste Grátis',
     highlight: false,
-    badge: '15 DIAS GRÁTIS',
+    badge: '30 DIAS GRÁTIS',
     price: 'Grátis',
-    period: 'por 15 dias',
+    period: 'por 30 dias',
     desc: 'Sem cartão de crédito',
     features: [
       'Perfil público ativo',
