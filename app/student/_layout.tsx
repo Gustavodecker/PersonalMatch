@@ -28,6 +28,7 @@ export default function StudentLayout() {
       <Tabs.Screen name="appointments" options={{ title: 'Agenda',    tabBarIcon: ({ color, size }) => <Calendar size={size} color={color} /> }} />
       <Tabs.Screen name="favorites"    options={{ title: 'Favoritos', tabBarIcon: ({ color, size }) => <Heart size={size} color={color} /> }} />
       <Tabs.Screen name="profile"      options={{ title: 'Perfil',    tabBarIcon: ({ color, size }) => <User size={size} color={color} /> }} />
+      <Tabs.Screen name="configuracoes" options={{ href: null }} />
     </Tabs>
   );
 }

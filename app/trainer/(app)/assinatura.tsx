@@ -684,7 +684,7 @@ export default function AssinaturaScreen() {
           <View style={s.legalSection}>
             <TouchableOpacity
               style={s.legalLink}
-              onPress={() => router.push('/termos')}
+              onPress={() => Linking.openURL('https://www.apple.com/legal/internet-services/itunes/dev/stdeula/').catch(() => {})}
               activeOpacity={0.7}
             >
               <ExternalLink size={14} color={Colors.primary[600]} />
