@@ -1,14 +1,14 @@
 import { useEffect, useState, useCallback } from 'react';
 import {
-  View, Text, StyleSheet, ScrollView, RefreshControl,
-  TouchableOpacity, useWindowDimensions,
+  View, Text, StyleSheet, RefreshControl,
+  useWindowDimensions,
 } from 'react-native';
 import { supabase } from '@/lib/supabase';
 import { AdminShell } from '@/components/admin/AdminShell';
 import { Colors, FontSizes, Spacing, Shadows, BorderRadii } from '@/constants/theme';
 import {
   DollarSign, Users, CreditCard, TrendingUp,
-  Smartphone, Globe, Apple, ChevronRight,
+  Smartphone, Globe, Apple,
 } from 'lucide-react-native';
 
 type PlanBreakdown = { plan: string; count: number };
@@ -153,11 +153,7 @@ export default function ReceitaScreen() {
 
   return (
     <AdminShell title="Receita">
-      <ScrollView
-        style={s.scroll}
-        contentContainerStyle={s.scrollContent}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-      >
+      <RefreshControl refreshing={refreshing} onRefresh={onRefresh} style={{ flex: 0 }} />
         {/* KPI Cards */}
         <View style={[s.kpiRow, isWide && s.kpiRowWide]}>
           <KPICard
@@ -297,7 +293,6 @@ export default function ReceitaScreen() {
             <SourceItem icon={Smartphone} label="Android (Google Play)" desc="Compras dentro do app via RevenueCat" color={Colors.secondary[500]} />
           </View>
         </View>
-      </ScrollView>
     </AdminShell>
   );
 }
@@ -338,8 +333,7 @@ function SourceItem({
 }
 
 const s = StyleSheet.create({
-  scroll: { flex: 1 },
-  scrollContent: { padding: Spacing.lg, gap: 20, paddingBottom: 40 },
+
 
   kpiRow: { gap: 12 },
   kpiRowWide: { flexDirection: 'row', flexWrap: 'wrap' },
