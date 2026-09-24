@@ -684,7 +684,7 @@ export default function AssinaturaScreen() {
           <View style={s.legalSection}>
             <TouchableOpacity
               style={s.legalLink}
-              onPress={() => Linking.openURL('https://www.apple.com/legal/internet-services/itunes/dev/stdeula/').catch(() => {})}
+              onPress={() => router.push('/termos')}
               activeOpacity={0.7}
             >
               <ExternalLink size={14} color={Colors.primary[600]} />
@@ -692,7 +692,7 @@ export default function AssinaturaScreen() {
             </TouchableOpacity>
             <TouchableOpacity
               style={s.legalLink}
-              onPress={() => Linking.openURL('https://www.99personal.com.br/privacy').catch(() => {})}
+              onPress={() => router.push('/privacidade')}
               activeOpacity={0.7}
             >
               <ExternalLink size={14} color={Colors.primary[600]} />

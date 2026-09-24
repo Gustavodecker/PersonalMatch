@@ -93,11 +93,11 @@ export const PLANS: Plan[] = [
   {
     id: 'free_trial',
     name: 'Teste Grátis',
-    description: 'Experimente todos os recursos por 7 dias',
-    priceLabel: 'Grátis por 7 dias',
+    description: 'Experimente todos os recursos por 30 dias',
+    priceLabel: 'Grátis por 30 dias',
     features: [
       'Todos os recursos do plano Pro',
-      '7 dias gratuitos',
+      '30 dias gratuitos',
       'Sem cartão necessário',
     ],
     badge: 'Teste',
