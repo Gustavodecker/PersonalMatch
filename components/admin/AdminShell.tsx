@@ -69,7 +69,9 @@ export function AdminShell({ children, title, actions }: Props) {
         <Text style={s.mobileTitle}>{title}</Text>
         {actions ? <View>{actions}</View> : <View style={{ width: 40 }} />}
       </View>
-      {children}
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={s.mobileScrollContent}>
+        {children}
+      </ScrollView>
 
       <Modal visible={drawerOpen} transparent animationType="slide">
         <View style={s.drawerOverlay}>
@@ -228,6 +230,7 @@ const s = StyleSheet.create({
     backgroundColor: Colors.neutral[100], alignItems: 'center', justifyContent: 'center',
   },
   mobileTitle: { flex: 1, fontSize: FontSizes.xl, fontWeight: '700', color: Colors.neutral[900] },
+  mobileScrollContent: { padding: Spacing.lg, gap: 20 },
 
   drawerOverlay: { flex: 1, flexDirection: 'row' },
   drawerBackdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)' },

@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import {
-  View, Text, StyleSheet, RefreshControl,
+  View, Text, StyleSheet,
   useWindowDimensions,
 } from 'react-native';
 import { supabase } from '@/lib/supabase';
@@ -69,7 +69,6 @@ export default function ReceitaScreen() {
   const isWide = width >= 768;
 
   const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
 
   const [totalRevenue, setTotalRevenue] = useState(0);
   const [paidOrders, setPaidOrders] = useState(0);
@@ -142,18 +141,14 @@ export default function ReceitaScreen() {
     }
     setTrainerSubs(subsWithNames);
     setLoading(false);
-    setRefreshing(false);
   }, []);
 
   useEffect(() => { loadData(); }, [loadData]);
-
-  const onRefresh = () => { setRefreshing(true); loadData(); };
 
   const totalTrainers = planBreakdown.reduce((s, p) => s + p.count, 0);
 
   return (
     <AdminShell title="Receita">
-      <RefreshControl refreshing={refreshing} onRefresh={onRefresh} style={{ flex: 0 }} />
         {/* KPI Cards */}
         <View style={[s.kpiRow, isWide && s.kpiRowWide]}>
           <KPICard

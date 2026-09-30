@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, RefreshControl, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { router } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 import { AdminShell } from '@/components/admin/AdminShell';
@@ -23,7 +23,6 @@ type Stats = {
 export default function AdminDashboard() {
   const [stats, setStats]       = useState<Stats | null>(null);
   const [loading, setLoading]   = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
 
 
   useEffect(() => { loadStats(); }, []);
@@ -52,7 +51,6 @@ export default function AdminDashboard() {
       siteVisits:      viewsRes.count ?? 0,
     });
     setLoading(false);
-    setRefreshing(false);
   };
 
   const formatNumber = (n: number) => {
@@ -81,7 +79,6 @@ export default function AdminDashboard() {
 
   return (
     <AdminShell title="Dashboard">
-      <RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); loadStats(); }} style={{ flex: 0 }} />
 
       {/* Platform metrics */}
       <View style={s.platformSection}>
