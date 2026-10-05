@@ -166,30 +166,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signUp = async (email: string, password: string, fullName: string, role: 'student' | 'trainer') => {
-    const { data, error } = await supabase.auth.signUp({ email, password });
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { full_name: fullName, role } },
+    });
     if (error) {
       console.error('signUp failed', error);
       return {
         error:
           'Não foi possível criar a conta com esses dados. Verifique o e-mail e a senha e tente novamente.',
       };
-    }
-    if (data.user) {
-      const { error: profileError } = await supabase.from('profiles').insert({
-        id: data.user.id,
-        full_name: fullName,
-        email,
-        role,
-      });
-      if (profileError) {
-        console.error('profile creation failed', profileError);
-        return { error: 'Não foi possível concluir o cadastro. Tente novamente.' };
-      }
-      if (role === 'trainer') {
-        await supabase.from('trainers').insert({ id: data.user.id });
-      } else {
-        await supabase.from('students').insert({ id: data.user.id });
-      }
     }
     return { error: null };
   };

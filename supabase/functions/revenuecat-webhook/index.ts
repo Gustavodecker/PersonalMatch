@@ -1,6 +1,5 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
-import { createHmac } from "node:crypto";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -21,12 +20,18 @@ const ENTITLEMENT_TO_PLAN: Record<string, "pro" | "premium"> = {
   premium: "premium",
 };
 
-function verifySignature(body: string, signature: string | null): boolean {
-  if (!WEBHOOK_SECRET || !signature) return false;
-  const expected = createHmac("sha256", WEBHOOK_SECRET)
-    .update(body)
-    .digest("hex");
-  return signature === expected;
+function timingSafeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0;
+}
+
+// RevenueCat sends the dashboard-configured Authorization header value verbatim.
+function isAuthorized(header: string | null): boolean {
+  if (!WEBHOOK_SECRET || !header) return false;
+  return timingSafeEqual(header, WEBHOOK_SECRET) ||
+    timingSafeEqual(header, `Bearer ${WEBHOOK_SECRET}`);
 }
 
 function mapProvider(store: string): "apple" | "google" {
@@ -71,18 +76,12 @@ Deno.serve(async (req: Request) => {
     return new Response(null, { status: 200, headers: corsHeaders });
   }
 
-  const body = await req.text();
-
-  if (WEBHOOK_SECRET) {
-    const sig = req.headers.get("x-revenuecat-signature");
-    if (!verifySignature(body, sig)) {
-      console.error("RevenueCat webhook signature mismatch");
-      return new Response("Invalid signature", {
-        status: 401,
-        headers: corsHeaders,
-      });
-    }
+  if (!isAuthorized(req.headers.get("authorization"))) {
+    console.error("RevenueCat webhook rejected: missing or invalid authorization");
+    return new Response("Unauthorized", { status: 401, headers: corsHeaders });
   }
+
+  const body = await req.text();
 
   try {
     const payload = JSON.parse(body);
