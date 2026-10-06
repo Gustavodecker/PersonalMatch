@@ -17,10 +17,10 @@ const supabase = createClient(
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
 );
 
-// Map Stripe price IDs to plan names
+// Must match the price IDs in stripe-checkout; the STRIPE_PRICE_* secrets are stale.
 const PRICE_TO_PLAN: Record<string, "pro" | "premium"> = {
-  [Deno.env.get("STRIPE_PRICE_PRO") ?? ""]:     "pro",
-  [Deno.env.get("STRIPE_PRICE_PREMIUM") ?? ""]: "premium",
+  price_1TlIhLGT3oj5YeOVfAEhPfpu: "pro",
+  price_1TlIhLGT3oj5YeOVEVxrxALk: "premium",
 };
 
 Deno.serve(async (req: Request) => {
@@ -48,6 +48,20 @@ Deno.serve(async (req: Request) => {
 
         const sub = await stripe.subscriptions.retrieve(session.subscription as string);
         await upsertSubscription(trainerId, sub);
+        if (session.invoice && session.payment_status === "paid") {
+          const invoice = await stripe.invoices.retrieve(session.invoice as string);
+          await recordInvoicePayment(invoice, trainerId, sub);
+        }
+        break;
+      }
+
+      case "invoice.paid": {
+        const invoice = event.data.object as Stripe.Invoice;
+        if (!invoice.subscription) break;
+        const sub = await stripe.subscriptions.retrieve(invoice.subscription as string);
+        const trainerId = sub.metadata?.trainer_id;
+        if (!trainerId) break;
+        await recordInvoicePayment(invoice, trainerId, sub);
         break;
       }
 
@@ -104,6 +118,24 @@ Deno.serve(async (req: Request) => {
     headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
 });
+
+async function recordInvoicePayment(invoice: Stripe.Invoice, trainerId: string, sub: Stripe.Subscription) {
+  if (!invoice.amount_paid || invoice.amount_paid <= 0) return;
+  const plan = PRICE_TO_PLAN[sub.items.data[0]?.price?.id ?? ""];
+  if (!plan) return;
+
+  const { error } = await supabase.from("payments").upsert({
+    trainer_id: trainerId,
+    provider: "stripe",
+    plan,
+    amount_cents: invoice.amount_paid,
+    currency: (invoice.currency ?? "brl").toUpperCase(),
+    kind: invoice.billing_reason === "subscription_cycle" ? "renewal" : "new",
+    external_id: invoice.id,
+    paid_at: new Date((invoice.status_transitions?.paid_at ?? invoice.created) * 1000).toISOString(),
+  }, { onConflict: "provider,external_id", ignoreDuplicates: true });
+  if (error) console.error("payment record failed:", error);
+}
 
 async function upsertSubscription(trainerId: string, sub: Stripe.Subscription) {
   const priceId = sub.items.data[0]?.price?.id ?? "";

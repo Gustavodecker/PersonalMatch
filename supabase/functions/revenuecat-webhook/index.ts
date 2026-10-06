@@ -172,6 +172,25 @@ Deno.serve(async (req: Request) => {
         is_featured: isPaid,
         photo_limit: photoLimit,
       }).eq("id", appUserId);
+
+      const price = Number(event.price_in_purchased_currency ?? event.price ?? 0);
+      const paymentId = event.id || transactionId;
+      if (
+        (eventType === "INITIAL_PURCHASE" || eventType === "RENEWAL" || eventType === "PRODUCT_CHANGE") &&
+        isPaid && price > 0 && paymentId
+      ) {
+        const { error: payErr } = await supabase.from("payments").upsert({
+          trainer_id: appUserId,
+          provider,
+          plan,
+          amount_cents: Math.round(price * 100),
+          currency: String(event.currency || "BRL").toUpperCase(),
+          kind: eventType === "RENEWAL" ? "renewal" : "new",
+          external_id: String(paymentId),
+          paid_at: purchaseDate ?? new Date().toISOString(),
+        }, { onConflict: "provider,external_id", ignoreDuplicates: true });
+        if (payErr) console.error("payment record failed:", payErr);
+      }
     }
 
     return new Response(JSON.stringify({ received: true }), {
