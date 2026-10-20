@@ -58,7 +58,7 @@ function extractGoal(msg: string | null): string | null {
 
 export default function TrainerDashboard() {
   const { profile } = useAuth();
-  const [trainerStatus, setTrainerStatus] = useState<TrainerStatus>('pending');
+  const [trainerStatus, setTrainerStatus] = useState<TrainerStatus | null>(null);
   const [stats, setStats] = useState({ rating: 0, reviewCount: 0, viewCount: 0, leadCount: 0 });
   const [newLeadsCount, setNewLeadsCount] = useState(0);
   const [unansweredCount, setUnansweredCount] = useState(0);
@@ -158,8 +158,8 @@ export default function TrainerDashboard() {
     try { await Share.share({ message: `Confira meu perfil de personal trainer: ${url}` }); } catch {}
   };
 
-  const si = statusConfig[trainerStatus];
-  const StatusIcon = si.icon;
+  const si = trainerStatus ? statusConfig[trainerStatus] : null;
+  const StatusIcon = si?.icon;
   const firstName = profile?.full_name?.split(' ')[0] ?? '';
   const initial = profile?.full_name?.[0]?.toUpperCase() ?? '?';
   const plan = getPlanById(subscriptionPlan);
@@ -231,10 +231,12 @@ export default function TrainerDashboard() {
                 </View>
                 <View>
                   <Text style={s.heroGreeting}>Olá, {firstName}</Text>
-                  <View style={s.heroStatusRow}>
-                    <View style={[s.heroStatusDot, { backgroundColor: si.dotColor }]} />
-                    <Text style={s.heroStatusText}>{si.label}</Text>
-                  </View>
+                  {si ? (
+                    <View style={s.heroStatusRow}>
+                      <View style={[s.heroStatusDot, { backgroundColor: si.dotColor }]} />
+                      <Text style={s.heroStatusText}>{si.label}</Text>
+                    </View>
+                  ) : null}
                 </View>
               </View>
               <TouchableOpacity style={s.heroEditBtn} onPress={() => router.push('/trainer/onboarding')}>
@@ -243,10 +245,12 @@ export default function TrainerDashboard() {
             </View>
 
             {/* Status description pill */}
-            <View style={s.heroStatusPill}>
-              <StatusIcon size={12} color={si.dotColor} />
-              <Text style={s.heroStatusDesc}>{si.desc}</Text>
-            </View>
+            {si && StatusIcon ? (
+              <View style={s.heroStatusPill}>
+                <StatusIcon size={12} color={si.dotColor} />
+                <Text style={s.heroStatusDesc}>{si.desc}</Text>
+              </View>
+            ) : null}
 
             {/* Trial banner */}
             {trialDaysLeft !== null && (

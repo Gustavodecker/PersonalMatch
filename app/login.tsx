@@ -15,6 +15,7 @@ import { Mail, Lock, Eye, EyeOff } from 'lucide-react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { getDashboardRoute } from '@/lib/role-routes';
+import { ConfirmEmailNotice } from '@/components/ConfirmEmailNotice';
 
 export default function LoginScreen() {
   const { signIn, user, profile, loading } = useAuth();
@@ -25,6 +26,7 @@ export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [unconfirmedEmail, setUnconfirmedEmail] = useState<string | null>(null);
 
   useEffect(() => {
     if (user && profile) {
@@ -47,14 +49,16 @@ export default function LoginScreen() {
     setError(null);
     setSubmitting(true);
 
-    const { error: err } = await signIn(
+    const { error: err, emailNotConfirmed } = await signIn(
       email.trim().toLowerCase(),
       password
     );
 
     setSubmitting(false);
 
-    if (err) {
+    if (emailNotConfirmed) {
+      setUnconfirmedEmail(email.trim().toLowerCase());
+    } else if (err) {
       setError('E-mail ou senha incorretos.');
     }
   };
@@ -78,6 +82,14 @@ export default function LoginScreen() {
             />
           </View>
 
+          {unconfirmedEmail ? (
+            <ConfirmEmailNotice
+              email={unconfirmedEmail}
+              onBack={() => setUnconfirmedEmail(null)}
+              backLabel="Já confirmei, entrar"
+            />
+          ) : (
+          <>
           {/* CABEÇALHO */}
           <View style={styles.header}>
             <Text style={styles.title}>Bem-vindo de volta</Text>
@@ -182,6 +194,8 @@ export default function LoginScreen() {
                 Voltar ao início
               </Text>
             </TouchableOpacity>
+          )}
+          </>
           )}
 
         </View>

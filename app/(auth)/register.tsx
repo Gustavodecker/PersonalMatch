@@ -11,6 +11,8 @@ import { Button } from '@/components/Button';
 import { SocialLoginButtons } from '@/components/SocialLoginButtons';
 import { Colors, Spacing, FontSizes, BorderRadii } from '@/constants/theme';
 import { ArrowLeft } from 'lucide-react-native';
+import { checkEmail } from '@/lib/emailCheck';
+import { ConfirmEmailNotice } from '@/components/ConfirmEmailNotice';
 
 type Role = 'student' | 'trainer';
 
@@ -24,6 +26,9 @@ export default function RegisterScreen() {
   const [role, setRole]         = useState<Role>(initialRole);
   const [loading, setLoading]   = useState(false);
   const [error, setError]       = useState<string | null>(null);
+  const [suggestion, setSuggestion] = useState<string | null>(null);
+  const [acceptedEmail, setAcceptedEmail] = useState<string | null>(null);
+  const [pendingEmail, setPendingEmail] = useState<string | null>(null);
 
   const handleRegister = async () => {
     if (!fullName.trim() || !email.trim() || !password) {
@@ -34,12 +39,23 @@ export default function RegisterScreen() {
       setError('Senha deve ter no mínimo 6 caracteres.');
       return;
     }
+    const cleanEmail = email.trim().toLowerCase();
+    const check = checkEmail(cleanEmail);
+    if (check.error && (!check.suggestion || acceptedEmail !== cleanEmail)) {
+      setError(check.error);
+      setSuggestion(check.suggestion);
+      if (check.suggestion) setAcceptedEmail(cleanEmail);
+      return;
+    }
     setError(null);
+    setSuggestion(null);
     setLoading(true);
-    const { error: err } = await signUp(email.trim().toLowerCase(), password, fullName.trim(), role);
+    const { error: err, needsConfirmation } = await signUp(cleanEmail, password, fullName.trim(), role);
     setLoading(false);
     if (err) {
       setError(err);
+    } else if (needsConfirmation) {
+      setPendingEmail(cleanEmail);
     } else if (role === 'trainer') {
       router.replace('/trainer/onboarding');
     } else {
@@ -59,6 +75,10 @@ export default function RegisterScreen() {
           </View>
 
           <View style={styles.card}>
+            {pendingEmail ? (
+              <ConfirmEmailNotice email={pendingEmail} onBack={() => router.replace('/(auth)/login')} />
+            ) : (
+            <>
             <Text style={styles.title}>Quem é você?</Text>
 
             <View style={styles.roleRow}>
@@ -78,7 +98,22 @@ export default function RegisterScreen() {
               ))}
             </View>
 
-            {error ? <Text style={styles.errorMsg}>{error}</Text> : null}
+            {error ? (
+              <View style={styles.errorBox}>
+                <Text style={styles.errorText}>{error}</Text>
+                {suggestion ? (
+                  <>
+                    <TouchableOpacity
+                      style={styles.suggestionBtn}
+                      onPress={() => { setEmail(suggestion); setError(null); setSuggestion(null); }}
+                    >
+                      <Text style={styles.suggestionBtnText}>Corrigir para {suggestion}</Text>
+                    </TouchableOpacity>
+                    <Text style={styles.suggestionHint}>Se o seu e-mail estiver certo, toque em Criar conta de novo.</Text>
+                  </>
+                ) : null}
+              </View>
+            ) : null}
 
             <Input label="Nome completo" value={fullName} onChangeText={setFullName} autoCapitalize="words" placeholder="Seu nome" />
             <Input label="E-mail" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" placeholder="seu@email.com" />
@@ -93,6 +128,8 @@ export default function RegisterScreen() {
                 Já tem conta? <Text style={styles.linkBold}>Entrar</Text>
               </Text>
             </TouchableOpacity>
+            </>
+            )}
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -123,10 +160,17 @@ const styles = StyleSheet.create({
   roleLabelActive: { color: Colors.primary[700] },
   roleDesc: { fontSize: FontSizes.sm, color: Colors.neutral[500] },
   roleDescActive: { color: Colors.primary[500] },
-  errorMsg: {
-    backgroundColor: Colors.error[50], color: Colors.error[700],
-    borderRadius: BorderRadii.md, padding: Spacing.md, fontSize: FontSizes.sm, marginBottom: Spacing.sm,
+  errorBox: {
+    backgroundColor: Colors.error[50], borderRadius: BorderRadii.md,
+    padding: Spacing.md, marginBottom: Spacing.sm, gap: Spacing.sm,
   },
+  errorText: { color: Colors.error[700], fontSize: FontSizes.sm, lineHeight: 20 },
+  suggestionBtn: {
+    alignSelf: 'flex-start', backgroundColor: Colors.white, borderWidth: 1, borderColor: Colors.error[200],
+    borderRadius: BorderRadii.md, paddingHorizontal: Spacing.md, paddingVertical: Spacing.sm,
+  },
+  suggestionBtnText: { color: Colors.error[700], fontSize: FontSizes.sm, fontWeight: '700' },
+  suggestionHint: { color: Colors.error[600], fontSize: FontSizes.xs },
   link: { alignItems: 'center', paddingVertical: Spacing.md, marginTop: Spacing.sm },
   linkText: { fontSize: FontSizes.md, color: Colors.neutral[600] },
   linkBold: { color: Colors.primary[600], fontWeight: '700' },

@@ -22,6 +22,8 @@ import {
 } from '@/constants/theme';
 import { ArrowLeft } from 'lucide-react-native';
 import { getDashboardRoute } from '@/lib/role-routes';
+import { checkEmail } from '@/lib/emailCheck';
+import { ConfirmEmailNotice } from '@/components/ConfirmEmailNotice';
 
 type Role = 'student' | 'trainer';
 
@@ -34,6 +36,9 @@ export default function SignupScreen() {
   const [role, setRole] = useState<Role>('student');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [suggestion, setSuggestion] = useState<string | null>(null);
+  const [acceptedEmail, setAcceptedEmail] = useState<string | null>(null);
+  const [pendingEmail, setPendingEmail] = useState<string | null>(null);
 
   useEffect(() => {
     if (user && profile) {
@@ -54,11 +59,21 @@ export default function SignupScreen() {
       return;
     }
 
+    const cleanEmail = email.trim().toLowerCase();
+    const check = checkEmail(cleanEmail);
+    if (check.error && (!check.suggestion || acceptedEmail !== cleanEmail)) {
+      setError(check.error);
+      setSuggestion(check.suggestion);
+      if (check.suggestion) setAcceptedEmail(cleanEmail);
+      return;
+    }
+
     setError(null);
+    setSuggestion(null);
     setSubmitting(true);
 
-    const { error: err } = await signUp(
-      email.trim().toLowerCase(),
+    const { error: err, needsConfirmation } = await signUp(
+      cleanEmail,
       password,
       fullName.trim(),
       role
@@ -68,6 +83,8 @@ export default function SignupScreen() {
 
     if (err) {
       setError(err);
+    } else if (needsConfirmation) {
+      setPendingEmail(cleanEmail);
     } else if (role === 'trainer') {
       router.replace('/trainer/onboarding');
     } else {
@@ -111,6 +128,10 @@ export default function SignupScreen() {
 
           {/* CARD */}
           <View style={styles.card}>
+            {pendingEmail ? (
+              <ConfirmEmailNotice email={pendingEmail} onBack={() => router.replace('/login')} />
+            ) : (
+            <>
             <View style={styles.header}>
               <Text style={styles.title}>Criar conta</Text>
 
@@ -155,9 +176,21 @@ export default function SignupScreen() {
             </View>
 
             {error ? (
-              <Text style={styles.errorMsg}>
-                {error}
-              </Text>
+              <View style={styles.errorBox}>
+                <Text style={styles.errorText}>{error}</Text>
+                {suggestion ? (
+                  <View style={styles.suggestionRow}>
+                    <TouchableOpacity
+                      style={styles.suggestionBtn}
+                      onPress={() => { setEmail(suggestion); setError(null); setSuggestion(null); }}
+                      activeOpacity={0.8}
+                    >
+                      <Text style={styles.suggestionBtnText}>Corrigir para {suggestion}</Text>
+                    </TouchableOpacity>
+                    <Text style={styles.suggestionHint}>Se o seu e-mail estiver certo, toque em Criar conta de novo.</Text>
+                  </View>
+                ) : null}
+              </View>
             ) : null}
 
             {/* FORMULÁRIO */}
@@ -208,6 +241,8 @@ export default function SignupScreen() {
                 </Text>
               </Text>
             </TouchableOpacity>
+            </>
+            )}
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -351,13 +386,43 @@ const styles = StyleSheet.create({
 
   /* ERRO */
 
-  errorMsg: {
+  errorBox: {
     backgroundColor: Colors.error[50],
-    color: Colors.error[700],
     borderRadius: BorderRadii.md,
     padding: Spacing.md,
-    fontSize: FontSizes.sm,
     marginBottom: Spacing.md,
+    gap: Spacing.sm,
+  },
+
+  errorText: {
+    color: Colors.error[700],
+    fontSize: FontSizes.sm,
+    lineHeight: 20,
+  },
+
+  suggestionRow: {
+    gap: Spacing.xs,
+  },
+
+  suggestionBtn: {
+    alignSelf: 'flex-start',
+    backgroundColor: Colors.white,
+    borderWidth: 1,
+    borderColor: Colors.error[200],
+    borderRadius: BorderRadii.md,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+  },
+
+  suggestionBtnText: {
+    color: Colors.error[700],
+    fontSize: FontSizes.sm,
+    fontWeight: '700',
+  },
+
+  suggestionHint: {
+    color: Colors.error[600],
+    fontSize: FontSizes.xs,
   },
 
   /* FORMULÁRIO */

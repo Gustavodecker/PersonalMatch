@@ -16,8 +16,9 @@ type AuthContextType = {
   session: Session | null;
   profile: Profile | null;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<{ error: string | null }>;
-  signUp: (email: string, password: string, fullName: string, role: 'student' | 'trainer') => Promise<{ error: string | null }>;
+  signIn: (email: string, password: string) => Promise<{ error: string | null; emailNotConfirmed?: boolean }>;
+  signUp: (email: string, password: string, fullName: string, role: 'student' | 'trainer') => Promise<{ error: string | null; needsConfirmation?: boolean }>;
+  resendConfirmation: (email: string) => Promise<{ error: string | null }>;
   signInWithProvider: (provider: Provider) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
@@ -162,14 +163,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error?.code === 'email_not_confirmed') {
+      return { error: error.message, emailNotConfirmed: true };
+    }
     return { error: error?.message ?? null };
   };
 
+  const confirmationRedirect = () =>
+    Platform.OS === 'web'
+      ? `${window.location.origin}/login`
+      : makeRedirectUri({ scheme: 'personal99', path: 'auth/callback' });
+
+  const resendConfirmation = async (email: string) => {
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email,
+      options: { emailRedirectTo: confirmationRedirect() },
+    });
+    if (error) {
+      console.error('resend confirmation failed', error);
+      return { error: 'Não foi possível reenviar o e-mail agora. Aguarde um minuto e tente novamente.' };
+    }
+    return { error: null };
+  };
+
   const signUp = async (email: string, password: string, fullName: string, role: 'student' | 'trainer') => {
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { full_name: fullName, role } },
+      options: { data: { full_name: fullName, role }, emailRedirectTo: confirmationRedirect() },
     });
     if (error) {
       console.error('signUp failed', error);
@@ -178,7 +200,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           'Não foi possível criar a conta com esses dados. Verifique o e-mail e a senha e tente novamente.',
       };
     }
-    return { error: null };
+    return { error: null, needsConfirmation: !data.session };
   };
 
   const signInWithProvider = useCallback(async (provider: Provider) => {
@@ -273,7 +295,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, profile, loading, signIn, signUp, signInWithProvider, signOut, refreshProfile }}>
+    <AuthContext.Provider value={{ user, session, profile, loading, signIn, signUp, resendConfirmation, signInWithProvider, signOut, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   );

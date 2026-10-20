@@ -11,6 +11,7 @@ import { Input } from '@/components/Input';
 import { Button } from '@/components/Button';
 import { SocialLoginButtons } from '@/components/SocialLoginButtons';
 import { Colors, Spacing, FontSizes, BorderRadii } from '@/constants/theme';
+import { ConfirmEmailNotice } from '@/components/ConfirmEmailNotice';
 
 export default function LoginScreen() {
   const { signIn, user, profile } = useAuth();
@@ -19,14 +20,17 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [loading, setLoading]   = useState(false);
   const [error, setError]       = useState<string | null>(null);
+  const [unconfirmedEmail, setUnconfirmedEmail] = useState<string | null>(null);
 
   const handleLogin = async () => {
     if (!email || !password) { setError('Preencha e-mail e senha.'); return; }
     setError(null);
     setLoading(true);
-    const { error: err } = await signIn(email.trim().toLowerCase(), password);
+    const { error: err, emailNotConfirmed } = await signIn(email.trim().toLowerCase(), password);
     setLoading(false);
-    if (err) {
+    if (emailNotConfirmed) {
+      setUnconfirmedEmail(email.trim().toLowerCase());
+    } else if (err) {
       setError('E-mail ou senha incorretos.');
     } else if (params.redirect) {
       router.replace(params.redirect as any);
@@ -46,6 +50,14 @@ export default function LoginScreen() {
           </View>
 
           <View style={styles.card}>
+            {unconfirmedEmail ? (
+              <ConfirmEmailNotice
+                email={unconfirmedEmail}
+                onBack={() => setUnconfirmedEmail(null)}
+                backLabel="Já confirmei, entrar"
+              />
+            ) : (
+            <>
             <Text style={styles.title}>Entrar</Text>
 
             {error ? <Text style={styles.errorMsg}>{error}</Text> : null}
@@ -79,6 +91,8 @@ export default function LoginScreen() {
             <TouchableOpacity style={styles.homeLink} onPress={() => router.replace('/')}>
               <Text style={styles.homeLinkText}>Voltar ao início</Text>
             </TouchableOpacity>
+            </>
+            )}
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
